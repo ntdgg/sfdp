@@ -31,12 +31,12 @@
 				<div class="btn-group">
 					
 					{if condition='$k.status == 0'}
-					<span  onclick="layer_show('新增函数','{:url('functions',['id'=>$k.id])}','850','500')" class="btn  radius size-S">新增函数</span>
+					<span  onclick="layer_show('新增函数','{:url('functions',['id'=>$k.id])}','1150','500')" class="btn  radius size-S">新增函数</span>
 					{if condition='$k.ziduan == ""'}
-					<span  onclick="layer_show('表单设计','{:url('desc',['id'=>$k.id])}','950','500')" class="btn  radius size-S">表单设计</span>
+					<span  onclick="layer_show('表单设计','{:url('desc',['id'=>$k.id])}','1150','500')" class="btn  radius size-S">表单设计</span>
 					{/if}
-					<span class="btn  radius size-S" onclick="layer_show('修改','{:url('edit_desc',['id'=>$k.id])}','850','500')">设计修改</span>
-					<span class="btn  radius size-S" onclick="layer_show('预览','{:url('dsec_view',['id'=>$k.id])}','850','500')">设计预览</span>
+					<span class="btn  radius size-S" onclick="layer_show('修改','{:url('edit_desc',['id'=>$k.id])}','1150','500')">设计修改</span>
+					<span class="btn  radius size-S" onclick="layer_show('预览','{:url('dsec_view',['id'=>$k.id])}','1150','500')">设计预览</span>
 					<a class="btn  radius size-S" href="{:url('shengcheng',['id'=>$k.id])}">一键生成</a>
 					{else/}
 					已生成

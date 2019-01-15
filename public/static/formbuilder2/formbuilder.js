@@ -660,7 +660,7 @@
           checked: false
         }
       ];
-	  attrs.field_options.size = 'medium';
+	  attrs.field_options.size = 'small';
 	  attrs.lists = 'no';
 	  attrs.search = 'no';
 	  attrs.type  = 'checkbox';
@@ -677,7 +677,7 @@
     edit: "",
     addButton: "<span class=\"symbol\"><span class=\"fa fa-calendar\"></span></span> 日期",
 	defaultAttributes: function(attrs) {
-	  attrs.field_options.size = 'medium';
+	  attrs.field_options.size = 'small';
 	  attrs.lists = 'no';
 	  attrs.search = 'no';
 	  attrs.type  = 'date';
@@ -686,24 +686,6 @@
   });
 
 }).call(this);
-
-(function() {
-  Formbuilder.registerField('upload', {
-    order: 0,
-    view: "<img src='/static/formbuilder/upload.png' style='width:45px' ><input type='hidden' class='rf-size-<%= rf.get(Formbuilder.options.mappings.SIZE) %>' />",
-    edit: "<%= Formbuilder.templates['edit/size']() %>\n<%= Formbuilder.templates['edit/min_max_length']() %>",
-    addButton: "<span class='symbol'><span class='fa fa-upload'></span></span> 上传组件",
-    defaultAttributes: function(attrs) {
-      attrs.field_options.size = 'medium';
-	  attrs.lists = 'yes';
-	  attrs.search = 'yes';
-	  attrs.type  = 'upload';
-      return attrs;
-    }
-  });
-
-}).call(this);
-
 
 (function() {
   Formbuilder.registerField('dropdown', {
@@ -722,7 +704,7 @@
         }
       ];
       attrs.field_options.include_blank_option = false;
-      attrs.field_options.size = 'medium';
+      attrs.field_options.size = 'small';
 	  attrs.lists = 'yes';
 	  attrs.search = 'no';
 	  attrs.type  = 'select';
@@ -739,7 +721,7 @@
     edit: "",
     addButton: "<span class=\"symbol\"><span class=\"fa fa-envelope-o\"></span></span> 邮箱",
 	 defaultAttributes: function(attrs) {
-      attrs.field_options.size = 'medium';
+      attrs.field_options.size = 'small';
 	  attrs.lists = 'yes';
 	  attrs.search = 'no';
 	  attrs.type  = 'text';
@@ -749,9 +731,32 @@
 
 }).call(this);
 
+(function() {
+
+
+}).call(this);
+
+/* (function() {
+  Formbuilder.registerField('number', {
+    order: 30,
+    view: "<input type='text' />\n<% if (units = rf.get(Formbuilder.options.mappings.UNITS)) { %>\n  <%= units %>\n<% } %>",
+    edit: "<%= Formbuilder.templates['edit/min_max']() %>\n<%= Formbuilder.templates['edit/units']() %>\n<%= Formbuilder.templates['edit/integer_only']() %>",
+    addButton: "<span class=\"symbol\"><span class=\"fa fa-number\">123</span></span> 数字"
+  });
+
+}).call(this); */
 
 
 
+/* (function() {
+  Formbuilder.registerField('price', {
+    order: 45,
+    view: "<div class='input-line'>\n  <span class='above-line'>$</span>\n  <span class='dolars'>\n    <input type='text' />\n    <label>Dollars</label>\n  </span>\n  <span class='above-line'>.</span>\n  <span class='cents'>\n    <input type='text' />\n    <label>Cents</label>\n  </span>\n</div>",
+    edit: "",
+    addButton: "<span class=\"symbol\"><span class=\"fa fa-usd\"></span></span> 金额"
+  });
+
+}).call(this); */
 
 (function() {
   Formbuilder.registerField('radio', {
@@ -769,7 +774,7 @@
           checked: false
         }
       ];
-	  attrs.field_options.size = 'medium';
+	  attrs.field_options.size = 'small';
 	  attrs.lists = 'yes';
 	  attrs.search = 'no';
 	  attrs.type  = 'radio';
@@ -784,9 +789,9 @@
     order: 0,
     view: "<input type='text' class='rf-size-<%= rf.get(Formbuilder.options.mappings.SIZE) %>' />",
     edit: "<%= Formbuilder.templates['edit/size']() %>\n<%= Formbuilder.templates['edit/min_max_length']() %>",
-    addButton: "<span class='symbol'><span class='fa fa-font'></span></span> 文本控件",
+    addButton: "<span class='symbol'><span class='fa fa-font'></span></span> 文本框",
     defaultAttributes: function(attrs) {
-      attrs.field_options.size = 'medium';
+      attrs.field_options.size = 'small';
 	  attrs.lists = 'yes';
 	  attrs.search = 'yes';
 	  attrs.type  = 'text';
@@ -796,7 +801,25 @@
 
 }).call(this);
 
+/* (function() {
+  Formbuilder.registerField('time', {
+    order: 25,
+    view: "<div class='input-line'>\n  <span class='hours'>\n    <input type=\"text\" />\n    <label>HH</label>\n  </span>\n\n  <span class='above-line'>:</span>\n\n  <span class='minutes'>\n    <input type=\"text\" />\n    <label>MM</label>\n  </span>\n\n  <span class='above-line'>:</span>\n\n  <span class='seconds'>\n    <input type=\"text\" />\n    <label>SS</label>\n  </span>\n\n  <span class='am_pm'>\n    <select>\n      <option>AM</option>\n      <option>PM</option>\n    </select>\n  </span>\n</div>",
+    edit: "",
+    addButton: "<span class=\"symbol\"><span class=\"fa fa-clock-o\"></span></span> 时间框"
+  });
 
+}).call(this); */
+
+/* (function() {
+  Formbuilder.registerField('website', {
+    order: 35,
+    view: "<input type='text' placeholder='http://' />",
+    edit: "",
+    addButton: "<span class=\"symbol\"><span class=\"fa fa-link\"></span></span> 网址框"
+  });
+
+}).call(this); */
 
 this["Formbuilder"] = this["Formbuilder"] || {};
 this["Formbuilder"]["templates"] = this["Formbuilder"]["templates"] || {};
@@ -883,7 +906,7 @@ var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<input type=\'text\' data-rv-input=\'model.' +
 ((__t = ( Formbuilder.options.mappings.LABEL )) == null ? '' : __t) +
-'\' />\n字段：<input style="width: 80px" type=\'text\' data-rv-input=\'model.name\' />  类型： <select style="width:80px" class="select" data-rv-input=\'model.type\'> <option value="text">单行文本</option><option value="textarea">多行文本</option><option value="select">选择列</option><option value="radio">单选框</option><option value="checkbox">多选框</option> <option value="date">日期组件</option><option value="upload">上传组件</option></select><br/>查询：<select style="width: 80px" class="select" data-rv-input=\'model.search\'> <option value="yes">是</option><option value="no">否</option></select>列表：<select style="width: 80px" class="select" data-rv-input=\'model.lists\'> <option value="yes">是</option><option value="no">否</option></select><br/>\n尺寸：<select data-rv-value="model.field_options.size">\n  <option value="small">小(三个小尺寸组成一行)</option>\n  <option value="medium">中(一中一小组成一行)</option>\n  <option value="large">大(一大组成一行)</option>\n</select>\n';
+'\' />\n字段：<input style="width: 80px" type=\'text\' data-rv-input=\'model.name\' />  类型： <select style="width:80px" class="select" data-rv-input=\'model.type\'> <option value="text">text</option><option value="select">select</option><option value="radio">radio</option><option value="textarea">textarea</option><option value="checkbox">checkbox</option><option value="password">password</option> <option value="number">number</option><option value="date">date</option></select><br/>查询：<select style="width: 80px" class="select" data-rv-input=\'model.search\'> <option value="yes">是</option><option value="no">否</option></select>列表：<select style="width: 80px" class="select" data-rv-input=\'model.lists\'> <option value="yes">是</option><option value="no">否</option></select><br/>尺寸：<select data-rv-value="model.field_options.size">\n  <option value="small">小</option>\n  <option value="medium">中</option>\n  <option value="large">大</option>\n</select>\n';
 }
 return __p
 };
@@ -982,9 +1005,9 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
 __p +=
-((__t = ( Formbuilder.templates['partials/left_side']() )) == null ? '' : __t) +
+((__t = ( Formbuilder.templates['partials/save_button']() )) == null ? '' : __t) +
 '\n' +
-((__t = ( Formbuilder.templates['partials/center']() )) == null ? '' : __t) +
+((__t = ( Formbuilder.templates['partials/left_side']() )) == null ? '' : __t) +
 '\n' +
 ((__t = ( Formbuilder.templates['partials/right_side']() )) == null ? '' : __t) +
 '\n<div class=\'fb-clear\'></div>';
@@ -1039,18 +1062,11 @@ this["Formbuilder"]["templates"]["partials/left_side"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class=\'fb-left\'>\n  <ul class=\'fb-tabs\'>\n    <li class=\'active\'><a data-target=\'#addField\'>添加字段</a></li>\n    <li></li>\n</ul>\n\n  <div class=\'fb-tab-content\'>\n    ' +
+__p += '<div class=\'fb-left\'>\n  <ul class=\'fb-tabs\'>\n    <li class=\'active\'><a data-target=\'#addField\'>添加字段</a></li>\n    <li><a data-target=\'#editField\'>编辑字段 </a></li>\n</ul>\n\n  <div class=\'fb-tab-content\'>\n    ' +
 ((__t = ( Formbuilder.templates['partials/add_field']() )) == null ? '' : __t) +
+'\n    ' +
+((__t = ( Formbuilder.templates['partials/edit_field']() )) == null ? '' : __t) +
 '\n  </div>\n</div>';
-}
-return __p
-};
-
-this["Formbuilder"]["templates"]["partials/center"] = function(obj) {
-obj || (obj = {});
-var __t, __p = '', __e = _.escape;
-with (obj) {
-__p += '<div class=\'fb-center\'>\n  <div class=\'fb-no-response-fields\'>请开始设计表单吧~</div>\n  <div class=\'fb-response-fields\'></div>\n</div>';
 
 }
 return __p
@@ -1060,15 +1076,23 @@ this["Formbuilder"]["templates"]["partials/right_side"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class=\'fb-right\'><ul class=\'fb-tabs\'><li class=\'active\'>\n<a data-target=\'#editField\'>编辑字段 </a></li>\n</ul><div class=\'fb-tab-pane\' id=\'editField\'>\n  <div class=\'fb-edit-field-wrapper\'></div>\n<button class=\'js-save-form ' +
-((__t = ( Formbuilder.options.BUTTON_CLASS )) == null ? '' : __t) +
-'\'></button>\n<button id=\'up\' class=\'fb-button\'>上传</button>\n</div></div>\n</div>\n';
+__p += '<div class=\'fb-right\'>\n  <div class=\'fb-no-response-fields\'>No response fields</div>\n  <div class=\'fb-response-fields\'></div>\n</div>\n';
 
 }
 return __p
 };
 
+this["Formbuilder"]["templates"]["partials/save_button"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape;
+with (obj) {
+__p += '<div class=\'fb-save-wrapper\'>\n  <button class=\'js-save-form ' +
+((__t = ( Formbuilder.options.BUTTON_CLASS )) == null ? '' : __t) +
+'\'></button>\n<button id=\'up\' class=\'fb-button\'>上传</button>\n</div>';
 
+}
+return __p
+};
 
 this["Formbuilder"]["templates"]["view/base"] = function(obj) {
 obj || (obj = {});

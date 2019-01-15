@@ -1,5 +1,4 @@
 {include file='pub/base' /}
-  <link rel="stylesheet" href="__LIB__/multiple-select/multiple-select.css" />
 <article class="page-container">
 		{present name="info.id"}
 			<form action="{:url('edit')}" method="post" name="form" id="form">
@@ -11,9 +10,9 @@
 		<table class="table table-border table-bordered table-bg">
 			<tr>
 			<td style='width:75px'>菜单名称</td><td style='width:330px'>
-			<input type="text" class="input-text" value="{$info.title ?? ''}" name="title"  datatype="*" ></td>
+			<input type="text" class="input-text" value="{$info.title ?? ''}" name="title"  datatype="s4-8"   errormsg="4~8位中文！"></td>
 			<td style='width:75px'>数据表（table）</td><td>
-				<input type="text" class="input-text" value="{$info.name ?? ''}" name="name"  datatype="*" >
+				<input type="text" class="input-text" value="{$info.name ?? ''}" name="name"  datatype="s4-8"  errormsg="4~8位英文字母！" >
 			</td>
 			</tr>
 			<tr>
@@ -22,7 +21,6 @@
                     <select name="file" class="select">
                         <option value="all">默认生成文件（all）</option>
                         <option value="controller">控制器（controller）</option>
-						<!-- <option value="数据表（table）">数据表（table）</option> -->
                     </select>
                 </div>
 			</td>
@@ -59,10 +57,6 @@
 	</form>
 </article>
 
-
-<script type="text/javascript" src="__LIB__/ueditor/1.4.3/ueditor.config.js"></script> 
-<script type="text/javascript" src="__LIB__/ueditor/1.4.3/ueditor.all.min.js"> </script> 
-<script type="text/javascript" src="__LIB__/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
 <script type="text/javascript">
 $(function(){
 	$("[name='new_top'][value='{$info.new_top ?? ''}']").attr("checked",true);
@@ -74,14 +68,17 @@ $(function(){
 	});
 	
 	$("#form").Validform({
-            tiptype:2,
+            tiptype:function(msg,o,cssctl){
+					if (o.type == 3){
+						layer.msg(msg, {time: 800}); 
+					}
+				},
             ajaxPost:true,
             showAllError:true,
             callback:function(ret){
                 ajax_progress(ret);
             }
         });
-	var ue = UE.getEditor('editor');
 });
 </script>
 <!--/请在上方写此页面业务相关的脚本-->
