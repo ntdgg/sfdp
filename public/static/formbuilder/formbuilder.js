@@ -587,7 +587,8 @@
         MAX: 'field_options.max',
         MINLENGTH: 'field_options.minlength',
         MAXLENGTH: 'field_options.maxlength',
-        LENGTH_UNITS: 'field_options.min_max_length_units'
+        LENGTH_UNITS: 'field_options.min_max_length_units',
+		
       },
       dict: {
         ALL_CHANGES_SAVED: '已缓存',
@@ -643,159 +644,6 @@
   }
 
 }).call(this);
-
-(function() {
-  Formbuilder.registerField('checkboxes', {
-    order: 10,
-    view: "<% for (i in (rf.get(Formbuilder.options.mappings.OPTIONS) || [])) { %>\n  <div>\n    <label class='fb-option'>\n      <input type='checkbox' <%= rf.get(Formbuilder.options.mappings.OPTIONS)[i].checked && 'checked' %> onclick=\"javascript: return false;\" />\n      <%= rf.get(Formbuilder.options.mappings.OPTIONS)[i].label %>\n    </label>\n  </div>\n<% } %>\n\n",
-    edit: "<%= Formbuilder.templates['edit/options']({ includeOther: true }) %>",
-    addButton: "<span class=\"symbol\"><span class=\"fa fa-square-o\"></span></span> 多选框",
-    defaultAttributes: function(attrs) {
-      attrs.field_options.options = [
-        {
-          label: "",
-          checked: false
-        }, {
-          label: "",
-          checked: false
-        }
-      ];
-	  attrs.field_options.size = 'medium';
-	  attrs.lists = 'no';
-	  attrs.search = 'no';
-	  attrs.type  = 'checkbox';
-      return attrs;
-    }
-  });
-
-}).call(this);
-
-(function() {
-  Formbuilder.registerField('date', {
-    order: 20,
-    view: "<div class='input-line'>\n  <input type='date' />\n</div>",
-    edit: "",
-    addButton: "<span class=\"symbol\"><span class=\"fa fa-calendar\"></span></span> 日期",
-	defaultAttributes: function(attrs) {
-	  attrs.field_options.size = 'medium';
-	  attrs.lists = 'no';
-	  attrs.search = 'no';
-	  attrs.type  = 'date';
-      return attrs;
-    }
-  });
-
-}).call(this);
-
-(function() {
-  Formbuilder.registerField('upload', {
-    order: 0,
-    view: "<img src='/static/formbuilder/upload.png' style='width:45px' ><input type='hidden' class='rf-size-<%= rf.get(Formbuilder.options.mappings.SIZE) %>' />",
-    edit: "<%= Formbuilder.templates['edit/size']() %>\n<%= Formbuilder.templates['edit/min_max_length']() %>",
-    addButton: "<span class='symbol'><span class='fa fa-upload'></span></span> 上传组件",
-    defaultAttributes: function(attrs) {
-      attrs.field_options.size = 'medium';
-	  attrs.lists = 'yes';
-	  attrs.search = 'yes';
-	  attrs.type  = 'upload';
-      return attrs;
-    }
-  });
-
-}).call(this);
-
-
-(function() {
-  Formbuilder.registerField('dropdown', {
-    order: 24,
-    view: "<select>\n  <% if (rf.get(Formbuilder.options.mappings.INCLUDE_BLANK)) { %>\n    <option value=''></option>\n  <% } %>\n\n  <% for (i in (rf.get(Formbuilder.options.mappings.OPTIONS) || [])) { %>\n    <option <%= rf.get(Formbuilder.options.mappings.OPTIONS)[i].checked && 'selected' %>>\n      <%= rf.get(Formbuilder.options.mappings.OPTIONS)[i].label %>\n    </option>\n  <% } %>\n</select>",
-    edit: "<%= Formbuilder.templates['edit/options']() %>",
-    addButton: "<span class=\"symbol\"><span class=\"fa fa-caret-down\"></span></span> 下拉",
-    defaultAttributes: function(attrs) {
-      attrs.field_options.options = [
-        {
-          label: "",
-          checked: false
-        }, {
-          label: "",
-          checked: false
-        }
-      ];
-      attrs.field_options.include_blank_option = false;
-      attrs.field_options.size = 'medium';
-	  attrs.lists = 'yes';
-	  attrs.search = 'no';
-	  attrs.type  = 'select';
-      return attrs;
-    }
-  });
-
-}).call(this);
-
-(function() {
-  Formbuilder.registerField('email', {
-    order: 40,
-    view: "<input type='text' class='rf-size-<%= rf.get(Formbuilder.options.mappings.SIZE) %>' />",
-    edit: "",
-    addButton: "<span class=\"symbol\"><span class=\"fa fa-envelope-o\"></span></span> 邮箱",
-	 defaultAttributes: function(attrs) {
-      attrs.field_options.size = 'medium';
-	  attrs.lists = 'yes';
-	  attrs.search = 'no';
-	  attrs.type  = 'text';
-      return attrs;
-    }
-  });
-
-}).call(this);
-
-
-
-
-
-(function() {
-  Formbuilder.registerField('radio', {
-    order: 15,
-    view: "<% for (i in (rf.get(Formbuilder.options.mappings.OPTIONS) || [])) { %>\n  <div>\n    <label class='fb-option'>\n      <input type='radio' <%= rf.get(Formbuilder.options.mappings.OPTIONS)[i].checked && 'checked' %> onclick=\"javascript: return false;\" />\n      <%= rf.get(Formbuilder.options.mappings.OPTIONS)[i].label %>\n    </label>\n  </div>\n<% } %>\n\n<% if (rf.get(Formbuilder.options.mappings.INCLUDE_OTHER)) { %>\n  <div class='other-option'>\n    <label class='fb-option'>\n      <input type='radio' />\n      Other\n    </label>\n\n    <input type='text' />\n  </div>\n<% } %>",
-    edit: "<%= Formbuilder.templates['edit/options']() %>",
-    addButton: "<span class=\"symbol\"><span class=\"fa fa-circle-o\"></span></span> 单选框 ",
-    defaultAttributes: function(attrs) {
-      attrs.field_options.options = [
-        {
-          label: "",
-          checked: false
-        }, {
-          label: "",
-          checked: false
-        }
-      ];
-	  attrs.field_options.size = 'medium';
-	  attrs.lists = 'yes';
-	  attrs.search = 'no';
-	  attrs.type  = 'radio';
-      return attrs;
-    }
-  });
-
-}).call(this);
-
-(function() {
-  Formbuilder.registerField('text', {
-    order: 0,
-    view: "<input type='text' class='rf-size-<%= rf.get(Formbuilder.options.mappings.SIZE) %>' />",
-    edit: "<%= Formbuilder.templates['edit/size']() %>\n<%= Formbuilder.templates['edit/min_max_length']() %>",
-    addButton: "<span class='symbol'><span class='fa fa-font'></span></span> 文本控件",
-    defaultAttributes: function(attrs) {
-      attrs.field_options.size = 'medium';
-	  attrs.lists = 'yes';
-	  attrs.search = 'yes';
-	  attrs.type  = 'text';
-      return attrs;
-    }
-  });
-
-}).call(this);
-
 
 
 this["Formbuilder"] = this["Formbuilder"] || {};
@@ -883,7 +731,7 @@ var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<input type=\'text\' data-rv-input=\'model.' +
 ((__t = ( Formbuilder.options.mappings.LABEL )) == null ? '' : __t) +
-'\' />\n字段：<input style="width: 80px" type=\'text\' data-rv-input=\'model.name\' />  类型： <select style="width:80px" class="select" data-rv-input=\'model.type\'> <option value="text">单行文本</option><option value="textarea">多行文本</option><option value="select">选择列</option><option value="radio">单选框</option><option value="checkbox">多选框</option> <option value="date">日期组件</option><option value="upload">上传组件</option></select><br/>查询：<select style="width: 80px" class="select" data-rv-input=\'model.search\'> <option value="yes">是</option><option value="no">否</option></select>列表：<select style="width: 80px" class="select" data-rv-input=\'model.lists\'> <option value="yes">是</option><option value="no">否</option></select><br/>\n尺寸：<select data-rv-value="model.field_options.size">\n  <option value="small">小(三个小尺寸组成一行)</option>\n  <option value="medium">中(一中一小组成一行)</option>\n  <option value="large">大(一大组成一行)</option>\n</select>\n';
+'\' />\n字段：<input style="width: 80px" type=\'text\' data-rv-input=\'model.name\' />  类型： <select style="width:80px" class="select" data-rv-input=\'model.type\'> <option value="text">单行文本</option><option value="textarea">多行文本</option><option value="select">选择列</option><option value="radio">单选框</option><option value="checkbox">多选框</option> <option value="date">日期组件</option><option value="upload">上传组件</option></select><br/>查询：<select style="width: 80px" class="select" data-rv-input=\'model.search\'> <option value="yes">是</option><option value="no">否</option></select>列表：<select style="width: 80px" class="select" data-rv-input=\'model.lists\'> <option value="yes">是</option><option value="no">否</option></select><br/>\n尺寸：<select data-rv-value="model.field_options.size">\n  <option value="small">小(三个小尺寸组成一行)</option>\n  <option value="medium">中(一中一小组成一行)</option>\n  <option value="large">大(一大组成一行)</option>\n</select><br/>\n函数：<select data-rv-value="model.fun">\n  <option value="yes">是</option>\n<option value="no">否</option>\n</select>\n';
 }
 return __p
 };

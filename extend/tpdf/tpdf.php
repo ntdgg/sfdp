@@ -15,6 +15,7 @@ define ( 'Tp_DF', realpath ( dirname ( __FILE__ ) ) );
 
 require_once Tp_DF . '/class/build.php';
 require_once Tp_DF . '/config/config.php';
+require_once Tp_DF . '/db/FbDb.php';
 
 
 class tpdf
@@ -34,6 +35,29 @@ class tpdf
         'flow', 'flow_process','form','form_function','menu','news','news_type','role','role_user','run','run_cache','run_log','run_process','run_sign','user'
     ];
 
+	/*
+	 * API处理接口 API
+	 * 
+	 **/
+		
+	function FbApi($Type,$fid='',$data='demo')
+	{
+		if ($Type == "List") {
+				$info = FbDb::Lists($flow_id); 
+			} else if ($Type == "Desc") {
+				$info = FbDb::Fbdesc($fid);
+			} else if ($Type == "Edit") { 
+				$info = FbDb::Fbedit($fid);
+			} else if ($Type == "Save")  { 
+				$info = FbDb::Fbsave($data); 
+			} else if ($Type == "Bview")  { 
+				$info = FbDb::FBview($fid,$data); //保存设计样式
+			} else{
+				throw new \Exception ( "参数出错！" );
+			}
+		return $info;
+	}
+
     public function make($data, $option = 'all')
     {
 		$this->data = $data;
@@ -41,6 +65,7 @@ class tpdf
         $this->name = ucfirst($data['controller']);
         $this->nameLower = Loader::parseName($this->name);
 		define('APP_PATH',\Env::get('app_path') );
+		define('ROOT_PATH',\Env::get('root_path') );
 		define('DS',DIRECTORY_SEPARATOR);
 		if (!self::checkPath(APP_PATH . $data['module'])) {
             throw new Exception("目录没有权限不可写!", 403);
@@ -63,7 +88,7 @@ class tpdf
         }
 		$this->buildDir();//创建目录
 		$pathView = APP_PATH . $this->module . DS . "view" . DS . $this->dir . $this->nameLower . DS;
-        $pathTemplate = APP_PATH . 'index' . DS . "view" . DS . "formdesign" . DS . "template" . DS ;
+        $pathTemplate = ROOT_PATH . 'extend' . DS . "tpdf" . DS . "template" . DS ;
         $fileName = APP_PATH . "%MODULE%" . DS . "%NAME%" . DS . $this->dir . $this->name . ".php";
         $code = $this->parseCode();
 		if($option=='all'){

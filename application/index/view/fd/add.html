@@ -10,9 +10,9 @@
 		<table class="table table-border table-bordered table-bg">
 			<tr>
 			<td style='width:75px'>菜单名称</td><td style='width:330px'>
-			<input type="text" class="input-text" value="{$info.title ?? ''}" name="title"  datatype="s4-8"   errormsg="4~8位中文！"></td>
-			<td style='width:75px'>数据表（table）</td><td>
-				<input type="text" class="input-text" value="{$info.name ?? ''}" name="name"  datatype="s4-8"  errormsg="4~8位英文字母！" >
+			<input type="text" class="input-text" value="{$info.title ?? ''}" placeholder='菜单名称' name="title"  datatype="s4-8"   errormsg="4~8位中文！"></td>
+			<td style='width:75px'>数据表</td><td>
+				<input type="text" class="input-text" value="{$info.name ?? ''}" placeholder='只能填写小写英文' name="name"  datatype="s4-8"  errormsg="4~8位英文字母！" >
 			</td>
 			</tr>
 			<tr>
@@ -20,6 +20,7 @@
 			 <div class="select-box" style="width: 260px">
                     <select name="file" class="select">
                         <option value="all">默认生成文件（all）</option>
+						<option value="controller">数据库（database）</option>
                         <option value="controller">控制器（controller）</option>
                     </select>
                 </div>
@@ -34,25 +35,29 @@
 			</td>
 			</tr>
 			<tr>
-			<td style='width:75px'>挂带审批：</td><td style='width:330px'>
+			<td style='width:75px'>挂带审批：</td><td style='width:330px' colspan='3'>
 			 <div class="select-box" style="width: 260px">
                     <select name="flow" class="select">
                         <option value="0">挂带审批流</option>
                         <option value="1">无需审批流</option>
                     </select>
                 </div>
+				<span>Tip：系统会自动挂带工作流审批系统</span>
 			</td>
-			<td style='width:75px'></td><td>
+			
+			</tr>
+			<tr>
+			<td colspan='4' style='text-align:center'>
 				
-			</td>
+					<button  class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+					<button  class="btn btn-default radius" type="button" onclick="layer_close()">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+				
+			<td>
 			</tr>
 		</table>
 		
 		<div class="row cl">
-			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-				<button  class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
-				<button  class="btn btn-default radius" type="button" onclick="layer_close()">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
-			</div>
+			
 		</div>
 	</form>
 </article>
