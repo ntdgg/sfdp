@@ -57,13 +57,13 @@ class FbDb{
 		$field = [];
 		$form = [];
 		foreach($ziduan['fields'] as $k=>$v){
-			$field[$k]['name'] = $type;
+			$field[$k]['name'] = $v['name'];
 			$field[$k]['type'] = 'text';
 			$field[$k]['extra'] = '';
 			$field[$k]['comment'] = $v['label'];
 			$field[$k]['default'] = '';
 			$form[$k]['title'] =  $v['label'];
-			$form[$k]['name'] =  'demo';
+			$form[$k]['name'] =  $type;
 			$form[$k]['type'] =  $v['field_type'];
 			$form[$k]['option'] =  $v['field_options'];
 			$form[$k]['default'] = '';

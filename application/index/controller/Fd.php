@@ -84,7 +84,7 @@ class Fd extends Admin
     {
         if ($this->request->isPost()) {
 		$data = input('post.');
-		$ret=controller('Base', 'event')->commonadd('form',$data);
+		$ret=controller('Base', 'event')->commonadd('fd',$data);
 	    if($ret['code']==0){
 			return msg_return('发布成功！');
 			}else{

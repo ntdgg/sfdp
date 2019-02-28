@@ -5,6 +5,8 @@ TpFD基于thinkphp5+以上开发，可视化拖拽生成组件，插件等等
 
 **TpFD 是一种轻量级的「表单生成组件」**
 
+**TpFD 2.0**
+
 
 ![markdown](http://www.cojz8.com/Upload/image/ueditor/20181215/1544837133871623.png "Tpflow")
 

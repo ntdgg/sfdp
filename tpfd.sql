@@ -3,8 +3,8 @@
 -- ----------------------------
 -- Table structure for `wf_form`
 -- ----------------------------
-DROP TABLE IF EXISTS `wf_form`;
-CREATE TABLE `wf_form` (
+DROP TABLE IF EXISTS `wf_fb`;
+CREATE TABLE `wf_fb` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL COMMENT '表单名称',
   `name` varchar(255) DEFAULT NULL COMMENT '表名',
@@ -25,12 +25,13 @@ CREATE TABLE `wf_form` (
 -- ----------------------------
 -- Table structure for `wf_form_function`
 -- ----------------------------
-DROP TABLE IF EXISTS `wf_form_function`;
-CREATE TABLE `wf_form_function` (
+DROP TABLE IF EXISTS `wf_fb_fun`;
+CREATE TABLE `wf_fb_fun` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `fid` int(11) DEFAULT NULL,
   `sql` longtext,
   `name` varchar(255) DEFAULT NULL,
+  `zdname` varchar(255) DEFAULT NULL,
   `uid` int(11) DEFAULT NULL,
   `add_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)

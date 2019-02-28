@@ -16,6 +16,9 @@ define ( 'Tp_DF', realpath ( dirname ( __FILE__ ) ) );
 require_once Tp_DF . '/class/build.php';
 require_once Tp_DF . '/config/config.php';
 require_once Tp_DF . '/db/FbDb.php';
+require_once Tp_DF . '/class/BuildView.php';
+require_once Tp_DF . '/class/BuildTable.php';
+require_once Tp_DF . '/class/BuildController.php';
 
 
 class tpdf
@@ -23,7 +26,6 @@ class tpdf
     private $module;
     private $name;
     private $dir;
-    private $namespaceSuffix;
     private $nameLower;
     private $data;
     // 控制器黑名单
@@ -51,7 +53,7 @@ class tpdf
 			} else if ($Type == "Save")  { 
 				$info = FbDb::Fbsave($data); 
 			} else if ($Type == "Bview")  { 
-				$info = FbDb::FBview($fid,$data); //保存设计样式
+				$info = FbDb::FBview($fid,$data);
 			} else{
 				throw new \Exception ( "参数出错！" );
 			}
@@ -91,184 +93,20 @@ class tpdf
         $pathTemplate = ROOT_PATH . 'extend' . DS . "tpdf" . DS . "template" . DS ;
         $fileName = APP_PATH . "%MODULE%" . DS . "%NAME%" . DS . $this->dir . $this->name . ".php";
         $code = $this->parseCode();
-		if($option=='all'){
-			 $this->makeAll($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
-		}
-		if($option=='demo'){
-			 $this->buildView($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
-		}
-       
-    }
-	private function makeAll($pathView, $pathTemplate, $fileName, $tableName, $code, $data)
-	{
-		$this->buildController($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
-		$this->buildIndex($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
-		$this->buildEdit($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
-		$this->buildTable($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
-	}
-	/**
-     * 创建控制器文件
-     */
-    private function buildController($path, $pathTemplate, $fileName, $tableName, $code, $data)
-    {
-        $template = file_get_contents($pathTemplate . "Controller.tpl");
-        $file = str_replace(
-            ['%MODULE%', '%NAME%'],
-            [$this->module, 'controller'],
-            $fileName
-        );
-        return file_put_contents($file, str_replace(
-                ["[MODULE]", "[TITLE]", "[NAME]", "[FILTER]", "[NAMESPACE]"],
-                [$this->module, $this->data['title'], $this->name, $code['filter'], $this->namespaceSuffix],
-                $template
-            )
-        );
-    }
-	 /**
-     * 创建 index.html 文件
-     */
-    private function buildIndex($path, $pathTemplate, $fileName, $tableName, $code, $data)
-    {
-        $script = '';
-        if ($code['search_selected']) {
-            $script = '{block name="script"}' . implode("", $code['script_search']) . "\n"
-                . '<script>' . "\n"
-                . tab(1) . '$(function () {' . "\n"
-                . $code['search_selected']
-                . tab(1) . '})' . "\n"
-                . '</script>' . "\n"
-                . '{/block}' . "\n";
-        }
-        // 菜单全选的默认直接继承模板
-        $menuArr = isset($this->data['menu']) ? $this->data['menu'] : [];
-        $menu = '';
-        if ($menuArr) {
-            $menu = '{tp:menu menu="' . implode(",", $menuArr) . '" /}';
-        }
-        $tdMenu = '';
-        $template = file_get_contents($pathTemplate . "index.tpl");
-        $file = $path . "index.html";
-        if ($this->module == Request::module()) {
-            $module = '';
-        } else {
-            $module = Request::module() . '@';
-        }
-		if ($data['flow'] == 0) {
-            $flow = "{:action('flow/btn',['wf_fid'=>\$vo.id,'wf_type'=>'".$data['table']."','status'=>\$vo.status])}";
-        } else {
-            $flow= '';
-        }
-		$form = implode("\n" . tab(1), $code['search']);
-        $th = implode("\n" . tab(3), $code['th']);
-        $td = implode("\n" . tab(3), $code['td']);
-        $tdMenu .= tab(4) . '{tp:menu menu=\'sdeleteforever\' /}';
-        return file_put_contents($file, str_replace(
-                ["[MODULE]", "[FORM]", "[MENU]", "[TH]", "[TD]", "[TD_MENU]", "[SCRIPT]","[FLOW]"],
-                [$module, $form, $menu, $th, $td, $tdMenu, $script,$flow],
-                $template
-            )
-        );
-    }
-	/**
-     * 创建 edit.html 文件
-     */
-    private function buildView($path, $pathTemplate, $fileName, $tableName, $code, $data)
-    {
-        $template = file_get_contents($pathTemplate . "view.tpl");
-        $file = $path . "view.html";
-        if ($this->module == Request::module() || !$this->module) {
-            $module = '';
-        } else {
-            $module = Request::module() . '@';
-        }
-        return file_put_contents($file, str_replace(
-            ["[MODULE]", "[ROWS]", "[SET_VALUE]", "[SCRIPT]"],
-            [$module, $code['edit'], implode("\n", array_merge($code['set_checked'], $code['set_selected'])), implode("", $code['script_edit'])],
-            $template));
-    }
-	/**
-     * 创建 edit.html 文件
-     */
-    private function buildEdit($path, $pathTemplate, $fileName, $tableName, $code, $data)
-    {
-        $template = file_get_contents($pathTemplate . "edit.tpl");
-        $file = $path . "edit.html";
-        if ($this->module == Request::module() || !$this->module) {
-            $module = '';
-        } else {
-            $module = Request::module() . '@';
-        }
-        return file_put_contents($file, str_replace(
-            ["[MODULE]", "[ROWS]", "[SET_VALUE]", "[SCRIPT]"],
-            [$module, $code['edit'], implode("\n", array_merge($code['set_checked'], $code['set_selected'])), implode("", $code['script_edit'])],
-            $template));
-    }
-	/**
-     * 创建数据表
-     */
-    private function buildTable($path, $pathTemplate, $fileName, $tableName, $code, $data)
-    {
-        $tableName = isset($this->data['table_name']) && $this->data['table_name'] ?
-            $this->data['table_name'] : Config::get("database.prefix") . $tableName;
-        $tableExist = false;// 判断表是否存在
-        $ret = Db::query("SHOW TABLES LIKE '{$tableName}'");
-        if ($ret && isset($ret[0])) {
-            //不是强制建表但表存在时直接return
-            if (!isset($this->data['create_table_force']) || !$this->data['create_table_force']) {
-                return true;
-            }
-            Db::execute("RENAME TABLE {$tableName} to {$tableName}_build_bak");
-            $tableExist = true;
-        }
-        $auto_create_field = ['id', 'status', 'isdelete', 'create_time', 'update_time'];
-        // 强制建表和不存在原表执行建表操作
-        $fieldAttr = [];
-        $key = [];
-        if (in_array('id', $auto_create_field)) {
-            $fieldAttr[] = tab(1) . "`id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '{$this->data['title']}主键'";
-        }
-        foreach ($this->data['field'] as $field) {
-            if (!in_array($field['name'], $auto_create_field)) {
-                // 字段属性
-                $fieldAttr[] = tab(1) . "`{$field['name']}` {$field['type']}"
-                    . ($field['extra'] ? ' ' . $field['extra'] : '')
-                    . (isset($field['not_null']) && $field['not_null'] ? ' NOT NULL' : '')
-                    . (strtolower($field['default']) == null ? '' : " DEFAULT '{$field['default']}'")
-                    . ($field['comment'] === '' ? '' : " COMMENT '{$field['comment']}'");
-            }
-            // 索引
-            if (isset($field['key']) && $field['key'] && $field['name'] != 'id') {
-                $key[] = tab(1) . "KEY `{$field['name']}` (`{$field['name']}`)";
-            }
-        }
 		
-        // 默认自动创建主键为id
-        $fieldAttr[] = tab(1) . "PRIMARY KEY (`id`)";
-		$fieldAttr[] = tab(1) . "`uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id'";
-		$fieldAttr[] = tab(1) . "`status` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '审核状态'";
-		$fieldAttr[] = tab(1) . "`add_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '新增时间'";
-        // 会删除之前的表，会清空数据，重新创建表，谨慎操作
+		//生成数据库
+		//$bulid = new BuildTable();
+		//$bulid->Btable($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
 		
-        $sql_drop = "DROP TABLE IF EXISTS `{$tableName}`";
-        // 默认字符编码为utf8，表引擎默认InnoDB，其他都是默认
-        $sql_create = "CREATE TABLE `{$tableName}` (\n"
-            . implode(",\n", array_merge($fieldAttr, $key))
-            . "\n)ENGINE=" . (isset($this->data['table_engine']) ? $this->data['table_engine'] : 'InnoDB')
-            . " DEFAULT CHARSET=utf8 COMMENT '{$this->data['title']}'";
-        // execute和query方法都不支持传入分号 (;)，不支持一次执行多条 SQL
-        try {
-            Db::execute($sql_drop);
-            Db::execute($sql_create);
-            Db::execute("DROP TABLE IF EXISTS `{$tableName}_build_bak`");
-        } catch (\Exception $e) {
-            // 模拟事务操作，滚回原表
-            if ($tableExist) {
-                Db::execute("RENAME TABLE {$tableName}_build_bak to {$tableName}");
-            }
-            throw new Exception($e->getMessage());
-        }
+		//生成控制器
+		//$bulid = new BuildController();
+		//$bulid->Bc($pathView, $pathTemplate, $fileName, $code, $data);
+		
+		//生成视图
+		//$bulid = new BuildView();
+		//$bulid->Bview($pathView, $pathTemplate, $fileName, $code, $data);
+		exit;
     }
-	
 	/**
 	 * 目录可写检测
 	 *
@@ -287,7 +125,7 @@ class tpdf
         }
 	} 
 	/**
-	 * 目录可写检测
+	 * 生成目录
 	 *
 	 **/
 	private function buildDir(){
@@ -302,7 +140,7 @@ class tpdf
             }
         }
 	}
-	 private function parseCode()
+	private function parseCode()
     {
         $sortable = false; // 生成 form.html 文件的代码
         $search = ['<form class="mb-20" method="get" action="{:url($Request.action)}">'];// 生成 th.html 文件的代码
@@ -335,8 +173,6 @@ class tpdf
 					$td[] = '<td>{$vo.' . $form['name'] ."}</td>";
 					$th[] = '<th>' . $form['title'] ."</th>";
 				}
-				
-				
 				/*生成 Edit.html 开始*/
 				if($ii == 0){
 					$editField .= "\n" . tab(3).'<tr>';
@@ -369,7 +205,6 @@ class tpdf
             $search[] = tab(1) . '<button type="submit" class="btn btn-success"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>';
             $search[] = '</form>';
 			} else {
-				// 不设置将form.html置空
 				$search = [];
 		}
         $scriptSearch = [];

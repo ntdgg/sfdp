@@ -40,7 +40,28 @@ class Build{
 					}
 				$editField .= '</select></td>';
 				break;
-			case "textarea":
+				
+			case "upload":
+				$editField .= '<td width="10%">'.$form['title'].'</td>'."\n" . tab(3).'<td width="23%" '.$colspan.'><input type="text" class="dfinput" id="'.$form['name'].'" value="{$vo.' . $form['name'] . '}" name="'.$form['name'].'" datatype="*"><a class="btn btn-primary radius" id=\'bupload\' onclick=layer_show("上传","/index.php/admin/Fromdesc/upload?id='.$form['name'].'","140","160")>附件</a> </td>';
+				break;
+			case "Ue":
+				$editField .= '<td width="10%">'.$form['title'].'</td>'."\n" . tab(3).'<td width="23%" '.$colspan.'><script id="container" name="content" type="text/plain">{$vo.' . $form['name'] . '}</script></td>';
+				$script_edit .= "\n var finish = UE.getEditor('container', {
+                toolbars: [[
+                    'undo', //撤销
+                    'redo', //重做
+                    '|',
+                    'bold', //加粗
+                    'italic', //斜体
+                    'underline', //下划线
+                    'strikethrough', //删除线 
+                ]],
+                allHtmlEnabled:true,
+                initialFrameWidth: 600,
+                initialFrameHeight: 200,
+                elementPathEnabled:false,   // 是否启用元素路径，默认是显示
+            });\n";
+			break;
 				
 			case "date":
 				$editField .= '<td>'.$form['title'].'</td>'."\n" . tab(3).'<td '.$colspan.'><input type="text" class="input-text date" value="{$info.' . $form['name'] . ' ?? \'\'}" name="'.$form['name'].'" datatype="*"></td>';
