@@ -1,7 +1,12 @@
 {include file='pub/base' /}
 <div class="page-container">
-    <form class="form form-horizontal" id="form" method="post" action="">
-        <input type="hidden" name="id" value="{$vo.id ?? ''}">
+		{present name="vo.id"}
+			<form action="{:url('edit')}" method="post" name="form" id="form">
+			<input type="hidden" name="id" value="{$vo.id}">
+			<input type="hidden" name="status" value="0">
+		{else /}
+			<form action="{:url('add')}" method="post" name="form" id="form">
+		{/present}
 		<table class="table table-border table-bordered table-bg">
             <tr>
             <td width="10%">新闻 type获取</td>

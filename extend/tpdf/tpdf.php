@@ -12,6 +12,9 @@ use think\Loader;
 use think\facade\Request;
 
 define ( 'Tp_DF', realpath ( dirname ( __FILE__ ) ) );
+define('APP_PATH',\Env::get('app_path') );
+define('ROOT_PATH',\Env::get('root_path') );
+define('DS',DIRECTORY_SEPARATOR);
 
 require_once Tp_DF . '/class/build.php';
 require_once Tp_DF . '/config/config.php';
@@ -60,15 +63,13 @@ class tpdf
 		return $info;
 	}
 
-    public function make($data, $option = 'all')
+    public function make($data)
     {
 		$this->data = $data;
         $this->module = $data['module'];
         $this->name = ucfirst($data['controller']);
         $this->nameLower = Loader::parseName($this->name);
-		define('APP_PATH',\Env::get('app_path') );
-		define('ROOT_PATH',\Env::get('root_path') );
-		define('DS',DIRECTORY_SEPARATOR);
+	
 		if (!self::checkPath(APP_PATH . $data['module'])) {
             throw new Exception("目录没有权限不可写!", 403);
 		}
@@ -94,18 +95,30 @@ class tpdf
         $fileName = APP_PATH . "%MODULE%" . DS . "%NAME%" . DS . $this->dir . $this->name . ".php";
         $code = $this->parseCode();
 		
-		//生成数据库
-		//$bulid = new BuildTable();
-		//$bulid->Btable($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
-		
-		//生成控制器
-		//$bulid = new BuildController();
-		//$bulid->Bc($pathView, $pathTemplate, $fileName, $code, $data);
-		
-		//生成视图
-		//$bulid = new BuildView();
-		//$bulid->Bview($pathView, $pathTemplate, $fileName, $code, $data);
-		exit;
+		if($data['controller'] != 'demo'){
+			if($data['file']=='all'){
+				//生成数据库
+				$bulid = new BuildTable();
+				$bulid->Btable($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
+				//生成控制器
+				$bulid = new BuildController();
+				$bulid->Bc($pathView, $pathTemplate, $fileName, $code, $data);
+				//生成视图
+				$bulid = new BuildView();
+				$bulid->Bview($pathView, $pathTemplate, $fileName, $code, $data);
+			}
+			if($data['file']=='database'){
+				$bulid = new BuildTable();
+				$bulid->Btable($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
+			}
+			if($data['file']=='controller'){
+				$bulid = new BuildController();
+				$bulid->Bc($pathView, $pathTemplate, $fileName, $code, $data);
+			}
+		}else{
+			$bulid = new BuildView();
+			$bulid->Bview($pathView, $pathTemplate, $fileName, $code, $data);
+		}
     }
 	/**
 	 * 目录可写检测
@@ -179,6 +192,7 @@ class tpdf
 				}
 				$bulid = new build();
 				$input = $bulid->convertInput($form);
+				
 				$editField .= "\n" . tab(3).$input['Field'];
 				$ii =$ii + $input['num'];
 				if($ii == 3){

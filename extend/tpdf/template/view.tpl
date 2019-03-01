@@ -1,5 +1,4 @@
 {include file='pub/base' /}
-{block name="content"}
 <div class="page-container">
     <form class="form form-horizontal" id="form" method="post" action="">
         <input type="hidden" name="id" value="{$vo.id ?? ''}">
@@ -12,8 +11,6 @@
         </div>
     </form>
 </div>
-{/block}
-{block name="script"}
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script>
     $(function () {
@@ -37,4 +34,3 @@
     })
 [SCRIPT]
 </script>
-{/block}

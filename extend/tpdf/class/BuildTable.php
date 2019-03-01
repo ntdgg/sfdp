@@ -24,10 +24,6 @@ class BuildTable{
         $tableExist = false;// 判断表是否存在
         $ret = Db::query("SHOW TABLES LIKE '{$tableName}'");
         if ($ret && isset($ret[0])) {
-            //不是强制建表但表存在时直接return
-            if (!isset($data['create_table_force']) || !$data['create_table_force']) {
-                return true;
-            }
             Db::execute("RENAME TABLE {$tableName} to {$tableName}_build_bak");
             $tableExist = true;
         }
@@ -52,14 +48,12 @@ class BuildTable{
                 $key[] = tab(1) . "KEY `{$field['name']}` (`{$field['name']}`)";
             }
         }
-		
         // 默认自动创建主键为id
         $fieldAttr[] = tab(1) . "PRIMARY KEY (`id`)";
 		$fieldAttr[] = tab(1) . "`uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户id'";
 		$fieldAttr[] = tab(1) . "`status` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '审核状态'";
 		$fieldAttr[] = tab(1) . "`add_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '新增时间'";
 		$fieldAttr[] = tab(1) . "`uptime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间'";
-		
         $sql_drop = "DROP TABLE IF EXISTS `{$tableName}`";
         // 默认字符编码为utf8，表引擎默认InnoDB，其他都是默认
         $sql_create = "CREATE TABLE `{$tableName}` (\n"

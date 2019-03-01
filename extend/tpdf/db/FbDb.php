@@ -56,14 +56,25 @@ class FbDb{
 		$ziduan = json_decode($info['ziduan'],true);
 		$field = [];
 		$form = [];
+		if(count($ziduan['fields'])==0){
+			 echo '您还没设计呀~';
+			 exit;
+		}
+		if($type=='Act'){
+			$type = $info['name'];
+		}
 		foreach($ziduan['fields'] as $k=>$v){
 			$field[$k]['name'] = $v['name'];
 			$field[$k]['type'] = 'text';
 			$field[$k]['extra'] = '';
 			$field[$k]['comment'] = $v['label'];
 			$field[$k]['default'] = '';
+			if($v['fun']=='yes'){
+				$form[$k]['fun_con'] = Db::name('fd_fun')->where('fid',$id)->where('zdname',$v['name'])->find();
+			}
+			$form[$k]['fun'] = $v['fun'] ?? 'no';
 			$form[$k]['title'] =  $v['label'];
-			$form[$k]['name'] =  $type;
+			$form[$k]['name'] =  $v['name'];
 			$form[$k]['type'] =  $v['field_type'];
 			$form[$k]['option'] =  $v['field_options'];
 			$form[$k]['default'] = '';
@@ -71,13 +82,13 @@ class FbDb{
 			$form[$k]['lists'] = $v['lists'];
 		}
 		$data = [
+			'file'=>$info['file'],
 			'module'=>'index',
 			'controller'=>$type,
 			'menu'=>['add,del'],
 			'title'=>$info['title'],
 			'flow'=>$info['flow'],
 			'table'=>$info['name'],
-			'create_table'=>'demo',
 			'field'=>$field,
 			'form'=>$form
 		];

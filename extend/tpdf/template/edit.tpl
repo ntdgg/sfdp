@@ -1,8 +1,12 @@
 {include file='pub/base' /}
-{block name="content"}
 <div class="page-container">
-    <form class="form form-horizontal" id="form" method="post" action="">
-        <input type="hidden" name="id" value="{$vo.id ?? ''}">
+		{present name="vo.id"}
+			<form action="{:url('edit')}" method="post" name="form" id="form">
+			<input type="hidden" name="id" value="{$vo.id}">
+			<input type="hidden" name="status" value="0">
+		{else /}
+			<form action="{:url('add')}" method="post" name="form" id="form">
+		{/present}
 		[ROWS]
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
@@ -12,8 +16,6 @@
         </div>
     </form>
 </div>
-{/block}
-{block name="script"}
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script>
     $(function () {
@@ -37,4 +39,3 @@
     })
 [SCRIPT]
 </script>
-{/block}

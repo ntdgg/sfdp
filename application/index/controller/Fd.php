@@ -72,9 +72,8 @@ class Fd extends Admin
      */
 	public function dsec_view()
 	{
-		$tpdf = new tpdf();
-		$tpdf->make($this->tpdf->FbApi('Bview',input('id'),'demo'),'demo');
-	  return $this->view->fetch('demo/view');
+		$this->tpdf->make($this->tpdf->FbApi('Bview',input('id')),'demo');
+		return $this->view->fetch('demo/view');
 	}
 	/**
      * 首页
@@ -128,51 +127,12 @@ class Fd extends Admin
 	}
 	public function shengcheng()
 	{
-		$id = input('id');
-		$info = db('fd')->find($id);
-		$ziduan = json_decode($info['ziduan'],true);
-		$field = [];
-		$form = [];
-		foreach($ziduan['fields'] as $k=>$v){
-			$field[$k]['name'] = $v['name'];
-			$field[$k]['type'] = 'text';
-			$field[$k]['extra'] = '';
-			$field[$k]['comment'] = $v['label'];
-			$field[$k]['default'] = '';
-			$form[$k]['title'] =  $v['label'];
-			$form[$k]['name'] =  $v['name'];
-			$form[$k]['type'] =  $v['field_type'];
-			$form[$k]['option'] =  $v['field_options'];
-			$form[$k]['default'] = '';
-			$form[$k]['search'] = $v['search'];
-			$form[$k]['lists'] = $v['lists'];
-		}
-		$data = [
-		'module'=>'index',
-		'controller'=>$info['name'],
-		'menu'=>['add,del'],
-		'title'=>$info['title'],
-		'flow'=>$info['flow'],
-		'table'=>$info['name'],
-		'create_table'=>$info['name'],
-		'field'=>$field,
-		'form'=>$form
-		];
-		if($info['menu']==0){
-			$menu = [
-			'url'=>$info['name'].'/index',
-			'name'=>$info['title'],
-			];
-			$ret=controller('Base', 'event')->commonadd('menu',$menu);
-		}
-		$tpdf = new tpdf();
-		$tpdf->make($data);
-		$up = [
-			'id'=>$id,
-			'status'=>1,
-		];
-		controller('Base', 'event')->commonedit('fd',$up);
-		$this->success('生成成功！','/index/index/welcome');
+		$data = $this->tpdf->FbApi('Bview',input('id'),'Act');
+		$this->tpdf->make($data);
+		controller('Base', 'event')->commonedit('fd',['id'=>input('id'),'status'=>1]);
+		controller('Base', 'event')->commonadd('menu',['url'=>$data['controller'].'/index','name'=>$data['title']]);
 		
+		
+		$this->success('生成成功！','/index/index/welcome');
 	}
 }
