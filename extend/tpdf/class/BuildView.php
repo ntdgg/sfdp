@@ -49,7 +49,7 @@ class BuildView{
             $module = Request::module() . '@';
         }
 		if ($data['flow'] == 0) {
-            $flow = "{:action('flow/btn',['wf_fid'=>\$vo.id,'wf_type'=>'".$data['table']."','status'=>\$vo.status])}";
+            $flow = "{:action('wf/btn',['wf_fid'=>\$vo.id,'wf_type'=>'".$data['table']."','status'=>\$vo.status])}";
         } else {
             $flow= '';
         }

@@ -43,7 +43,7 @@ class Build{
 					break;
 					
 				case "upload":
-					$editField .= '<td width="10%">'.$form['title'].'</td>'."\n" . tab(3).'<td width="23%" '.$colspan.'><input type="text" class="dfinput" id="'.$form['name'].'" value="{$vo.' . $form['name'] . ' ?? ""}" name="'.$form['name'].'" datatype="*"><a class="btn btn-primary radius" id=\'bupload\' onclick=layer_show("上传","/index.php/admin/Fromdesc/upload?id='.$form['name'].'","140","160")>附件</a> </td>';
+					$editField .= '<td width="10%">'.$form['title'].'</td>'."\n" . tab(3).'<td width="23%" '.$colspan.'><input type="text" class="dfinput" id="'.$form['name'].'" value="{$vo.' . $form['name'] . ' ?? ""}" name="'.$form['name'].'" datatype="*"><a class="btn btn-primary radius" id=\'bupload\' onclick=layer_show("上传","/index.php/index/fd/upload?id='.$form['name'].'","140","160")>附件</a> </td>';
 					break;
 				case "Ue":
 					$editField .= '<td width="10%">'.$form['title'].'</td>'."\n" . tab(3).'<td width="23%" '.$colspan.'><script id="container" name="content" type="text/plain">{$vo.' . $form['name'] . '}</script></td>';
