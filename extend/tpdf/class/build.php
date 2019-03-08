@@ -38,7 +38,7 @@ class Build{
 					}
 					$editField .= '</div></td>';
 					break;
-				case "select":
+				case "dropdown":
 					$editField .= '<td>'.$form['title'].'</td>'."\n" . tab(3).'<td '.$colspan.'><span class="select-box"><select name="'.$form['name'].'"  class="select"  datatype="*">';
 						foreach($form['option']["options"] as $v){
 							$editField .= '<option value="'.$v['label'].'" >'.$v['label'].'</option>	';
