@@ -26,48 +26,90 @@
     margin-bottom: 5px;
     font-size: 40px;
   }
+  .ui-state-highlight { height: 1.5em; line-height: 1.2em; }
   </style>
 <div class="page-container">
-   <div class='fb-main'></div>
+  <div class="fb-main">
+   <ul style='list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;'><li><h3>表单设计Form design V3.0</h3></li></ul>
+  <div class="fb-left">
+ <ul class="fb-tabs"><li class="active">设计控制区 Design control area</li></ul>
+		<div class="fb-tab-content">
+			<div class="fb-tab-pane active">
+			  <div class="fb-add-field-types">
+				<div class="section">
+					<a data-field-type="upload" class="fb-button"><span><span class="fa fa-upload"></span></span> 生成数据</a>
+					<a data-field-type="text" class="fb-button"><span><span class="fa fa-font"></span></span> 保存设计</a>
+					<a data-field-type="checkboxes" class="fb-button"><span><span class="fa fa-square-o"></span></span> 代码检查</a>
+					<a data-field-type="radio" class="fb-button"><span><span class="fa fa-circle-o"></span></span> 系统帮助 </a>
+				</div>
+			  </div>
+			</div>
+		 </div>
+  
+  <ul class="fb-tabs"><li class="active">表单控件库 Form control library</li></ul>
+		  <div class="fb-tab-content">
+			<div class="fb-tab-pane active">
+			  <div class="fb-add-field-types">
+				<div class="section">
+					<a data-field-type="upload" class="fb-button fbtd"><span><span class="fa fa-upload"></span></span> 上传组件</a>
+					<a data-field-type="text" class="fb-button fbtd"><span><span class="fa fa-font"></span></span> 文本控件</a>
+					<a data-field-type="checkboxes" class="fb-button fbtd"><span><span class="fa fa-square-o"></span></span> 多选框</a>
+					<a data-field-type="radio" class="fb-button fbtd"><span><span class="fa fa-circle-o"></span></span> 单选框 </a>
+					<a data-field-type="date" class="fb-button fbtd"><span><span class="fa fa-calendar"></span></span> 日期</a>
+					<a data-field-type="dropdown" class="fb-button fbtd"><span><span class="fa fa-caret-down"></span></span> 下拉</a>
+					<a data-field-type="email" class="fb-button fbtd"><span><span class="fa fa-envelope-o"></span></span> 邮箱</a>
+				</div>
+			  </div>
+			</div>
+		  </div>
+	
+	</div>
+<div class="fb-center"  >
+	<table class="table table-border table-bordered table-bg">
+		<tbody id='fb-center'>
+		<tr><td>123</td><td>123</td></tr>
+		<tr><td>123</td><td>123</td></tr>
+		</tbody>
+	</table>
+ 
+</div>
+<div class="fb-right"></div>
 </div>
 <input name='ziduan' id='ziduan' value='{$info.ziduan ?? ''}' type='hidden'>
 
 <input name='id' id='id' value='{$fid}' type='hidden'>
-
-  <script src="/static/fb/vendor.js"></script>
-  <script src="/static/fb/fb.js"></script>
-    <script src="/static/fb/fb-unit.js"></script>
- <script>
-    $(function(){
-      fb = new Formbuilder({
-        selector: '.fb-main',
-        bootstrapData: {$ziduan|raw}
-      });
-      fb.on('save', function(payload){
-        $('#ziduan').val(payload);
-      })
-	  $("#up").click(function(){
-		 var ziduan=$("#ziduan").val();
-		 var id=$("#id").val();
-		$.ajax({  
-			 url:'{:url("desc")}',
-			 data:{ziduan:ziduan,id:id},  
-			 type:'post',  
-			 cache:true,  
-			dataType:'json',			 
-			 success:function(data) {  
-				if(data.code==0){
-					parent.layer.msg('设置成功');
-					setTimeout(function(){
-					parent.location.reload();
-					},1000)
-				}
-			  },  
-			  error : function() {  
-			  }  
-		 }); 
-		
-		})
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+   <script>
+  $( function() {
+    $( "#fb-center" ).sortable({
+		opacity: 0.5, //
+		placeholder: "box-holdplace",
+      revert: true,
+	  stop:function(event,ui){ //结束
+                     console.log(4)
+                   
+          }
     });
+
+    $( "#fb-center" ).disableSelection();
+
 	
+	 $( "#fb-center" ).droppable({
+		accept: ".fbtd",
+		deactivate: function( event, ui ) {
+		//放下后回调
+		console.info(event);
+		console.info(ui);
+	  }
+    });
+    $( ".fbtd" ).draggable({
+      connectToSortable: "#fb-center",
+      helper: "clone",
+      revert: "invalid",
+	  cursor: "move"
+    });
+   // $( ".fb-button" ).disableSelection();
+  } );
   </script>
+
