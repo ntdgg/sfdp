@@ -29,11 +29,10 @@
 				</td>
 				<td class="td-manage">
 				<div class="btn-group">
-					
 					{if condition='$k.status == 0'}
 					<span  onclick="layer_show('新增函数','{:url('functions',['id'=>$k.id])}','1150','500')" class="btn  radius size-S">新增函数</span>
 					{if condition='$k.ziduan == ""'}
-					<span  onclick="layer_show('表单设计','{:url('desc',['id'=>$k.id])}','1150','500')" class="btn  radius size-S">表单设计</span>
+					<span data-title="查看" data-href="{:url('desc',['id'=>$k.id])}" onclick="Hui_admin_tab(this)"  class="btn  radius size-S">表单设计</span>
 					{else/}
 						<span class="btn  radius size-S" onclick="layer_show('修改','{:url('edit_desc',['id'=>$k.id])}','1150','500')">设计修改</span>
 					{/if}

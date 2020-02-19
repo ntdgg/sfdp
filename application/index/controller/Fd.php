@@ -29,7 +29,7 @@ class Fd extends Admin
     public function index($map=[])
     {
         if ($this->request->param("title")) $map[] = ['title','like',"%" . $this->request->param("title") . "%"];
-        $list=controller('Base', 'event')->commonlist('fd',$map);
+        $list=controller('Base', 'event')->commonlist('fb',$map);
 		$this->assign('list', $list);
         return $this->view->fetch();
     }
@@ -83,7 +83,7 @@ class Fd extends Admin
     {
         if ($this->request->isPost()) {
 		$data = input('post.');
-		$ret=controller('Base', 'event')->commonadd('fd',$data);
+		$ret=controller('Base', 'event')->commonadd('fb',$data);
 	    if($ret['code']==0){
 			return msg_return('发布成功！');
 			}else{
@@ -97,7 +97,7 @@ class Fd extends Admin
 	{
 		if ($this->request->isPost()) {
 		$data = input('post.');
-		$ret=controller('Base', 'event')->commonadd('fd_fun',$data);
+		$ret=controller('Base', 'event')->commonadd('fb_fun',$data);
 	    if($ret['code']==0){
 			return msg_return('发布成功！');
 			}else{
@@ -129,10 +129,8 @@ class Fd extends Admin
 	{
 		$data = $this->tpdf->FbApi('Bview',input('id'),'Act');
 		$this->tpdf->make($data);
-		controller('Base', 'event')->commonedit('fd',['id'=>input('id'),'status'=>1]);
+		controller('Base', 'event')->commonedit('fb',['id'=>input('id'),'status'=>1]);
 		controller('Base', 'event')->commonadd('menu',['url'=>$data['controller'].'/index','name'=>$data['title']]);
-		
-		
 		$this->success('生成成功！','/index/index/welcome');
 	}
 }

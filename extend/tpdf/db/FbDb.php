@@ -20,7 +20,7 @@ class FbDb{
 	 **/
 	public static function Fbdesc($fid)
 	{
-	   $fun = Db::name('fd_fun')->where('fid',$fid)->select();
+	   $fun = Db::name('fb_fun')->where('fid',$fid)->select();
 	   $html = '';
 	   if(count($fun)>=1){
 		   foreach($fun as $k=>$v){
@@ -71,7 +71,7 @@ class FbDb{
 			$field[$k]['comment'] = $v['label'];
 			$field[$k]['default'] = '';
 			if($v['fun']=='yes'){
-				$form[$k]['fun_con'] = Db::name('fd_fun')->where('fid',$id)->where('zdname',$v['name'])->find();
+				$form[$k]['fun_con'] = Db::name('fb_fun')->where('fid',$id)->where('zdname',$v['name'])->find();
 			}
 			$form[$k]['fun'] = $v['fun'] ?? 'no';
 			$form[$k]['title'] =  $v['label'];
