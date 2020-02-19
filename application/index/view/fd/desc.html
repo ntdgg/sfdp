@@ -37,10 +37,14 @@
 			<div class="fb-tab-pane active">
 			  <div class="fb-add-field-types">
 				<div class="section">
-					<a data-field-type="upload" class="fb-button"><span><span class="fa fa-upload"></span></span> 生成数据</a>
-					<a data-field-type="text" class="fb-button"><span><span class="fa fa-font"></span></span> 保存设计</a>
-					<a data-field-type="checkboxes" class="fb-button"><span><span class="fa fa-square-o"></span></span> 代码检查</a>
-					<a data-field-type="radio" class="fb-button"><span><span class="fa fa-circle-o"></span></span> 系统帮助 </a>
+					<a  class="fb-button"><span class="fa fa-upload"></span> 生成数据</a>
+					<a  class="fb-button"><span class="fa fa-font"></span> 保存设计</a>
+					<a  class="fb-button"><span class="fa fa-square-o"></span> 代码检查</a>
+					<a  class="fb-button"><span class="fa fa-circle-o"></span> 系统帮助 </a>
+					<a  class="fb-button" onclick='addtr(1)'><span class="fa fa-circle-o"></span> 1×1单元格 </a>
+					<a  class="fb-button" onclick='addtr(2)'><span class="fa fa-circle-o"></span> 1×2单元格 </a>
+					<a  class="fb-button" onclick='addtr(3)'><span class="fa fa-circle-o"></span> 1×3单元格 </a>
+					<a  class="fb-button" onclick='addtr(4)'><span class="fa fa-circle-o"></span> 1×4单元格 </a>
 				</div>
 			  </div>
 			</div>
@@ -64,16 +68,19 @@
 		  </div>
 	
 	</div>
-<div class="fb-center"  >
-	<table class="table table-border table-bordered table-bg">
-		<tbody id='fb-center'>
-		<tr><td>123</td><td>123</td></tr>
-		<tr><td>123</td><td>123</td></tr>
+<div class="fb-center"  style='padding-top: 0px; '>
+	
+	<table id='table_center' class="table table-border table-bordered table-bg">
+		<tbody id='fb-fz'>
+		
+		<tr class='table_tr'><th colspan='4'>正在设计：请假表单</th></tr>
 		</tbody>
 	</table>
  
 </div>
-<div class="fb-right"></div>
+<div class="fb-right">
+ <ul class="fb-tabs"><li class="active">日志输出区 Logs Out</li></ul>
+</div>
 </div>
 <input name='ziduan' id='ziduan' value='{$info.ziduan ?? ''}' type='hidden'>
 
@@ -82,9 +89,9 @@
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
    <script>
   $( function() {
-    $( "#fb-center" ).sortable({
+    $( ".fb-fz" ).sortable({
 		opacity: 0.5, //
-		placeholder: "box-holdplace",
+		//placeholder: "box-holdplace",
       revert: true,
 	  stop:function(event,ui){ //结束
                      console.log(4)
@@ -92,24 +99,73 @@
           }
     });
 
-    $( "#fb-center" ).disableSelection();
+    $( ".fb-fz" ).disableSelection();
 
 	
-	 $( "#fb-center" ).droppable({
+	 $( ".fb-fz" ).droppable({
 		accept: ".fbtd",
+		scope: "tasks",
+      drop: function( event, ui ) {
+       // $( this ).find( ".placeholder" ).remove();
+       // $( "<td></td>" ).text( ui.draggable.text() ).appendTo( this );
+      },
 		deactivate: function( event, ui ) {
-		//放下后回调
+		
 		console.info(event);
 		console.info(ui);
 	  }
+    }).sortable({
+      items: "li:not(.placeholder)",
+      sort: function() {
+        // 获取由 droppable 与 sortable 交互而加入的条目
+        // 使用 connectWithSortable 可以解决这个问题，但不允许您自定义 active/hoverClass 选项
+        //$( this ).removeClass( "ui-state-default" );
+      }
     });
     $( ".fbtd" ).draggable({
-      connectToSortable: "#fb-center",
+      connectToSortable: ".fb-fz",
       helper: "clone",
       revert: "invalid",
 	  cursor: "move"
     });
    // $( ".fb-button" ).disableSelection();
+   
+  
   } );
+   function addtr(id){ 
+		var $targetTbody= $("#table_center tbody");
+		var $tr = $targetTbody.children("tr[class='table_tr']:last");
+		switch(id) {
+			case 1:
+				var html ='<tr class="table_tr"><td class="fb-fz" colspan="4"></td></tr>';
+				break;
+			case 2:
+				var html ='<tr class="table_tr"><td class="fb-fz" colspan="2"></td><td colspan="2"class="fb-fz"></td></tr>';
+				break;
+			case 3:
+				var html ='<tr class="table_tr"><td class="fb-fz"></td><td class="fb-fz"></td><td colspan="2"class="fb-fz"></td></tr>';
+				break;
+			case 4:
+				var html ='<tr class="table_tr"><td class="fb-fz"></td><td class="fb-fz"></td><td class="fb-fz"></td><td class="fb-fz"></td></tr>';
+				break;
+			 default:
+				var html ='';
+		} 
+		
+		$tr.after(html);
+		    $( ".fb-fz" ).sortable({
+		opacity: 0.5, //
+		//placeholder: "box-holdplace",
+      revert: true,
+	  stop:function(event,ui){ //结束
+                     console.log(4)
+                   
+          }
+    });
+	$(".table_tr").dblclick(function(){
+		$(this).remove();
+		});
+	}
+  
   </script>
 

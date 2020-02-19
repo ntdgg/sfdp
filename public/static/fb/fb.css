@@ -4,8 +4,8 @@
 .fb-main{margin:0 auto;padding:0 20px 0 0;position:relative;font-family:'Source Sans Pro','Open Sans',Tahoma}
 .fb-save-wrapper{position:relative;right:20px;top:10px;float:right}
 .fb-left{left: 0px; cursor: default;width:320px;padding-top:15px;position: absolute;background-color: #fff;min-height:600px}
-.fb-center{left:320px;  width:calc(100% - 645px); cursor: default;padding-top:25px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:600px}
-.fb-right{left: calc(100% - 320px);  width:320px; cursor: default;padding-top:15px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:600px}
+.fb-center{left:320px;  width:calc(100% - 445px); cursor: default;padding-top:25px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:600px}
+.fb-right{left: calc(100% - 220px);  width:220px; cursor: default;padding-top:15px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:600px}
 .fb-no-response-fields{color:#999}
 .fb-tabs{list-style:none;margin:0 0 20px 0;padding:0 0 0 20px;border-bottom:1px solid #ccc}
 .fb-tabs li{display:inline-block}
