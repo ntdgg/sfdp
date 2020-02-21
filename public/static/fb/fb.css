@@ -2,9 +2,9 @@
 .fb-button[disabled]{background:#ddd !important;border:thin solid #ccc;color:#777 !important;text-shadow:none !important;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=65)";opacity:.65;cursor:default}
 .fb-clear{clear:both}
 .fb-main{margin:0 auto;padding:0 20px 0 0;position:relative;background-color: #fff;border-radius: 5px;min-height: auto}
-.fb-left{left: 0px; cursor: default;width:320px;padding-top:15px;position: absolute;background-color: #fff;min-height:450px}
-.fb-center{left:320px;  width:calc(100% - 545px); cursor: default;padding-top:25px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:450px}
-.fb-right{left: calc(100% - 220px);  width:220px; cursor: default;padding-top:15px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:450px}
+.fb-left{left: 0px; cursor: default;width:320px;padding-top:15px;position: absolute;background-color: #fff;min-height:550px}
+.fb-center{left:320px;  width:calc(100% - 545px); cursor: default;padding-top:25px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:550px}
+.fb-right{left: calc(100% - 220px);  width:220px; cursor: default;padding-top:15px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:550px}
 .fb-ul{list-style:none;margin:0 0 20px 0;padding:0 0 0 20px;border-bottom:1px solid #ccc}
 .fb-ul li{display:inline-block}
 .fb-ul li a{display:block;padding:10px;border-radius:5px 5px 0 0;font-size:13px;cursor:pointer;border-left:1px solid transparent;border-right:1px solid transparent}

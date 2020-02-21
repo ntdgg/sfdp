@@ -9,16 +9,15 @@
     background-color: #d6d3d3;
     font-family: sans-serif;
   }
-  input[type=text] {
-    height: 26px;
-    margin-bottom: 3px;
-  }
-
-  select {
-    margin-bottom: 5px;
-    font-size: 40px;
-  }
-  .ui-state-highlight { height: 1.5em; line-height: 1.2em; }
+input[type=text], select {
+  width: 60%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
   .table_tr{
 	height: 40px;
   }
@@ -33,6 +32,18 @@
   }
   .x-4{
 	width:25%
+  }
+  .code{
+	position: absolute;
+    right: 5px;
+    top: 0px;
+	color: thistle;
+  }
+  .code_td{
+	position: relative;
+  }
+  .ui-draggable{
+  
   }
   </style>
 <div class="page-container">
@@ -55,20 +66,20 @@
   <ul class="fb-ul"><li class="active">表单控件库 Form control library</li></ul>
 		  <div class="fb-content">
 				<div class="section">
-					<a data-field-type="upload" class="fb-button fbtd"><span class="fa fa-upload"></span> 上传组件</a>
-					<a data-field-type="text" class="fb-button fbtd"><span class="fa fa-font"></span> 文本控件</a>
-					<a data-field-type="checkboxes" class="fb-button fbtd"><span class="fa fa-square-o"></span> 多选框</a>
-					<a data-field-type="radio" class="fb-button fbtd"><span class="fa fa-circle-o"></span> 单选框 </a>
-					<a data-field-type="date" class="fb-button fbtd"><span class="fa fa-calendar"></span> 日期</a>
-					<a data-field-type="dropdown" class="fb-button fbtd"><span class="fa fa-caret-down"></span> 下拉</a>
-					<a data-field-type="email" class="fb-button fbtd"><span class="fa fa-envelope-o"></span> 邮箱</a>
+					<a data="upload" class="fb-button fbtd"><span class="fa fa-upload"></span> 上传组件</a>
+					<a data="text" class="fb-button fbtd"><span class="fa fa-font"></span> 文本控件</a>
+					<a data="checkboxes" class="fb-button fbtd"><span class="fa fa-square-o"></span> 多选框</a>
+					<a data="radio" class="fb-button fbtd"><span class="fa fa-circle-o"></span> 单选框 </a>
+					<a data="date" class="fb-button fbtd"><span class="fa fa-calendar"></span> 日期时间</a>
+					<a data="dropdown" class="fb-button fbtd"><span class="fa fa-caret-down"></span> 下拉选择</a>
+					<a data="email" class="fb-button fbtd"><span class="fa fa-envelope-o"></span> 邮箱</a>
 				</div>
 	</div>
 	</div>
 <div class="fb-center"  style='padding-top: 0px; '>
 	
 	<table id='table_center' class="table table-border table-bordered table-bg">
-		<tbody id='fb-fz'>
+		<tbody>
 		
 		<tr class='table_tr'><th colspan='4'>正在设计：<b id='fb_name'></b></th></tr>
 		</tbody>
@@ -87,97 +98,75 @@
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
    <script>
   $( function() {
-	var fb_data = {fb_name:'',fb_ver:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),fb_json:"aaa@aaa.com"};
-	localStorage.setItem("json_data",JSON.stringify(fb_data));
-  
-	//var json_data = JSON.parse(localStorage.getItem("json_data"));
-   console.log(fb_data)
-    $( ".fb-fz" ).sortable({
-		opacity: 0.5, //
-		//placeholder: "box-holdplace",
-      revert: true,
-	  stop:function(event,ui){ //结束
-                     console.log(4)
-                   
-          }
-    });
-
-    $( ".fb-fz" ).disableSelection();
-
-	
-	 $( ".fb-fz" ).droppable({
-		accept: ".fbtd",
-		scope: "tasks",
-      drop: function( event, ui ) {
-       // $( this ).find( ".placeholder" ).remove();
-       // $( "<td></td>" ).text( ui.draggable.text() ).appendTo( this );
-      },
-		deactivate: function( event, ui ) {
+		var fb_data = {fb_name:'测试表单',fb_ver:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),fb_json:"aaa@aaa.com"};
+		localStorage.setItem("json_data",JSON.stringify(fb_data));
+	   console.log(fb_data)
+	    //设置放置容器
 		
-		console.info(event);
-		console.info(ui);
-	  }
-    }).sortable({
-      items: "li:not(.placeholder)",
-      sort: function() {
-        // 获取由 droppable 与 sortable 交互而加入的条目
-        // 使用 connectWithSortable 可以解决这个问题，但不允许您自定义 active/hoverClass 选项
-        //$( this ).removeClass( "ui-state-default" );
-      }
-    });
-    $( ".fbtd" ).draggable({
-      connectToSortable: ".fb-fz",
-      helper: "clone",
-      revert: "invalid",
-	  cursor: "move"
-    });
-   // $( ".fb-button" ).disableSelection();
-   
-  
-  } );
+		 //设置拖拽单元属性
+		$( ".fbtd" ).draggable({
+		  connectToSortable: ".fb-fz",
+		  helper: "clone",
+		  revert: "invalid",
+		  cursor: "move"
+		});
+	});
    function addtr(id){ 
 		if(!has_item('fb_name')){
 			return;
 		}
 		var $targetTbody= $("#table_center tbody");
 		var $tr = $targetTbody.children("tr[class='table_tr']:last");
+		var code = 'Tr'+dateFormat(new Date(), "hhmmssS");
 		switch(id) {
 			case 1:
-				var html ='<tr class="table_tr"><td class="fb-fz x-1" colspan="4"></td></tr>';
+				logs ='新增1*1单元行';
+				//data = {tr:'tr00001'+code,tr_data:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss")};
+				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 2:
-				var html ='<tr class="table_tr"><td class="fb-fz x-2" colspan="2"></td><td colspan="2"class="fb-fz"></td></tr>';
+				logs ='新增1*2单元行';
+				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-2" colspan="2"></td><td colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 3:
-				var html ='<tr class="table_tr"><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td colspan="2"class="fb-fz  x-2"></td></tr>';
+				logs ='新增1*3单元行';
+				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 4:
-				var html ='<tr class="table_tr"><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td></tr>';
+				logs ='新增1*4单元行';
+				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4 code_td"><span class="code">'+code+'</span></td></tr>';
 				break;
 			 default:
 				var html ='';
 		} 
-		
-		
 		$tr.after(html);
-		    $( ".fb-fz" ).sortable({
-				opacity: 0.5, //
-				//placeholder: "box-holdplace",
+		$( ".fb-fz" ).sortable({
+				opacity: 0.5,
 				revert: true,
-				stop:function(event,ui){ //结束
-				console.log(4)
-          }
-		
-    });
-		var szInfo = "<div>" + dateFormat(new Date(), "mm:ss") + " 新增[" + id + "]单元格</div>";
-		$("#logout").html(szInfo + $("#logout").html());
+				stop: function( event, ui ) {
+					var type = $(this).children('a').attr("data");
+					var parent_code = $(this).parent().attr("id"); //获取Tr的ID值 
+					if($(this).html().indexOf("code") >= 0 ) { 
+						var code = '<span class="code">'+parent_code+'</span>';
+					}else{
+						var code = '';
+					}
+					var html =fb_tpl(type,code);
+					//禁止本单元格再放置其他控件
+					$(this).removeClass("fb-fz");
+					$(this).removeClass("ui-sortable");
+					//$(this).children('a').attr("data");
+					$(this).html(html);
+					//console.log($(this).children('a').attr("data"));
+				}
+				
+		});
+		logout(logs);
 		$(".table_tr").dblclick(function(){
+			logout('删除了单元行');
 			$(this).remove();
 		});
 	}
-	
-	
-	
 	// 格式化时间
 	function dateFormat(oDate, fmt) {
 		var o = {
@@ -199,23 +188,62 @@
 		}
 		return fmt;
 	}
+	//文本转换
+	function fb_tpl(type,code){
+		switch(type) {
+			case 'text':
+				var html ='<label>单行文本：</label><input type="text"  placeholder="" >';
+				break;
+			case 'upload':    
+				var html ='<label>上传控件：</label>上传';
+				break;
+			case 'checkboxes':
+				var html ='<label>多选控件：</label>选项1<input type="checkbox"  placeholder="" > 选项2<input type="checkbox"  placeholder="" >';
+				break;
+			case 'radio':
+				var html ='<label>单选控件：</label>选项1<input type="radio"  placeholder="" > 选项2<input type="radio"  placeholder="" >';
+				break;
+			case 'date':
+				var html ='<label>时间日期：</label><input type="text"  placeholder="" >';
+				break;
+			case 'dropdown':
+				var html ='<label>下拉选择：</label><select><option value ="volvo">Volvo</option><option value ="saab">Saab</option></select>';
+				break;
+			case 'email':
+				var html ='<label>邮箱控件：</label><input type="text"  placeholder="" >';
+				break;
+			 default:
+				var html ='';
+		} 
+		
+		return html+code;
+	}
+	//修改配置项
 	function fb_config(Item){
 	  var name=prompt("请输入设计的表单姓名","测试表单");
 	  if (name!=null && name!=""){
 		 $('#fb_name').html(name);
 		 var json_data = JSON.parse(localStorage.getItem("json_data"));
 			json_data[Item]=name;
-			console.log(json_data)
+			localStorage.setItem("json_data",JSON.stringify(json_data));
+			//console.log(json_data)
 		}else{
 			alert('请配置参数' + Item + '的信息');
 		}
 	}
+	//日志输出区
+	function logout(info){
+		var szInfo = "<div>[" + dateFormat(new Date(), "mm:ss")+'] ' + info+"</div>";
+		$("#logout").html(szInfo + $("#logout").html());
+	}
+	//配置项判断
 	function has_item(Item){
 		var json_data = JSON.parse(localStorage.getItem("json_data"));
 		if(json_data[Item]==''){
 			alert('参数' + Item + '未配置！');
 			return ; 
 		}
+		return true;
 	}
   
   </script>
