@@ -50,8 +50,8 @@
     <div class="fb-center" style="padding-top: 0px; "> 
      <table id="table_center"> 
       <tbody> 
-       <tr>
-        <th colspan="4">正在设计：<b id="fb_name"></b></th>
+       <tr class="table_tr">
+        <th  colspan="4">正在设计：<b id="fb_name"></b></th>
        </tr> 
       </tbody> 
      </table> 
@@ -67,11 +67,11 @@
  </body>
 </html>
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="/static/tpfd.config.js"></script>
    <script>
   $( function() {
-		
 		localStorage.setItem("json_data",JSON.stringify(fb_config_data));
 		//console.log(fb_config_data)
 	  // console.log(fb_data)
@@ -84,9 +84,7 @@
 		  revert: "invalid",
 		  cursor: "move"
 		});
+		
 	});
-	
-
-  
   </script>
 

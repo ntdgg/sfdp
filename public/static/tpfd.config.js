@@ -40,24 +40,24 @@
 		switch(id) {
 			case 1:
 				logs ='新增1*1单元行';
-				//data = {tr:'tr00001'+code,tr_data:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss")};
-				var html ='<tr id='+code+'><td class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 2:
 				logs ='新增1*2单元行';
-				var html ='<tr  id='+code+'><td class="fb-fz x-2" colspan="2"></td><td colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-2" colspan="2"></td><td colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 3:
 				logs ='新增1*3单元行';
-				var html ='<tr  id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 4:
 				logs ='新增1*4单元行';
-				var html ='<tr  id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4 code_td"><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4 code_td"><span class="code">'+code+'</span></td></tr>';
 				break;
 			 default:
 				var html ='';
 		} 
+		
 		$tr.after(html);
 		$( ".fb-fz" ).sortable({
 				opacity: 0.5,
