@@ -1,106 +1,80 @@
-{include file='pub/base' /}
-<link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/fb/fb.css" />
-  <style>
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    background-color: #d6d3d3;
-    font-family: sans-serif;
-  }
-input[type=text], select {
-  width: 60%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-  .table_tr{
-	height: 40px;
-  }
-  .logout{
-	margin: 10px;
-  }
-  .x-1{
-	width:100%
-  }
-  .x-2{
-	width:50%
-  }
-  .x-4{
-	width:25%
-  }
-  .code{
-	position: absolute;
-    right: 5px;
-    top: 0px;
-	color: thistle;
-  }
-  .code_td{
-	position: relative;
-  }
-  .ui-draggable{
-  
-  }
-  </style>
-<div class="page-container">
-  <div class="fb-main">
-   <ul style='list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;'><li><h3>表单设计Form design V3.0</h3></li></ul>
-  <div class="fb-left">
- <ul class="fb-ul"><li class="active">设计控制区 Design control area</li></ul>
-		<div class="fb-content">
-				<div class="section">
-					<a  class="fb-button" onclick='fb_config("fb_name")'><span class="fa fa-upload"></span> 配置表单</a>
-					<a  class="fb-button"><span class="fa fa-font"></span> 保存设计</a>
-					<a  class="fb-button"><span class="fa fa-square-o"></span> 生成数据</a>
-					<a  class="fb-button"><span class="fa fa-circle-o"></span> 系统帮助 </a>
-					<a  class="fb-button" onclick='addtr(1)'><span class="fa fa-circle-o"></span> 1×1单元格 </a>
-					<a  class="fb-button" onclick='addtr(2)'><span class="fa fa-circle-o"></span> 1×2单元格 </a>
-					<a  class="fb-button" onclick='addtr(3)'><span class="fa fa-circle-o"></span> 1×3单元格 </a>
-					<a  class="fb-button" onclick='addtr(4)'><span class="fa fa-circle-o"></span> 1×4单元格 </a>
-				</div>
-		 </div>
-  <ul class="fb-ul"><li class="active">表单控件库 Form control library</li></ul>
-		  <div class="fb-content">
-				<div class="section">
-					<a data="upload" class="fb-button fbtd"><span class="fa fa-upload"></span> 上传组件</a>
-					<a data="text" class="fb-button fbtd"><span class="fa fa-font"></span> 文本控件</a>
-					<a data="checkboxes" class="fb-button fbtd"><span class="fa fa-square-o"></span> 多选框</a>
-					<a data="radio" class="fb-button fbtd"><span class="fa fa-circle-o"></span> 单选框 </a>
-					<a data="date" class="fb-button fbtd"><span class="fa fa-calendar"></span> 日期时间</a>
-					<a data="dropdown" class="fb-button fbtd"><span class="fa fa-caret-down"></span> 下拉选择</a>
-					<a data="email" class="fb-button fbtd"><span class="fa fa-envelope-o"></span> 邮箱</a>
-				</div>
-	</div>
-	</div>
-<div class="fb-center"  style='padding-top: 0px; '>
-	
-	<table id='table_center' class="table table-border table-bordered table-bg">
-		<tbody>
-		
-		<tr class='table_tr'><th colspan='4'>正在设计：<b id='fb_name'></b></th></tr>
-		</tbody>
-	</table>
- 
-</div>
-<div class="fb-right">
- <ul class="fb-ul"><li class="active">日志输出区 Logs Out</li></ul>
- <div id="logout" class="logout"></div>
-</div>
-</div>
-<input name='ziduan' id='ziduan' value='{$info.ziduan ?? ''}' type='hidden'>
-
-<input name='id' id='id' value='{$fid}' type='hidden'>
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!DOCTYPE html>
+<html>
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta name="renderer" content="webkit|ie-comp|ie-stand" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /> 
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" /> 
+  <meta http-equiv="Cache-Control" content="no-siteapp" /> 
+  <title>TpFd 轻量级表单设计器V3.0</title> 
+ </head> 
+ <body> 
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" /> 
+  <link rel="stylesheet" href="/static/tpfd.common.css" /> 
+  <div class="page-container"> 
+   <div class="fb-main"> 
+    <ul style="list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;display: block;">
+     <li><h3>TpFd表单设计Form design V3.0</h3></li>
+    </ul> 
+    <div class="fb-left"> 
+     <ul class="fb-ul">
+      <li class="active">设计控制区 Design control area</li>
+     </ul> 
+     <div class="fb-content"> 
+      <div class="section"> 
+       <a class="fb-button" onclick="fb_config(&quot;fb_name&quot;)"><span class="fa fa-upload"></span> 配置表单</a> 
+       <a class="fb-button"><span class="fa fa-font"></span> 保存设计</a> 
+       <a class="fb-button"><span class="fa fa-square-o"></span> 生成数据</a> 
+       <a class="fb-button"><span class="fa fa-circle-o"></span> 系统帮助 </a> 
+       <a class="fb-button" onclick="addtr(1)"><span class="fa fa-circle-o"></span> 一单元格 </a> 
+       <a class="fb-button" onclick="addtr(2)"><span class="fa fa-circle-o"></span> 二单元格 </a> 
+       <a class="fb-button" onclick="addtr(3)"><span class="fa fa-circle-o"></span> 三单元格 </a> 
+       <a class="fb-button" onclick="addtr(4)"><span class="fa fa-circle-o"></span> 四单元格 </a> 
+      </div> 
+     </div> 
+     <ul class="fb-ul">
+      <li class="active">表单控件库 Form control library</li>
+     </ul> 
+     <div class="fb-content"> 
+      <div class="section"> 
+       <a data="upload" class="fb-button fbtd"><span class="fa fa-upload"></span> 上传组件</a> 
+       <a data="text" class="fb-button fbtd"><span class="fa fa-font"></span> 文本控件</a> 
+       <a data="checkboxes" class="fb-button fbtd"><span class="fa fa-square-o"></span> 多选框</a> 
+       <a data="radio" class="fb-button fbtd"><span class="fa fa-circle-o"></span> 单选框 </a> 
+       <a data="date" class="fb-button fbtd"><span class="fa fa-calendar"></span> 日期时间</a> 
+       <a data="dropdown" class="fb-button fbtd"><span class="fa fa-caret-down"></span> 下拉选择</a> 
+       <a data="email" class="fb-button fbtd"><span class="fa fa-envelope-o"></span> 邮箱</a> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="fb-center" style="padding-top: 0px; "> 
+     <table id="table_center"> 
+      <tbody> 
+       <tr>
+        <th colspan="4">正在设计：<b id="fb_name"></b></th>
+       </tr> 
+      </tbody> 
+     </table> 
+    </div> 
+    <div class="fb-right"> 
+     <ul class="fb-ul">
+      <li class="active">日志输出区 Logs Out</li>
+     </ul> 
+     <div id="logout" class="logout"></div> 
+    </div> 
+   </div> 
+  </div>
+ </body>
+</html>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="/static/tpfd.config.js"></script>
    <script>
   $( function() {
-		var fb_data = {fb_name:'测试表单',fb_ver:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),fb_json:"aaa@aaa.com"};
-		localStorage.setItem("json_data",JSON.stringify(fb_data));
-	   console.log(fb_data)
+		
+		localStorage.setItem("json_data",JSON.stringify(fb_config_data));
+		//console.log(fb_config_data)
+	  // console.log(fb_data)
 	    //设置放置容器
 		
 		 //设置拖拽单元属性
@@ -111,140 +85,8 @@ input[type=text], select {
 		  cursor: "move"
 		});
 	});
-   function addtr(id){ 
-		if(!has_item('fb_name')){
-			return;
-		}
-		var $targetTbody= $("#table_center tbody");
-		var $tr = $targetTbody.children("tr[class='table_tr']:last");
-		var code = 'Tr'+dateFormat(new Date(), "hhmmssS");
-		switch(id) {
-			case 1:
-				logs ='新增1*1单元行';
-				//data = {tr:'tr00001'+code,tr_data:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss")};
-				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span></td></tr>';
-				break;
-			case 2:
-				logs ='新增1*2单元行';
-				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-2" colspan="2"></td><td colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span></td></tr>';
-				break;
-			case 3:
-				logs ='新增1*3单元行';
-				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span></td></tr>';
-				break;
-			case 4:
-				logs ='新增1*4单元行';
-				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4 code_td"><span class="code">'+code+'</span></td></tr>';
-				break;
-			 default:
-				var html ='';
-		} 
-		$tr.after(html);
-		$( ".fb-fz" ).sortable({
-				opacity: 0.5,
-				revert: true,
-				stop: function( event, ui ) {
-					var type = $(this).children('a').attr("data");
-					var parent_code = $(this).parent().attr("id"); //获取Tr的ID值 
-					if($(this).html().indexOf("code") >= 0 ) { 
-						var code = '<span class="code">'+parent_code+'</span>';
-					}else{
-						var code = '';
-					}
-					var html =fb_tpl(type,code);
-					//禁止本单元格再放置其他控件
-					$(this).removeClass("fb-fz");
-					$(this).removeClass("ui-sortable");
-					//$(this).children('a').attr("data");
-					$(this).html(html);
-					//console.log($(this).children('a').attr("data"));
-				}
-				
-		});
-		logout(logs);
-		$(".table_tr").dblclick(function(){
-			logout('删除了单元行');
-			$(this).remove();
-		});
-	}
-	// 格式化时间
-	function dateFormat(oDate, fmt) {
-		var o = {
-			"M+": oDate.getMonth() + 1, //月份
-			"d+": oDate.getDate(), //日
-			"h+": oDate.getHours(), //小时
-			"m+": oDate.getMinutes(), //分
-			"s+": oDate.getSeconds(), //秒
-			"q+": Math.floor((oDate.getMonth() + 3) / 3), //季度
-			"S": oDate.getMilliseconds()//毫秒
-		};
-		if (/(y+)/.test(fmt)) {
-			fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
-		}
-		for (var k in o) {
-			if (new RegExp("(" + k + ")").test(fmt)) {
-				fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-			}
-		}
-		return fmt;
-	}
-	//文本转换
-	function fb_tpl(type,code){
-		switch(type) {
-			case 'text':
-				var html ='<label>单行文本：</label><input type="text"  placeholder="" >';
-				break;
-			case 'upload':    
-				var html ='<label>上传控件：</label>上传';
-				break;
-			case 'checkboxes':
-				var html ='<label>多选控件：</label>选项1<input type="checkbox"  placeholder="" > 选项2<input type="checkbox"  placeholder="" >';
-				break;
-			case 'radio':
-				var html ='<label>单选控件：</label>选项1<input type="radio"  placeholder="" > 选项2<input type="radio"  placeholder="" >';
-				break;
-			case 'date':
-				var html ='<label>时间日期：</label><input type="text"  placeholder="" >';
-				break;
-			case 'dropdown':
-				var html ='<label>下拉选择：</label><select><option value ="volvo">Volvo</option><option value ="saab">Saab</option></select>';
-				break;
-			case 'email':
-				var html ='<label>邮箱控件：</label><input type="text"  placeholder="" >';
-				break;
-			 default:
-				var html ='';
-		} 
-		
-		return html+code;
-	}
-	//修改配置项
-	function fb_config(Item){
-	  var name=prompt("请输入设计的表单姓名","测试表单");
-	  if (name!=null && name!=""){
-		 $('#fb_name').html(name);
-		 var json_data = JSON.parse(localStorage.getItem("json_data"));
-			json_data[Item]=name;
-			localStorage.setItem("json_data",JSON.stringify(json_data));
-			//console.log(json_data)
-		}else{
-			alert('请配置参数' + Item + '的信息');
-		}
-	}
-	//日志输出区
-	function logout(info){
-		var szInfo = "<div>[" + dateFormat(new Date(), "mm:ss")+'] ' + info+"</div>";
-		$("#logout").html(szInfo + $("#logout").html());
-	}
-	//配置项判断
-	function has_item(Item){
-		var json_data = JSON.parse(localStorage.getItem("json_data"));
-		if(json_data[Item]==''){
-			alert('参数' + Item + '未配置！');
-			return ; 
-		}
-		return true;
-	}
+	
+
   
   </script>
 
