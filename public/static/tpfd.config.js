@@ -1,7 +1,18 @@
 	//Tpfd表单控件
-	var fb_config_data = {fb_name:'测试表单',fb_ver:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),fb_json:"aaa@aaa.com"};
-
-
+	var fb_config_data = {
+		name:'',//表单名称
+		tpfd_id:'',//表单ID
+		tpfd_class:'',//表单样式
+		tpfd_fun:'',//调用方法
+		tpfd_diy:{
+			//json
+		},
+		list:{
+			//json
+		},
+		tpfd_time:'',
+		tpfd_ver:''
+	};
 
 	// 格式化时间
 	function dateFormat(oDate, fmt) {
@@ -40,24 +51,24 @@
 		switch(id) {
 			case 1:
 				logs ='新增1*1单元行';
-				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 2:
 				logs ='新增1*2单元行';
-				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-2" colspan="2"></td><td colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-2" colspan="2"></td><td id="2" colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 3:
 				logs ='新增1*3单元行';
-				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span></td></tr>';
 				break;
 			case 4:
 				logs ='新增1*4单元行';
-				var html ='<tr class="table_tr" id='+code+'><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4"></td><td class="fb-fz x-4 code_td"><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" class="fb-fz x-4"></td><td id="4" class="fb-fz x-4 code_td"><span class="code">'+code+'</span></td></tr>';
 				break;
 			 default:
 				var html ='';
 		} 
-		
+		save_json({tr:code,data:{},type:id},code,'tr');
 		$tr.after(html);
 		$( ".fb-fz" ).sortable({
 				opacity: 0.5,
@@ -70,24 +81,25 @@
 					}else{
 						var code = '';
 					}
-					var html =fb_tpl(type,code);
+					var html =fb_tpl(type,code,parent_code,$(this).attr("id"));
 					//禁止本单元格再放置其他控件
 					$(this).removeClass("fb-fz");
 					$(this).removeClass("ui-sortable");
 					//$(this).children('a').attr("data");
 					$(this).html(html);
-					//console.log($(this).children('a').attr("data"));
+					//console.log($(this).attr("id"));
 				}
 				
 		});
 		logout(logs);
 		$(".table_tr").dblclick(function(){
-			logout('删除了单元行');
+			save_json('',$(this).attr("id"),'tr_del');
+			logout('删除了单元行'+$(this).attr("id"));
 			$(this).remove();
 		});
 	}
 	//文本转换
-	function fb_tpl(type,code){
+	function fb_tpl(type,code,parent_code,td_xh){
 		switch(type) {
 			case 'text':
 				var html ='<label>单行文本：</label><input type="text"  placeholder="" >';
@@ -113,7 +125,7 @@
 			 default:
 				var html ='';
 		} 
-		
+		save_json({td:td_xh,td_type:type},parent_code,'tr_data');
 		return html+code;
 	}
 	//修改配置项
@@ -138,4 +150,29 @@
 			return ; 
 		}
 		return true;
+	}
+	//
+	function save_json(data,key,type){
+		//读取当前的JSON缓存
+		//save_json(type,parent_code,'tr_data');
+		var json_data = JSON.parse(localStorage.getItem("json_data"));
+		switch(type) {
+			case 'tr':
+			json_data.list[key]=data;
+			break;
+			case 'tr_del':
+			delete json_data.list[key];
+			break;
+			case 'tr_data':
+			
+				json_data['list'][key]['data'][data.td] = data;
+			
+			
+			
+			
+			
+			break;
+			default:
+		} 
+		localStorage.setItem("json_data",JSON.stringify(json_data));
 	}
