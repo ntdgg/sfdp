@@ -67,16 +67,12 @@
  </body>
 </html>
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-	
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="/static/tpfd.config.js"></script>
+	<script src="/static/tpfd.config.js"></script>
    <script>
   $( function() {
-		localStorage.setItem("json_data",JSON.stringify(fb_config_data));
-		//console.log(fb_config_data)
-	  // console.log(fb_data)
-	    //设置放置容器
-		
+		//初始化设计数据
+		int_data();
 		 //设置拖拽单元属性
 		$( ".fbtd" ).draggable({
 		  connectToSortable: ".fb-fz",
@@ -84,7 +80,6 @@
 		  revert: "invalid",
 		  cursor: "move"
 		});
-		
 	});
   </script>
 

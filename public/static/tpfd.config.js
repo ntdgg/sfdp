@@ -164,15 +164,23 @@
 			delete json_data.list[key];
 			break;
 			case 'tr_data':
-			
 				json_data['list'][key]['data'][data.td] = data;
-			
-			
-			
-			
-			
 			break;
 			default:
 		} 
 		localStorage.setItem("json_data",JSON.stringify(json_data));
+	}
+	//用于初始化设计
+	function int_data(){
+		var int_data = localStorage.getItem("json_data");
+		if(int_data==null){
+			localStorage.setItem("json_data",JSON.stringify(fb_config_data));
+		}else{
+			var r=confirm("已缓存有数据，是否继续设计？");
+			if (r==true){
+			  localStorage.setItem("json_data",int_data);
+			  }else{
+			  localStorage.setItem("json_data",JSON.stringify(fb_config_data));
+			}
+		}
 	}
