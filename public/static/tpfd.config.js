@@ -102,7 +102,7 @@
 	function fb_tpl(type,code,parent_code,td_xh){
 		switch(type) {
 			case 'text':
-				var html ='<label>单行文本：</label><input type="text"  placeholder="" >';
+				var html ='<label>单行文本：</label><input type="text"  placeholder="" >  <p class="code2" onclick="showLayer()">点击</p>';
 				break;
 			case 'upload':    
 				var html ='<label>上传控件：</label>上传';
