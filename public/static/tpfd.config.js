@@ -102,25 +102,25 @@
 	function fb_tpl(type,code,parent_code,td_xh){
 		switch(type) {
 			case 'text':
-				var html ='<label>单行文本：</label><input type="text"  placeholder="" >  <p class="code2" onclick="showLayer()">点击</p>';
+				var html ='<label onclick=showLayer("text")>单行文本：</label><input type="text"  placeholder="请输入信息~" disabled>';
 				break;
 			case 'upload':    
-				var html ='<label>上传控件：</label>上传';
+				var html ='<label  onclick=showLayer("upload")>上传控件：</label>上传';
 				break;
 			case 'checkboxes':
-				var html ='<label>多选控件：</label>选项1<input type="checkbox"  placeholder="" > 选项2<input type="checkbox"  placeholder="" >';
+				var html ='<label  onclick=showLayer("checkbox")>多选控件：</label>选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled>';
 				break;
 			case 'radio':
-				var html ='<label>单选控件：</label>选项1<input type="radio"  placeholder="" > 选项2<input type="radio"  placeholder="" >';
+				var html ='<label  onclick=showLayer("radio")>单选控件：</label>选项1<input type="radio"  placeholder="" disabled> 选项2<input type="radio"  placeholder="" disabled>';
 				break;
 			case 'date':
-				var html ='<label>时间日期：</label><input type="text"  placeholder="" >';
+				var html ='<label  onclick=showLayer("date")>时间日期：</label><input type="text"  placeholder="" disabled >';
 				break;
 			case 'dropdown':
-				var html ='<label>下拉选择：</label><select><option value ="volvo">Volvo</option><option value ="saab">Saab</option></select>';
+				var html ='<label  onclick=showLayer("dropdown")>下拉选择：</label><select disabled><option value ="请选择">请选择</option></select>';
 				break;
 			case 'email':
-				var html ='<label>邮箱控件：</label><input type="text"  placeholder="" >';
+				var html ='<label  onclick=showLayer("email")>邮箱控件：</label><input type="text"  placeholder="" disabled >';
 				break;
 			 default:
 				var html ='';
