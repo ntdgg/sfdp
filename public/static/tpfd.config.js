@@ -51,19 +51,19 @@
 		switch(id) {
 			case 1:
 				logs ='新增1*1单元行';
-				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span><span class="code2 fa fa-minus-square"></span></td></tr>';
 				break;
 			case 2:
 				logs ='新增1*2单元行';
-				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-2" colspan="2"></td><td id="2" colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-2" colspan="2"></td><td id="2" colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span><span class="code2 fa      fa-minus-square"></span></td></tr>';
 				break;
 			case 3:
 				logs ='新增1*3单元行';
-				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span><span class="code2 fa fa-minus-square"></span></td></tr>';
 				break;
 			case 4:
 				logs ='新增1*4单元行';
-				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" class="fb-fz x-4"></td><td id="4" class="fb-fz x-4 code_td"><span class="code">'+code+'</span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" class="fb-fz x-4"></td><td id="4" class="fb-fz x-4 code_td"><span class="code">'+code+'</span><span class="code2 fa fa-minus-square"></span></td></tr>';
 				break;
 			 default:
 				var html ='';
@@ -77,7 +77,7 @@
 					var type = $(this).children('a').attr("data");
 					var parent_code = $(this).parent().attr("id"); //获取Tr的ID值 
 					if($(this).html().indexOf("code") >= 0 ) { 
-						var code = '<span class="code">'+parent_code+'</span>';
+						var code = '<span class="code">'+parent_code+'</span><span class="code2 fa fa-minus-square"></span>';
 					}else{
 						var code = '';
 					}
@@ -92,10 +92,11 @@
 				
 		});
 		logout(logs);
-		$(".table_tr").dblclick(function(){
-			save_json('',$(this).attr("id"),'tr_del');
-			logout('删除了单元行'+$(this).attr("id"));
-			$(this).remove();
+		$(".code2").unbind('click').click(function(){
+				var tr_id = $(this).parent().parent().attr("id");
+				save_json('',tr_id,'tr_del');
+				logout('删除了单元行'+tr_id);
+				$(this).parent().parent().remove();
 		});
 	}
 	//文本转换
@@ -128,6 +129,17 @@
 		save_json({td:td_xh,td_type:type},parent_code,'tr_data');
 		return html+code;
 	}
+	//
+	function fb_set(){
+		var common_html = $.tpfd_common({text_bs:123});
+		var html ='<div>11</div>';
+		var high_html = $.tpfd_fun({text_bs:123});
+		
+		return common_html+html+high_html
+	}
+	
+	
+	
 	//修改配置项
 	function fb_config(Item){
 	  var name=prompt("请输入设计的表单姓名","测试表单");
@@ -151,7 +163,7 @@
 		}
 		return true;
 	}
-	//
+	//数据保存方法
 	function save_json(data,key,type){
 		//读取当前的JSON缓存
 		//save_json(type,parent_code,'tr_data');
