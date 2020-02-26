@@ -101,9 +101,10 @@
 	}
 	//文本转换
 	function fb_tpl(type,code,parent_code,td_xh){
+		var td_id = type+'_'+ dateFormat(new Date(), "mmssS");
 		switch(type) {
 			case 'text':
-				var html ='<label onclick=showLayer("text")>单行文本：</label><input type="text"  placeholder="请输入信息~" disabled>';
+				var html ='<label onclick=showLayer("text","'+td_id+'","'+parent_code+'") id="label'+td_id+'">文本控件：</label><input id="input'+td_id+'" type="text"  placeholder="请输入信息~" disabled>';
 				break;
 			case 'upload':    
 				var html ='<label  onclick=showLayer("upload")>上传控件：</label>上传';
@@ -126,17 +127,38 @@
 			 default:
 				var html ='';
 		} 
-		save_json({td:td_xh,td_type:type},parent_code,'tr_data');
+		save_json({td:td_xh,td_type:type,td_id:td_id},parent_code,'tr_data');
 		return html+code;
 	}
 	//
-	function fb_set(){
-		var common_html = $.tpfd_common({text_bs:123});
-		var html ='<div>11</div>';
-		var high_html = $.tpfd_fun({text_bs:123});
-		
+	function fb_set(type,id,parent_code){
+		$('#zd_id').html(id);
+		var all_data = JSON.parse(localStorage.getItem("json_data"));
+		var default_data = all_data['list'][parent_code]['data'][id];
+		if(default_data.tpfd_db==undefined){
+			var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "yes",tpfd_list: "no"};
+		}else{
+			var tpfd_db =default_data;
+		}
+		var common_html = $.tpfd_common(tpfd_db);
+		var html ='<div>'+id+'</div>';
+		var high_html = $.tpfd_fun({text_bs:''});
 		return common_html+html+high_html
 	}
+	function fb_set_return(data){
+		$('#label'+data.tpfd_id).html(data.tpfd_name+'：');
+		$('#input'+data.tpfd_id).val(data.tpfd_moren);
+		$('.tpfd-pop').fadeOut();
+	}
+	//点击保存按钮
+	$('.tpfd-ok').on('click', function() {
+		var params = $("#myform").serializeObject(); //将表单序列化为JSON对象   
+		fb_set_return(params);
+		
+		save_json(params,params.tr_id,'td_data');
+         
+	});
+	
 	
 	
 	
@@ -163,6 +185,20 @@
 		}
 		return true;
 	}
+	function showLayer(type,id,parent_code){
+		$('#table').html(fb_set(type,id,parent_code));
+		//fb_set
+		var layer = $('#pop'),
+			layerwrap = layer.find('.tpfd-wrap');
+		layer.fadeIn();
+		//屏幕居中
+		layerwrap.css({
+			'margin-top': -layerwrap.outerHeight() / 2
+		});
+	}
+	$('.tpfd-close').on('click', function() {
+		$('.tpfd-pop').fadeOut();
+	});
 	//数据保存方法
 	function save_json(data,key,type){
 		//读取当前的JSON缓存
@@ -176,7 +212,13 @@
 			delete json_data.list[key];
 			break;
 			case 'tr_data':
-				json_data['list'][key]['data'][data.td] = data;
+				json_data['list'][key]['data'][data.td_id] = data;
+			break;
+			case 'td_data':
+			console.info(data);
+				data.td = json_data['list'][key]['data'][data.tpfd_id]['td'];
+				data.td_type = json_data['list'][key]['data'][data.tpfd_id]['td_type'];
+				json_data['list'][key]['data'][data.tpfd_id] = data;
 			break;
 			default:
 		} 

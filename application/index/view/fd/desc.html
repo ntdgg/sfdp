@@ -79,7 +79,7 @@
 <div class="tpfd-pop" id="pop">
 	<div class="tpfd-wrap">
 	
-	<div style='font-size: 16px;font-weight: 800;'>字段属性</div>
+	<div style='font-size: 16px;font-weight: 800;'>字段属性 <span id="zd_id"></span></div>
 	    
 		<span class="fa fa-close tpfd-close"></span>
 			<form id="myform">  
@@ -101,7 +101,7 @@
    <script>
   $( function() {
 		//初始化设计数据
-		//int_data();
+		int_data();
 		//console.log($.money(123));
 
 		 //设置拖拽单元属性
@@ -117,24 +117,7 @@
   </script>
   <script>
 	//展示层
-	function showLayer(){
-		$('#table').html(fb_set());
-		//fb_set
-		var layer = $('#pop'),
-			layerwrap = layer.find('.tpfd-wrap');
-		layer.fadeIn();
-		//屏幕居中
-		layerwrap.css({
-			'margin-top': -layerwrap.outerHeight() / 2
-		});
-	}
-	//隐藏层
-	function hideLayer(){
-		$('.tpfd-pop').fadeOut();
-	}
-	$('.tpfd-close').on('click', function() {
-		hideLayer();
-	});
+
 	$.fn.serializeObject = function() {  
         var o = {};  
         var arr = this.serializeArray();  
@@ -150,9 +133,6 @@
         });  
         return o;  
     }
-	$('.tpfd-ok').on('click', function() {
-		var params = $("#myform").serializeObject(); //将表单序列化为JSON对象   
-         console.info(params);
-	});
+	
 </script>
 
