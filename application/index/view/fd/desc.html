@@ -37,13 +37,13 @@
      </ul> 
      <div class="fb-content"> 
       <div class="section"> 
-       <a data="upload" class="fb-button fbtd"><span class="fa fa-upload"></span> 上传组件</a> 
-       <a data="text" class="fb-button fbtd"><span class="fa fa-font"></span> 文本控件</a> 
+	  <a data="text" class="fb-button fbtd"><span class="fa fa-font"></span> 文本控件</a> 
        <a data="checkboxes" class="fb-button fbtd"><span class="fa fa-square-o"></span> 多选框</a> 
        <a data="radio" class="fb-button fbtd"><span class="fa fa-circle-o"></span> 单选框 </a> 
        <a data="date" class="fb-button fbtd"><span class="fa fa-calendar"></span> 日期时间</a> 
        <a data="dropdown" class="fb-button fbtd"><span class="fa fa-caret-down"></span> 下拉选择</a> 
        <a data="email" class="fb-button fbtd"><span class="fa fa-envelope-o"></span> 邮箱</a> 
+	   <a data="upload" class="fb-button fbtd"><span class="fa fa-upload"></span> 上传组件</a> 
       </div> 
      </div> 
     </div> 
@@ -78,15 +78,10 @@
   </style>
 <div class="tpfd-pop" id="pop">
 	<div class="tpfd-wrap">
-	
 	<div style='font-size: 16px;font-weight: 800;'>字段属性 <span id="zd_id"></span></div>
-	    
 		<span class="fa fa-close tpfd-close"></span>
 			<form id="myform">  
 		<div class="tpfd-content" id='table'>
-		 
-		
-		
 		</div>
 		</form>  
 		<button class="tpfd-ok">确 定</button>
@@ -132,6 +127,14 @@
         });  
         return o;  
     }
+	function addoption(){
+		var html ='<div><input type="checkbox"   name="tpfd_check[]" value=0 ><input name="tpfd_data[]" type="text" value="1"><span onclick="addoption()">增加</span></div>';
+		$('#optiondata').after(html);
+		
+	}
+	function editoption(this){
+		alert(1);
+	}
 	
 </script>
 

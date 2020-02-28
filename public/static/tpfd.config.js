@@ -118,30 +118,29 @@
 		}else{
 			var td_id =old_data;
 		}
-		console.log(old_data+'|'+td_id);
-		
-		
+		var labid = 'onclick=showLayer("'+type+'","'+td_id+'","'+parent_code+'") id="label'+td_id+'"';
+		var inputid = 'id="input'+td_id+'"';
 		switch(type) {
 			case 'text':
-				var html ='<label onclick=showLayer("text","'+td_id+'","'+parent_code+'") id="label'+td_id+'">文本控件：</label><input id="input'+td_id+'" type="text"  placeholder="请输入信息~" disabled>';
+				var html ='<label '+labid+'>文本控件：</label><input '+inputid+' type="text"  placeholder="请输入信息~" disabled>';
 				break;
 			case 'upload':    
-				var html ='<label  onclick=showLayer("upload")>上传控件：</label>上传';
+				var html ='<label '+labid+'>上传控件：</label>上传';
 				break;
 			case 'checkboxes':
-				var html ='<label  onclick=showLayer("checkbox")>多选控件：</label>选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled>';
+				var html ='<label '+labid+')>多选控件：</label>选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled>';
 				break;
 			case 'radio':
-				var html ='<label  onclick=showLayer("radio")>单选控件：</label>选项1<input type="radio"  placeholder="" disabled> 选项2<input type="radio"  placeholder="" disabled>';
+				var html ='<label '+labid+')>单选控件：</label>选项1<input type="radio"  placeholder="" disabled> 选项2<input type="radio"  placeholder="" disabled>';
 				break;
 			case 'date':
-				var html ='<label  onclick=showLayer("date")>时间日期：</label><input type="text"  placeholder="" disabled >';
+				var html ='<label '+labid+')>时间日期：</label><input type="text"  placeholder="" disabled >';
 				break;
 			case 'dropdown':
-				var html ='<label  onclick=showLayer("dropdown")>下拉选择：</label><select disabled><option value ="请选择">请选择</option></select>';
+				var html ='<label '+labid+'>下拉选择：</label><select disabled><option value ="请选择">请选择</option></select>';
 				break;
 			case 'email':
-				var html ='<label  onclick=showLayer("email")>邮箱控件：</label><input type="text"  placeholder="" disabled >';
+				var html ='<label '+labid+'>邮箱控件：</label><input type="text"  placeholder="" disabled >';
 				break;
 			 default:
 				var html ='';
@@ -155,21 +154,22 @@
 	function fb_set(type,id,parent_code){
 		$('#zd_id').html(id);
 		var all_data = JSON.parse(localStorage.getItem("json_data"));
-		
 		var default_data = all_data['list'][parent_code]['data'][id];
-
 		if(default_data.tpfd_db==undefined){
 			var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "yes",tpfd_list: "no"};
 		}else{
 			var tpfd_db =default_data;
 		}
 		var common_html = $.tpfd_common(tpfd_db);
+		
+		//console.log(type);
+		
 		var html ='<div>'+id+'</div>';
 		var high_html = $.tpfd_fun({text_bs:''});
-		return common_html+html+high_html
+		return $.tpfd_return(type,tpfd_db);
 	}
 	function fb_set_return(data){
-		console.log('id='+data.tpfd_id);
+		//console.log('id='+data.tpfd_id);
 		$('#label'+data.tpfd_id).html(data.tpfd_name+'：');
 		$('#input'+data.tpfd_id).val(data.tpfd_moren);
 		$('.tpfd-pop').fadeOut();
@@ -181,10 +181,6 @@
 		save_json(params,params.tr_id,'td_data');
          
 	});
-	
-	
-	
-	
 	//修改配置项
 	function fb_config(Item){
 	  var name=prompt("请输入设计的表单姓名","测试表单");
@@ -259,6 +255,8 @@
 					var class_code = '';
 				}
 				var html =fb_tpl(type,class_code,parent_code,td_data[x]['td'],td_data[x]['tpfd_id']);
+				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).removeClass("fb-fz");
+				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).removeClass("ui-sortable");
 				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).html(html);
 				if(td_data[x]['tpfd_name']!=undefined){
 					fb_set_return(td_data[x]);
@@ -279,10 +277,8 @@
 				$('#fb_name').html(desc_data.name);
 				 for (x in desc_data.list){
 					addtr(desc_data.list[x]['type'],desc_data.list[x]);//恢复表单布局设计
-					recovery_input(desc_data.list[x]);
+					recovery_input(desc_data.list[x]);//用于恢复表单字段内容
 				 }
-				
-				
 			  localStorage.setItem("json_data",int_data);
 			  }else{
 			  localStorage.setItem("json_data",JSON.stringify(fb_config_data));
