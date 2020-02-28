@@ -127,13 +127,15 @@
         });  
         return o;  
     }
-	function addoption(){
-		var html ='<div><input type="checkbox"   name="tpfd_check[]" value=0 ><input name="tpfd_data[]" type="text" value="1"><span onclick="addoption()">增加</span></div>';
-		$('#optiondata').after(html);
+	function addoption(id){
+		$('#checkboxes'+id).children('span').attr("onclick","editoption("+id+")");
+		$('#checkboxes'+id).children('span').html('Del');
+		var html ='<div id="checkboxes'+(id+1)+'"><input type="checkbox" name="tpfd_check" value='+(id+1)+' ><input name="tpfd_data" type="text" value="选项'+(id+2)+'"><span onclick="addoption('+(id+1)+')">Add</span></div>';
+		$('#checkboxes'+id).after(html);
 		
 	}
-	function editoption(this){
-		alert(1);
+	function editoption(id){
+		$('#checkboxes'+id).remove();
 	}
 	
 </script>
