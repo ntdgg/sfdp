@@ -41,13 +41,19 @@
 		$("#logout").html(szInfo + $("#logout").html());
 	}
 	//表单构建
-	function addtr(id){ 
+	function addtr(id,old_data=''){ 
 		if(!has_item('fb_name')){
 			return;
 		}
+		
 		var $targetTbody= $("#table_center tbody");
 		var $tr = $targetTbody.children("tr[class='table_tr']:last");
-		var code = 'Tr'+dateFormat(new Date(), "hhmmssS");
+		if(old_data==''){
+			var code = 'Tr'+dateFormat(new Date(), "hhmmssS");
+		}else{
+			var code = old_data['tr'];
+		}
+		
 		switch(id) {
 			case 1:
 				logs ='新增1*1单元行';
@@ -68,7 +74,12 @@
 			 default:
 				var html ='';
 		} 
-		save_json({tr:code,data:{},type:id},code,'tr');
+		if(old_data==''){
+			save_json({tr:code,data:{},type:id},code,'tr');
+			logout(logs);
+		}else{
+			logout('[恢复]'+logs);
+		}
 		$tr.after(html);
 		$( ".fb-fz" ).sortable({
 				opacity: 0.5,
@@ -91,7 +102,7 @@
 				}
 				
 		});
-		logout(logs);
+		
 		$(".code2").unbind('click').click(function(){
 				var tr_id = $(this).parent().parent().attr("id");
 				save_json('',tr_id,'tr_del');
@@ -100,8 +111,16 @@
 		});
 	}
 	//文本转换
-	function fb_tpl(type,code,parent_code,td_xh){
-		var td_id = type+'_'+ dateFormat(new Date(), "mmssS");
+	function fb_tpl(type,code,parent_code,td_xh,old_data=0){
+		
+		if(old_data==0){
+			var td_id = type+'_'+ dateFormat(new Date(), "mmssS");
+		}else{
+			var td_id =old_data;
+		}
+		console.log(old_data+'|'+td_id);
+		
+		
 		switch(type) {
 			case 'text':
 				var html ='<label onclick=showLayer("text","'+td_id+'","'+parent_code+'") id="label'+td_id+'">文本控件：</label><input id="input'+td_id+'" type="text"  placeholder="请输入信息~" disabled>';
@@ -126,15 +145,19 @@
 				break;
 			 default:
 				var html ='';
-		} 
-		save_json({td:td_xh,td_type:type,td_id:td_id},parent_code,'tr_data');
+		}
+		if(old_data==0){
+			save_json({td:td_xh,td_type:type,tpfd_id:td_id},parent_code,'tr_data');
+		}
 		return html+code;
 	}
 	//
 	function fb_set(type,id,parent_code){
 		$('#zd_id').html(id);
 		var all_data = JSON.parse(localStorage.getItem("json_data"));
+		
 		var default_data = all_data['list'][parent_code]['data'][id];
+
 		if(default_data.tpfd_db==undefined){
 			var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "yes",tpfd_list: "no"};
 		}else{
@@ -146,6 +169,7 @@
 		return common_html+html+high_html
 	}
 	function fb_set_return(data){
+		console.log('id='+data.tpfd_id);
 		$('#label'+data.tpfd_id).html(data.tpfd_name+'：');
 		$('#input'+data.tpfd_id).val(data.tpfd_moren);
 		$('.tpfd-pop').fadeOut();
@@ -154,7 +178,6 @@
 	$('.tpfd-ok').on('click', function() {
 		var params = $("#myform").serializeObject(); //将表单序列化为JSON对象   
 		fb_set_return(params);
-		
 		save_json(params,params.tr_id,'td_data');
          
 	});
@@ -190,7 +213,7 @@
 		//fb_set
 		var layer = $('#pop'),
 			layerwrap = layer.find('.tpfd-wrap');
-		layer.fadeIn();
+			layer.fadeIn();
 		//屏幕居中
 		layerwrap.css({
 			'margin-top': -layerwrap.outerHeight() / 2
@@ -212,10 +235,9 @@
 			delete json_data.list[key];
 			break;
 			case 'tr_data':
-				json_data['list'][key]['data'][data.td_id] = data;
+				json_data['list'][key]['data'][data.tpfd_id] = data;
 			break;
 			case 'td_data':
-			console.info(data);
 				data.td = json_data['list'][key]['data'][data.tpfd_id]['td'];
 				data.td_type = json_data['list'][key]['data'][data.tpfd_id]['td_type'];
 				json_data['list'][key]['data'][data.tpfd_id] = data;
@@ -223,6 +245,26 @@
 			default:
 		} 
 		localStorage.setItem("json_data",JSON.stringify(json_data));
+	}
+	function recovery_input(old_data){
+		var td_data = old_data.data;
+		//如果有设计数据，则开始恢复表单数据
+		if(!$.isEmptyObject(old_data.data)){
+			for (x in td_data){
+				var type = td_data[x]['td_type'];
+				var parent_code = old_data['tr'];
+				if($('#'+old_data['tr']).children('td').eq(td_data[x]['td']-1).html().indexOf("code") >= 0 ) { 
+					var class_code = '<span class="code">'+parent_code+'</span><span class="code2 fa fa-minus-square"></span>';
+				}else{
+					var class_code = '';
+				}
+				var html =fb_tpl(type,class_code,parent_code,td_data[x]['td'],td_data[x]['tpfd_id']);
+				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).html(html);
+				if(td_data[x]['tpfd_name']!=undefined){
+					fb_set_return(td_data[x]);
+				} 
+			}
+		}
 	}
 	//用于初始化设计
 	function int_data(){
@@ -232,6 +274,15 @@
 		}else{
 			var r=confirm("已缓存有数据，是否继续设计？");
 			if (r==true){
+				//初始化获取已经设计的缓存数据
+				var desc_data = JSON.parse(int_data);
+				$('#fb_name').html(desc_data.name);
+				 for (x in desc_data.list){
+					addtr(desc_data.list[x]['type'],desc_data.list[x]);//恢复表单布局设计
+					recovery_input(desc_data.list[x]);
+				 }
+				
+				
 			  localStorage.setItem("json_data",int_data);
 			  }else{
 			  localStorage.setItem("json_data",JSON.stringify(fb_config_data));
