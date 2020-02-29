@@ -1,7 +1,7 @@
 	//Tpfd表单控件
 	var fb_config_data = {
 		name:'',//表单名称
-		name_db :'',//数据表名称
+		name_db:'',//数据表名称
 		tpfd_id:'SFDP'+dateFormat(new Date(), "mmssS"),//表单ID
 		tpfd_class:'',//表单样式
 		tpfd_fun:'',//调用方法
@@ -176,9 +176,23 @@
 	//点击保存按钮
 	$('.tpfd-ok').on('click', function() {
 		var params = $("#myform").serializeObject(); //将表单序列化为JSON对象  
-		fb_set_return(params);
-		save_json(params,params.tr_id,'td_data');
-         
+		//console.log(params);
+		if(params.name!=undefined){
+			$('#fb_name').html(params.name+'(DbTable:'+params.name_db+')');
+			var json_data = JSON.parse(localStorage.getItem("json_data"));
+				//console.log(json_data);
+				json_data['name']=params.name;
+				json_data['name_db']=params.name_db;
+				json_data['tpfd_class']=params.tpfd_class;
+				json_data['tpfd_fun']=params.tpfd_fun;
+				json_data['tpfd_script']=params.tpfd_script;
+			localStorage.setItem("json_data",JSON.stringify(json_data));
+			$('.tpfd-pop').fadeOut();
+			logout('初始化配置成功！');
+		}else{
+			fb_set_return(params);
+			save_json(params,params.tr_id,'td_data');
+		}
 	});
 	//修改配置项
 	function fb_config(Item){
@@ -207,13 +221,17 @@
 	
 	function showLayer(type,id,parent_code){
 		if(type=='config'){
-			var html = '<div>设置表单标题：<input name="name" type="text"></div>'+
-			'<div>数据库表名称：<input name="name_db" type="text"></div>'+
-			'<div>设置表单样式：<input name="tpfd_class" type="text"></div>'+
-			'<div>表单调用函数：<textarea name="tpfd_fun"></textarea></div>'+
-			'<div>设置表单脚本：<textarea name="tpfd_script" rows="4" cols="20"></textarea></div>';
+			var json_data = JSON.parse(localStorage.getItem("json_data"));
+			var html = '<div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div>'+
+			'<div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+'></div>'+
+			'<div>设置表单样式：<input name="tpfd_class" type="text" value='+json_data.tpfd_class+'></div>'+
+			'<div>表单调用函数：<textarea name="tpfd_fun">'+json_data.tpfd_fun+'</textarea></div>'+
+			'<div>设置表单脚本：<textarea name="tpfd_script" rows="4" cols="20">'+json_data.tpfd_script+'</textarea></div>';
 			
 		$('#table').html(html);
+		}else if(type=='view'){
+			//
+			$('#table').html(1111);
 		}else{
 			$('#table').html(fb_set(type,id,parent_code));
 		}
@@ -222,10 +240,18 @@
 		var layer = $('#pop'),
 			layerwrap = layer.find('.tpfd-wrap');
 			layer.fadeIn();
-		//屏幕居中
-		layerwrap.css({
+		if(type=='view'){
+			layerwrap.css({
+			//'margin-top': -layerwrap.outerHeight() / 2,
+			'width':'100%',
+			margin-left: -10px;
+			});
+		
+		}else{
+			layerwrap.css({
 			'margin-top': -layerwrap.outerHeight() / 2
-		});
+			});
+		}
 	}
 	$('.tpfd-close').on('click', function() {
 		$('.tpfd-pop').fadeOut();
@@ -286,7 +312,7 @@
 			if (r==true){
 				//初始化获取已经设计的缓存数据
 				var desc_data = JSON.parse(int_data);
-				$('#fb_name').html(desc_data.name);
+				$('#fb_name').html(desc_data.name+'(DbTable:'+desc_data.name_db+')');
 				 for (x in desc_data.list){
 					addtr(desc_data.list[x]['type'],desc_data.list[x]);//恢复表单布局设计
 					recovery_input(desc_data.list[x]);//用于恢复表单字段内容
