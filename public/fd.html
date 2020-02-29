@@ -6,15 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /> 
   <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" /> 
   <meta http-equiv="Cache-Control" content="no-siteapp" /> 
-  <title>TpFd 轻量级表单设计器V3.0</title> 
+  <title>SFDP 超级表单开发平台V3.0</title> 
  </head> 
  <body> 
-  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" /> 
   <link rel="stylesheet" href="/static/tpfd.common.css" /> 
   <div class="page-container"> 
    <div class="fb-main"> 
     <ul style="list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;display: block;">
-     <li><h3>TpFd表单设计Form design V3.0</h3></li>
+     <li><h3>SFDP 超级表单开发平台—V3.0</h3></li>
     </ul> 
     <div class="fb-left"> 
      <ul class="fb-ul">
@@ -22,14 +21,21 @@
      </ul> 
      <div class="fb-content"> 
       <div class="section"> 
-       <a class="fb-button" onclick="fb_config('name')"><span class="fa fa-upload"></span> 配置表单</a> 
-       <a class="fb-button"><span class="fa fa-font"></span> 保存设计</a> 
-       <a class="fb-button"><span class="fa fa-square-o"></span> 生成数据</a> 
-       <a class="fb-button"><span class="fa fa-circle-o"></span> 系统帮助 </a> 
-       <a class="fb-button" onclick="addtr(1)"><span class="fa fa-circle-o"></span> 一单元格 </a> 
-       <a class="fb-button" onclick="addtr(2)"><span class="fa fa-circle-o"></span> 二单元格 </a> 
-       <a class="fb-button" onclick="addtr(3)"><span class="fa fa-circle-o"></span> 三单元格 </a> 
-       <a class="fb-button" onclick="addtr(4)"><span class="fa fa-circle-o"></span> 四单元格 </a> 
+       <a class="fb-button" onclick="showLayer('config',1,0)" style='width: 22%;'><img src='/static/images/set.png'> 配置</a> 
+       <a class="fb-button"><img src='/static/images/help.png'> 保存</a> 
+       <a class="fb-button"><img src='/static/images/help.png'> 生成</a> 
+       <a class="fb-button"><img src='/static/images/help.png'> 帮助 </a>
+      </div> 
+     </div> 
+	 <ul class="fb-ul">
+      <li class="active">页面布局 Form control library</li>
+     </ul>
+	  <div class="fb-content"> 
+      <div class="section"> 
+       <a class="fb-button" onclick="addtr(1)"><img src='/static/images/table.png'> 一格 </a> 
+       <a class="fb-button" onclick="addtr(2)"><img src='/static/images/table.png'> 二格 </a> 
+       <a class="fb-button" onclick="addtr(3)"><img src='/static/images/table.png'> 三格 </a> 
+       <a class="fb-button" onclick="addtr(4)"><img src='/static/images/table.png'> 四格 </a> 
       </div> 
      </div> 
      <ul class="fb-ul">
@@ -37,15 +43,15 @@
      </ul> 
      <div class="fb-content"> 
       <div class="section"> 
-	  <a data="text" class="fb-button fbtd"><span class="fa fa-font"></span> 文本控件</a> 
-       <a data="checkboxes" class="fb-button fbtd"><span class="fa fa-square-o"></span> 多选框</a> 
-       <a data="radio" class="fb-button fbtd"><span class="fa fa-circle-o"></span> 单选框 </a> 
-	   <a data="dropdown" class="fb-button fbtd"><span class="fa fa-caret-down"></span> 下拉选择</a> 
-       <a data="date" class="fb-button fbtd"><span class="fa fa-calendar"></span> 日期时间</a> 
-       <a data="textarea" class="fb-button fbtd"><span class="fa fa-envelope-o"></span> 多行文本</a> 
-	   <a data="html" class="fb-button fbtd"><span class="fa fa-calendar"></span> Html</a> 
-       <a data="wenzi" class="fb-button fbtd"><span class="fa fa-envelope-o"></span> 文字显示</a> 
-	   <a data="upload" class="fb-button fbtd"><span class="fa fa-upload"></span> 上传组件</a> 
+		  <a data="text" class="fb-button fbtd"><img src='/static/images/text.png'> 文本 </a> 
+		   <a data="checkboxes" class="fb-button fbtd"><img src='/static/images/checkboxes.png'>多选框</a> 
+		   <a data="radio" class="fb-button fbtd"><img src='/static/images/radio.png'>单选框</a> 
+		   <a data="dropdown" class="fb-button fbtd"><img src='/static/images/dropdown.png'> 下拉 </a> 
+		   <a data="date" class="fb-button fbtd"><img src='/static/images/time.png'> 日期时间</a> 
+		   <a data="textarea" class="fb-button fbtd"><img src='/static/images/textarea.png'> 多行文本</a> 
+		   <a data="html" class="fb-button fbtd"><img src='/static/images/html.png'> Html控件</a> 
+		   <a data="wenzi" class="fb-button fbtd"><img src='/static/images/text.png'> 文字显示</a> 
+		   <a data="upload" class="fb-button fbtd"><img src='/static/images/upload.png'> 上传组件</a> 
       </div> 
      </div> 
     </div> 
@@ -60,33 +66,24 @@
     </div> 
     <div class="fb-right"> 
      <ul class="fb-ul">
-      <li class="active" onclick=showLayer("text")>日志输出区 Logs Out</li>
+      <li class="active">日志输出区 Logs Out</li>
      </ul> 
      <div id="logout" class="logout"></div> 
     </div> 
    </div> 
   </div>
   <style>
-.tpfd-pop{display:none; position: fixed; top:0;left:0;width:100%;height:100%; background-color: rgba(0,0,0,0.3);z-index:10;}
-.tpfd-wrap{box-sizing:border-box; width:570px; position:absolute;left:50%;top:50%; margin-left:-285px; border-radius:3px; background-color:#fff; box-shadow:1px 2px 4px 0 rgba(0,0,0,0.12); padding:15px 10px;}
-.tpfd-close{position:absolute; right:20px; top:20px; width:20px; height:20px; cursor:pointer; font-size:20px; color:#ccc;}
-.tpfd-content{margin:5px 0; line-height:22px; color:#595d60; text-align:left;}
-@media (max-width:768px){
-	.tpfd-wrap{width:350px; margin-left:-175px; margin-top:-200px; padding:45px 50px; text-align:center;}
-}
-@media (max-width:400px){
-	.tpfd-wrap{width:250px; margin-left:-125px;padding:25px 30px;}
-}
+
   </style>
 <div class="tpfd-pop" id="pop">
 	<div class="tpfd-wrap">
-	<div style='font-size: 16px;font-weight: 800;'>字段属性 <span id="zd_id"></span></div>
-		<span class="fa fa-close tpfd-close"></span>
+	<div style='font-size: 16px;font-weight: 800;'>表单设置 <span id="zd_id"></span></div>
+		<span class="tpfd-close">X</span>
 			<form id="myform">  
 		<div class="tpfd-content" id='table'>
 		</div>
 		</form>  
-		<button class="tpfd-ok">确 定</button>
+		<button class="tpfd-ok">保 存</button>
 	</div>
 </div>
  </body>
@@ -99,8 +96,7 @@
   $( function() {
 		//初始化设计数据
 		int_data();
-		//console.log($.money(123));
-		 //设置拖拽单元属性
+		//设置拖拽单元属性
 		$( ".fbtd" ).draggable({
 		  connectToSortable: ".fb-fz",
 		  helper: "clone",
@@ -108,37 +104,5 @@
 		  cursor: "move"
 		});
 	});
-	
-	
   </script>
-  <script>
-	//展示层
-
-	$.fn.serializeObject = function() {  
-        var o = {};  
-        var arr = this.serializeArray();  
-        $.each(arr,function(){  
-            if (o[this.name]) {  //返回json中有该属性
-                if (!o[this.name].push) { //将已存在的属性值改成数组
-                    o[this.name] = [ o[this.name] ];
-                }  
-                o[this.name].push(this.value || ''); //将值存放到数组中
-            } else {  //返回json中没有有该属性
-                o[this.name] = this.value || '';  //直接将属性和值放入返回json中
-            }  
-        });  
-        return o;  
-    }
-	function addoption(id,type='checkbox'){
-		$('#checkboxes'+id).children('span').attr("onclick","editoption("+id+")");
-		$('#checkboxes'+id).children('span').html('Del');
-		var html ='<div id="checkboxes'+(id+1)+'"><input type="'+type+'" name="tpfd_check" value='+(id+1)+' ><input name="tpfd_data" type="text" value="选项'+(id+2)+'"><span onclick=addoption('+(id+1)+',"'+type+'")>Add</span></div>';
-		$('#checkboxes'+id).after(html);
-		
-	}
-	function editoption(id){
-		$('#checkboxes'+id).remove();
-	}
-	
-</script>
 

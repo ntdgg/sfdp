@@ -16,7 +16,7 @@ td input[type=text], select,textarea {width: 60%;padding: 12px 20px;display: inl
 .fb-right{left: calc(100% - 220px);  width:220px; cursor: default;padding-top:15px;border-left:1px solid #ddd;position: absolute;background-color: #fff;min-height:550px}
 .fb-ul{list-style:none;margin:0 0 20px 0;padding:0 0 0 20px;border-bottom:1px solid #ccc}
 .fb-ul li a{display:block;padding:10px;border-radius:5px 5px 0 0;font-size:13px;cursor:pointer;border-left:1px solid transparent;border-right:1px solid transparent}
-.fb-content a{font-size:13px;width:32%;display:inline-block;background-color:#3bb4f2bf;margin-bottom:9px;box-sizing:border-box;color: #333;}
+.fb-content a{text-align: center;font-size:13px;width:22.9%;display:inline-block;background-color:#3bb4f2bf;margin-bottom:9px;box-sizing:border-box;color: #333;}
 .active{font-weight: bold;padding-bottom: 5px;}
 .fb-content .section{padding: 0 20px;}
 .logout{margin: 10px;}
@@ -29,3 +29,9 @@ td input[type=text], select,textarea {width: 60%;padding: 12px 20px;display: inl
 #table input, #table select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}
 .code2{position: absolute;right: 5px;top: 24px;color: #010f17a6;font-size: 18px;}
 .tpfd-content div{line-height: 35px;}
+.tpfd-pop{display:none; position: fixed; top:0;left:0;width:100%;height:100%; background-color: rgba(0,0,0,0.3);z-index:10;}
+.tpfd-wrap{box-sizing:border-box; width:570px; position:absolute;left:50%;top:50%; margin-left:-285px; border-radius:3px; background-color:#fff; box-shadow:1px 2px 4px 0 rgba(0,0,0,0.12); padding:15px 10px;}
+.tpfd-close{position:absolute; right:20px; top:20px; width:20px; height:20px; cursor:pointer; font-size:20px; color:#ccc;}
+.tpfd-content{margin:5px 0; line-height:22px; color:#595d60; text-align:left;overflow-y: auto;height: 300px;}
+.tpfd-ok{position:absolute; right:20px; top: 90%; cursor:pointer; font-size:20px;}
+.fb-button img{width: 15px;}

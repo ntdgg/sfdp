@@ -1,17 +1,16 @@
 	//Tpfd表单控件
 	var fb_config_data = {
 		name:'',//表单名称
-		tpfd_id:'',//表单ID
+		name_db :'',//数据表名称
+		tpfd_id:'SFDP'+dateFormat(new Date(), "mmssS"),//表单ID
 		tpfd_class:'',//表单样式
 		tpfd_fun:'',//调用方法
-		tpfd_diy:{
-			//json
-		},
+		tpfd_script:'',//数据表脚本
 		list:{
-			//json
+			//设计数据
 		},
-		tpfd_time:'',
-		tpfd_ver:''
+		tpfd_time:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),//表单设计时间
+		tpfd_ver:'v3.0'//表单设计器版本
 	};
 
 	// 格式化时间
@@ -204,8 +203,21 @@
 		}
 		return true;
 	}
+
+	
 	function showLayer(type,id,parent_code){
-		$('#table').html(fb_set(type,id,parent_code));
+		if(type=='config'){
+			var html = '<div>设置表单标题：<input name="name" type="text"></div>'+
+			'<div>数据库表名称：<input name="name_db" type="text"></div>'+
+			'<div>设置表单样式：<input name="tpfd_class" type="text"></div>'+
+			'<div>表单调用函数：<textarea name="tpfd_fun"></textarea></div>'+
+			'<div>设置表单脚本：<textarea name="tpfd_script" rows="4" cols="20"></textarea></div>';
+			
+		$('#table').html(html);
+		}else{
+			$('#table').html(fb_set(type,id,parent_code));
+		}
+		
 		//fb_set
 		var layer = $('#pop'),
 			layerwrap = layer.find('.tpfd-wrap');
@@ -284,5 +296,29 @@
 			  localStorage.setItem("json_data",JSON.stringify(fb_config_data));
 			}
 		}
+	}
+		$.fn.serializeObject = function() {  
+        var o = {};  
+        var arr = this.serializeArray();  
+        $.each(arr,function(){  
+            if (o[this.name]) {  //返回json中有该属性
+                if (!o[this.name].push) { //将已存在的属性值改成数组
+                    o[this.name] = [ o[this.name] ];
+                }  
+                o[this.name].push(this.value || ''); //将值存放到数组中
+            } else {  //返回json中没有有该属性
+                o[this.name] = this.value || '';  //直接将属性和值放入返回json中
+            }  
+        });  
+        return o;  
+    }
+	function addoption(id,type='checkbox'){
+		$('#checkboxes'+id).children('span').attr("onclick","editoption("+id+")");
+		$('#checkboxes'+id).children('span').html('Del');
+		var html ='<div id="checkboxes'+(id+1)+'"><input type="'+type+'" name="tpfd_check" value='+(id+1)+' ><input name="tpfd_data" type="text" value="选项'+(id+2)+'"><span onclick=addoption('+(id+1)+',"'+type+'")>Add</span></div>';
+		$('#checkboxes'+id).after(html);
+	}
+	function editoption(id){
+		$('#checkboxes'+id).remove();
 	}
 	
