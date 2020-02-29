@@ -139,8 +139,14 @@
 			case 'dropdown':
 				var html ='<label '+labid+'>下拉选择：</label><select disabled><option value ="请选择">请选择</option></select>';
 				break;
-			case 'email':
-				var html ='<label '+labid+'>邮箱控件：</label><input type="text"  placeholder="" disabled >';
+			case 'textarea':
+				var html ='<label '+labid+'>多行控件：</label><textarea  disabled ></textarea>';
+				break;
+			case 'html':
+				var html ='<label '+labid+'>HTML控件：</label><b style="color: blue;">Look this is a HTML</b>';
+				break;
+			case 'wenzi':
+				var html ='<label '+labid+'>文字控件：</label>默认现实的文本';
 				break;
 			 default:
 				var html ='';
@@ -160,23 +166,17 @@
 		}else{
 			var tpfd_db =default_data;
 		}
-		var common_html = $.tpfd_common(tpfd_db);
-		
-		//console.log(type);
-		
-		var html ='<div>'+id+'</div>';
-		var high_html = $.tpfd_fun({text_bs:''});
 		return $.tpfd_return(type,tpfd_db);
 	}
 	function fb_set_return(data){
 		//console.log('id='+data.tpfd_id);
 		$('#label'+data.tpfd_id).html(data.tpfd_name+'：');
-		$('#input'+data.tpfd_id).val(data.tpfd_moren);
+		//$('#input'+data.tpfd_id).val(data.tpfd_moren);
 		$('.tpfd-pop').fadeOut();
 	}
 	//点击保存按钮
 	$('.tpfd-ok').on('click', function() {
-		var params = $("#myform").serializeObject(); //将表单序列化为JSON对象   
+		var params = $("#myform").serializeObject(); //将表单序列化为JSON对象  
 		fb_set_return(params);
 		save_json(params,params.tr_id,'td_data');
          

@@ -6,7 +6,7 @@ tr{height: 40px;}
 ul{margin: 0;}
 li{margin: 0;padding: 0;}
 h3 {padding-top: 20px;color: inherit;font-size: 16px;}
-td input[type=text], select {width: 60%;padding: 12px 20px;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}
+td input[type=text], select,textarea {width: 60%;padding: 12px 20px;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}
 .fb-button{display:inline-block;margin:0;padding:.563rem .244rem;border:0 none;background:#3bb4f2bf;color:#fff;text-align:center;text-decoration:none;font-size:12px;line-height:1.5;cursor:pointer;border-radius:.125rem;border:thin solid #3bb4f2bf;border-bottom:2px solid #3bb4f2bf;text-align: left;}
 .fb-button[disabled]{background:#ddd !important;border:thin solid #ccc;color:#777 !important;text-shadow:none !important;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=65)";opacity:.65;cursor:default}
 .fb-clear{clear:both}
