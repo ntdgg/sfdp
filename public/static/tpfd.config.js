@@ -40,7 +40,7 @@
 		$("#logout").html(szInfo + $("#logout").html());
 	}
 	//表单构建
-	function addtr(id,old_data=''){ 
+	function addtr(id,old_data='',showtype=''){ 
 		if(!has_item('fb_name')){
 			return;
 		}
@@ -79,35 +79,39 @@
 		}else{
 			logout('[恢复]'+logs);
 		}
-		$tr.after(html);
-		$( ".fb-fz" ).sortable({
-				opacity: 0.5,
-				revert: true,
-				stop: function( event, ui ) {
-					var type = $(this).children('a').attr("data");
-					var parent_code = $(this).parent().attr("id"); //获取Tr的ID值 
-					if($(this).html().indexOf("code") >= 0 ) { 
-						var code = '<span class="code">'+parent_code+'</span><span class="code2 fa fa-minus-square"></span>';
-					}else{
-						var code = '';
+		if(showtype==''){
+			$tr.after(html);
+			$( ".fb-fz" ).sortable({
+					opacity: 0.5,
+					revert: true,
+					stop: function( event, ui ) {
+						var type = $(this).children('a').attr("data");
+						var parent_code = $(this).parent().attr("id"); //获取Tr的ID值 
+						if($(this).html().indexOf("code") >= 0 ) { 
+							var code = '<span class="code">'+parent_code+'</span><span class="code2 fa fa-minus-square"></span>';
+						}else{
+							var code = '';
+						}
+						var html =fb_tpl(type,code,parent_code,$(this).attr("id"));
+						//禁止本单元格再放置其他控件
+						$(this).removeClass("fb-fz");
+						$(this).removeClass("ui-sortable");
+						//$(this).children('a').attr("data");
+						$(this).html(html);
+						//console.log($(this).attr("id"));
 					}
-					var html =fb_tpl(type,code,parent_code,$(this).attr("id"));
-					//禁止本单元格再放置其他控件
-					$(this).removeClass("fb-fz");
-					$(this).removeClass("ui-sortable");
-					//$(this).children('a').attr("data");
-					$(this).html(html);
-					//console.log($(this).attr("id"));
-				}
-				
-		});
-		
-		$(".code2").unbind('click').click(function(){
-				var tr_id = $(this).parent().parent().attr("id");
-				save_json('',tr_id,'tr_del');
-				logout('删除了单元行'+tr_id);
-				$(this).parent().parent().remove();
-		});
+					
+			});
+			
+			$(".code2").unbind('click').click(function(){
+					var tr_id = $(this).parent().parent().attr("id");
+					save_json('',tr_id,'tr_del');
+					logout('删除了单元行'+tr_id);
+					$(this).parent().parent().remove();
+			});
+		}else{
+			return html;
+		}
 	}
 	//文本转换
 	function fb_tpl(type,code,parent_code,td_xh,old_data=0){
@@ -177,21 +181,26 @@
 	$('.tpfd-ok').on('click', function() {
 		var params = $("#myform").serializeObject(); //将表单序列化为JSON对象  
 		//console.log(params);
-		if(params.name!=undefined){
-			$('#fb_name').html(params.name+'(DbTable:'+params.name_db+')');
-			var json_data = JSON.parse(localStorage.getItem("json_data"));
-				//console.log(json_data);
-				json_data['name']=params.name;
-				json_data['name_db']=params.name_db;
-				json_data['tpfd_class']=params.tpfd_class;
-				json_data['tpfd_fun']=params.tpfd_fun;
-				json_data['tpfd_script']=params.tpfd_script;
-			localStorage.setItem("json_data",JSON.stringify(json_data));
+		if($('#showtype').val()=='view'){
 			$('.tpfd-pop').fadeOut();
-			logout('初始化配置成功！');
+			logout('界面预览成功！');
 		}else{
-			fb_set_return(params);
-			save_json(params,params.tr_id,'td_data');
+			if(params.name!=undefined){
+				$('#fb_name').html(params.name+'(DbTable:'+params.name_db+')');
+				var json_data = JSON.parse(localStorage.getItem("json_data"));
+					//console.log(json_data);
+					json_data['name']=params.name;
+					json_data['name_db']=params.name_db;
+					json_data['tpfd_class']=params.tpfd_class;
+					json_data['tpfd_fun']=params.tpfd_fun;
+					json_data['tpfd_script']=params.tpfd_script;
+				localStorage.setItem("json_data",JSON.stringify(json_data));
+				$('.tpfd-pop').fadeOut();
+				logout('初始化配置成功！');
+			}else{
+				fb_set_return(params);
+				save_json(params,params.tr_id,'td_data');
+			}
 		}
 	});
 	//修改配置项
@@ -227,12 +236,14 @@
 			'<div>设置表单样式：<input name="tpfd_class" type="text" value='+json_data.tpfd_class+'></div>'+
 			'<div>表单调用函数：<textarea name="tpfd_fun">'+json_data.tpfd_fun+'</textarea></div>'+
 			'<div>设置表单脚本：<textarea name="tpfd_script" rows="4" cols="20">'+json_data.tpfd_script+'</textarea></div>';
-			
+		$('#showtype').val('config');
 		$('#table').html(html);
 		}else if(type=='view'){
-			//
-			$('#table').html(1111);
+			$('#showtype').val('view');
+			showview();
+			//$('#table').html('<table id="table_view"> </table>');
 		}else{
+			$('#showtype').val('other');
 			$('#table').html(fb_set(type,id,parent_code));
 		}
 		
@@ -241,13 +252,17 @@
 			layerwrap = layer.find('.tpfd-wrap');
 			layer.fadeIn();
 		if(type=='view'){
+			layerwrap.removeAttr("style");
 			layerwrap.css({
-			//'margin-top': -layerwrap.outerHeight() / 2,
-			'width':'100%',
-			margin-left: -10px;
+			'width':'90%',
+			'margin-left': '-10px',
+			'top': '5%',
+			'left': '5%',
+			'height': '450px'
 			});
 		
 		}else{
+			layerwrap.removeAttr("style");
 			layerwrap.css({
 			'margin-top': -layerwrap.outerHeight() / 2
 			});
@@ -346,5 +361,26 @@
 	}
 	function editoption(id){
 		$('#checkboxes'+id).remove();
+	}
+	function showview(){
+		var int_data = localStorage.getItem("json_data");
+		if(int_data==null){
+			alert('对不起，您尚未开始设计！');
+		}else{
+			
+				//初始化获取已经设计的缓存数据
+				var desc_data = JSON.parse(int_data);
+				$('#table').html('<table id="table_view"><tr class="table_tr_view"><th  colspan="4">正在设计：<b id="fb_name_view"></b></th></tr> </table>');
+				//$('#fb_name').html(desc_data.name+'(DbTable:'+desc_data.name_db+')');
+				 for (x in desc_data.list){
+					var table = addtr(desc_data.list[x]['type'],desc_data.list[x],'showview');//恢复表单布局设计
+					$('.table_tr_view').after(table);
+					console.log(table);
+					//recovery_input(desc_data.list[x]);//用于恢复表单字段内容
+				 } 
+			  
+			 
+		}
+		
 	}
 	
