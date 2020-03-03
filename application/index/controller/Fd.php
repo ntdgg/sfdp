@@ -46,7 +46,7 @@ class Fd extends Admin
 			if($ret['status']==1){
 				return msg_return('修改成功！');
 				}else{
-				return msg_return($ret['data'],1);
+				return msg_return($ret['msg'],1);
 			}
 	   }
 	   $info = $this->tpdf->FbApi('Desc',input('id'));

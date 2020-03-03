@@ -367,7 +367,6 @@
 		if(int_data==null){
 			alert('对不起，您尚未开始设计！');
 		}else{
-			
 				//初始化获取已经设计的缓存数据
 				var desc_data = JSON.parse(int_data);
 				$('#table').html('<table id="table_view"><tr class="table_tr_view"><th  colspan="4">正在设计：<b id="fb_name_view"></b></th></tr> </table>');

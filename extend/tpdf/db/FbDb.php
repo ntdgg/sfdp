@@ -38,14 +38,14 @@ class FbDb{
 	}
 	public static function Fbedit($id)
 	{
-	   $info = Db::name('fd')->find($id);
+	   $info = Db::name('fb')->find($id);
 	   $field = json_decode($info['ziduan'],true);
 	   $info['field'] =  json_encode($field['fields']);
 	   return ['info'=>$info,'id'=>$id];
 	}
 	public static function Fbsave($data)
 	{
-	   $ret = Db::name('fd')->where('id', $data['id'])->update($data);
+	   $ret = Db::name('fb')->where('id', $data['id'])->update($data);
 	   if(!$ret){
 		   return ['status' => 0, 'msg' => '操作失败', 'info' => ''];
 	   }
@@ -53,7 +53,7 @@ class FbDb{
 	}
 	public static function FBview($id,$type)
 	{
-		$info = Db::name('fd')->find($id);
+		$info = Db::name('fb')->find($id);
 		$ziduan = json_decode($info['ziduan'],true);
 		$field = [];
 		$form = [];
