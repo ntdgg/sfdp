@@ -35,6 +35,6 @@ return [
         '__HUI__' => '/static/h-ui',
 		'__HUIADMIN__' => '/static/h-ui.admin',
         '__LIB__'    => '/static/lib',
-		'__Flow__'    => '/static/work',
+		'__SFDP__'    => '/static/sfdp',
     ]
 ];

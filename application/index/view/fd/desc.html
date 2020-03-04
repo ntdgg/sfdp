@@ -9,7 +9,9 @@
   <title>SFDP 超级表单开发平台V3.0</title> 
  </head> 
  <body> 
-  <link rel="stylesheet" href="/static/tpfd.common.css" /> 
+  <link rel="stylesheet" href="__SFDP__/css/sfdp.desc.css" /> 
+  <link rel="stylesheet" href="__SFDP__/css/sfdp.common.css" /> 
+  
   <div class="page-container"> 
    <div class="fb-main"> 
     <ul style="list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;display: block;">
@@ -21,10 +23,10 @@
      </ul> 
      <div class="fb-content"> 
       <div class="section"> 
-       <a class="fb-button" onclick="showLayer('config',1,0)"><img src='/static/images/set.png'> 配置</a> 
-       <a class="fb-button" id='save'><img src='/static/images/help.png'> 保存</a> 
-       <a class="fb-button" onclick="showLayer('view',1,0)"><img src='/static/images/help.png'> 预览</a> 
-       <a class="fb-button"><img src='/static/images/help.png'> 帮助 </a>
+       <a class="fb-button" onclick="showLayer('config',1,0)"><img src='__SFDP__/images/set.png'> 配置</a> 
+       <a class="fb-button" id='save'><img src='__SFDP__/images/help.png'> 保存</a> 
+       <a class="fb-button" onclick="showLayer('view',1,0)"><img src='__SFDP__/images/help.png'> 预览</a> 
+       <a class="fb-button"><img src='__SFDP__/images/help.png'> 帮助 </a>
       </div> 
      </div> 
 	 <ul class="fb-ul">
@@ -32,10 +34,10 @@
      </ul>
 	  <div class="fb-content"> 
       <div class="section"> 
-       <a class="fb-button" onclick="addtr(1)"><img src='/static/images/table.png'> 一格 </a> 
-       <a class="fb-button" onclick="addtr(2)"><img src='/static/images/table.png'> 二格 </a> 
-       <a class="fb-button" onclick="addtr(3)"><img src='/static/images/table.png'> 三格 </a> 
-       <a class="fb-button" onclick="addtr(4)"><img src='/static/images/table.png'> 四格 </a> 
+       <a class="fb-button" onclick="addtr(1)"><img src='__SFDP__/images/table.png'> 一格 </a> 
+       <a class="fb-button" onclick="addtr(2)"><img src='__SFDP__/images/table.png'> 二格 </a> 
+       <a class="fb-button" onclick="addtr(3)"><img src='__SFDP__/images/table.png'> 三格 </a> 
+       <a class="fb-button" onclick="addtr(4)"><img src='__SFDP__/images/table.png'> 四格 </a> 
       </div> 
      </div> 
      <ul class="fb-ul">
@@ -43,15 +45,15 @@
      </ul> 
      <div class="fb-content"> 
       <div class="section"> 
-		  <a data="text" class="fb-button fbtd"><img src='/static/images/text.png'> 文本 </a> 
-		   <a data="checkboxes" class="fb-button fbtd"><img src='/static/images/checkboxes.png'>多选框</a> 
-		   <a data="radio" class="fb-button fbtd"><img src='/static/images/radio.png'>单选框</a> 
-		   <a data="dropdown" class="fb-button fbtd"><img src='/static/images/dropdown.png'> 下拉 </a> 
-		   <a data="date" class="fb-button fbtd"><img src='/static/images/time.png'> 日期时间</a> 
-		   <a data="textarea" class="fb-button fbtd"><img src='/static/images/textarea.png'> 多行文本</a> 
-		   <a data="html" class="fb-button fbtd"><img src='/static/images/html.png'> Html控件</a> 
-		   <a data="wenzi" class="fb-button fbtd"><img src='/static/images/text.png'> 文字显示</a> 
-		   <a data="upload" class="fb-button fbtd"><img src='/static/images/upload.png'> 上传组件</a> 
+		  <a data="text" class="fb-button fbtd"><img src='__SFDP__/images/text.png'> 文本 </a> 
+		   <a data="checkboxes" class="fb-button fbtd"><img src='__SFDP__/images/checkboxes.png'>多选框</a> 
+		   <a data="radio" class="fb-button fbtd"><img src='__SFDP__/images/radio.png'>单选框</a> 
+		   <a data="dropdown" class="fb-button fbtd"><img src='__SFDP__/images/dropdown.png'> 下拉 </a> 
+		   <a data="date" class="fb-button fbtd"><img src='__SFDP__/images/time.png'> 日期时间</a> 
+		   <a data="textarea" class="fb-button fbtd"><img src='__SFDP__/images/textarea.png'> 多行文本</a> 
+		   <a data="html" class="fb-button fbtd"><img src='__SFDP__/images/html.png'> Html控件</a> 
+		   <a data="wenzi" class="fb-button fbtd"><img src='__SFDP__/images/text.png'> 文字显示</a> 
+		   <a data="upload" class="fb-button fbtd"><img src='__SFDP__/images/upload.png'> 上传组件</a> 
       </div> 
      </div> 
     </div> 
@@ -90,10 +92,10 @@
 </div>
  </body>
 </html>
-	<script src="/static/jquery-1.12.4.js"></script>
-	<script src="/static/jquery-ui.js"></script>
-	<script src="/static/tpfd.config.js"></script>
-	<script src="/static/tpfd.class.js"></script>
+	<script src="__SFDP__/js/jquery-1.12.4.js"></script>
+	<script src="__SFDP__/js/jquery-ui.js"></script>
+	<script src="__SFDP__/sfdp.3.0.js"></script>
+	<script src="__SFDP__/js/sfdp.unit.js"></script>
    <script>
   $( function() {
 		//初始化设计数据
