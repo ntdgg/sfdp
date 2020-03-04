@@ -1,3 +1,13 @@
+/*!
+ * SFDP 表单设计器--组件构建器
+ * http://cojz8.com
+ *
+ * 
+ * Released under the MIT license
+ * http://cojz8.com
+ *
+ * Date: 2020年3月4日23:34:39
+ */
 $(function(){
     $.extend({
 		tpfd_return:function(type,data){
