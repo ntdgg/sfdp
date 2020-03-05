@@ -45,7 +45,7 @@ $(function(){
 				var html ='<label>文字控件：</label>默认现实的文本';
 				break;
 			 default:
-				var html ='';
+				var html ='1';
 			}
 			return html;
 		}

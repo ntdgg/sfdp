@@ -31,7 +31,7 @@ class Test extends Admin
 	}
 	public function add()
 	{
-		$sfdp_id = db('sfdp_link')->where('work_id',1)->value('sfdp_id');
+		$sfdp_id = db('sfdp_link')->where('work_id',2)->value('sfdp_id');
 		$json = db('fb')->find($sfdp_id);
 		$this->assign('data', $json['ziduan']);
 		return $this->fetch('edit');

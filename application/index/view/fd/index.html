@@ -1,16 +1,12 @@
 {include file='pub/base' /}
 <div class="page-container">
-<a href="javascript:;" onclick="layer_show('新增表单','{:url('add')}','850','450')" class="btn btn-primary radius">
-	<i class="Hui-iconfont">&#xe600;</i> 新增表单</a>
+<a href="{:url('add')}" class="btn btn-primary radius">新增</a>
 	<table class="table table-border table-bordered table-bg">
 		<thead>
 			<tr class="text-c">
 				<th width="25">ID</th>
 				<th width="50">名称</th>
-				<th width="80">数据表</th>
-				<th width="150">生成文件</th>
 				<th width="150">发布时间</th>
-				<th width="150">状态</th>
 				<th width="100">操作</th>
 			</tr>
 		</thead>
@@ -19,27 +15,14 @@
 			<tr class="text-c">
 				<td>{$k.id}</td>
 				<td>{$k.title}</td>
-				<td>{$k.name}</td>
-				<td>{$k.file}</td>
+				
 				<td>{$k.add_time|date='Y-m-d H:i'}</td>
-				<td>
-				</td>
+			
 				<td class="td-manage">
 				<div class="btn-group">
-					{if condition='$k.status == 0'}
-					<span  onclick="layer_show('新增函数','{:url('functions',['id'=>$k.id])}','1150','500')" class="btn  radius size-S">新增函数</span>
-					{if condition='$k.ziduan == ""'}
+					
 					<span data-title="查看" data-href="{:url('desc',['id'=>$k.id])}" onclick="Hui_admin_tab(this)"  class="btn  radius size-S">表单设计</span>
-					{else/}
-						<span class="btn  radius size-S" onclick="layer_show('修改','{:url('edit_desc',['id'=>$k.id])}','1150','500')">设计修改</span>
-					{/if}
-					{if condition='$k.ziduan != ""'}
-					<span class="btn  radius size-S" onclick="layer_show('预览','{:url('dsec_view',['id'=>$k.id])}','1150','500')">设计预览</span>
-					<a class="btn  radius size-S" href="{:url('shengcheng',['id'=>$k.id])}">一键生成</a>
-					{/if}
-					{else/}
-					已生成
-					{/if}
+					
 				</div>
 				</td>
 			</tr>

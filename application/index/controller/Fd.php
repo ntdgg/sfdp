@@ -81,16 +81,12 @@ class Fd extends Admin
      */
     public function add($map=[])
     {
-        if ($this->request->isPost()) {
-		$data = input('post.');
+        
+		$data = [
+			'title'=>date('YmdHis')
+		];
 		$ret=controller('Base', 'event')->commonadd('fb',$data);
-	    if($ret['code']==0){
-			return msg_return('发布成功！');
-			}else{
-			return msg_return($ret['data'],1);
-		}
-	   }
-        return $this->view->fetch();
+	    $this->success('生成成功！','/index/fb/index');
     }
 	
 	public function functions()
