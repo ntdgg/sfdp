@@ -9,6 +9,7 @@
  * Date: 2020年3月4日23:34:39
  */
 	function showview(int_data){
+		console.log(int_data);
 		if(int_data==null){
 			alert('对不起，您尚未开始设计！');
 		}else{

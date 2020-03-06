@@ -11,13 +11,12 @@
 $(function(){
     $.extend({
 		tpfd_field_return:function(type,data){
-			console.log(data);
 			if (typeof(data['tpfd_name']) == 'undefined') {
 				return $.tpfd_default(type,data);
 			}else{
 				switch(type) {
 					case 'text':
-					var html ='<label>'+data.tpfd_name+'：</label><input type="text" name="'+data.tpfd_db+'"  placeholder="" >';
+					var html ='<label>'+data.tpfd_name+'：</label><input type="text" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'">';
 					break;
 					case 'radio':
 					var html ='<label>'+data.tpfd_name+'：</label>'+tpfd_checkboxes_clss(data,'radio');

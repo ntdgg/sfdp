@@ -68,7 +68,9 @@ class tpdf
 			}
 		return $info;
 	}
-
+	static function lists(){
+		return 123;
+	}
     public function make($data)
     {
 		$this->data = $data;

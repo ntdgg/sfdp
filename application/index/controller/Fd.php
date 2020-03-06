@@ -28,6 +28,7 @@ class Fd extends Admin
      */
     public function index($map=[])
     {
+		var_dump($this->tpdf::lists());
         if ($this->request->param("title")) $map[] = ['title','like',"%" . $this->request->param("title") . "%"];
         $list=controller('Base', 'event')->commonlist('fb',$map);
 		$this->assign('list', $list);

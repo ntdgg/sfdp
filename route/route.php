@@ -9,6 +9,5 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-return [
+Route::get('index/sfdp/list','\tpdf\Api::lists');
 
-];
