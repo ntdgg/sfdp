@@ -8,7 +8,7 @@
  * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
-namespace tpdf;
+namespace sfdp;
 
 use think\Exception;
 use think\facade\Log;
@@ -17,20 +17,20 @@ use think\Db;
 use think\Loader;
 use think\facade\Request;
 
-define ( 'Tp_DF', realpath ( dirname ( __FILE__ ) ) );
+define ( 'FILE_PATH', realpath ( dirname ( __FILE__ ) ) );
 define('APP_PATH',\Env::get('app_path') );
 define('ROOT_PATH',\Env::get('root_path') );
 define('DS',DIRECTORY_SEPARATOR);
 
-require_once Tp_DF . '/class/build.php';
-require_once Tp_DF . '/config/config.php';
-require_once Tp_DF . '/db/FbDb.php';
-require_once Tp_DF . '/class/BuildView.php';
-require_once Tp_DF . '/class/BuildTable.php';
-require_once Tp_DF . '/class/BuildController.php';
+require_once FILE_PATH . '/class/build.php';
+require_once FILE_PATH . '/config/config.php';
+require_once FILE_PATH . '/db/FbDb.php';
+require_once FILE_PATH . '/class/BuildView.php';
+require_once FILE_PATH . '/class/BuildTable.php';
+require_once FILE_PATH . '/class/BuildController.php';
 
 
-class tpdf
+class sfdp
 {
     private $module;
     private $name;

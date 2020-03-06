@@ -24,12 +24,9 @@
 				</dd>
 			</dl>
 			<dl>
-				<dt><i class="Hui-iconfont"></i> 自定义表单生成<i class="Hui-iconfont menu_dropdown-arrow"></i></dt>
+				<dt><i class="Hui-iconfont"></i> 业务功能<i class="Hui-iconfont menu_dropdown-arrow"></i></dt>
 				<dd style="display: block;"><ul>
-				{volist name='menu' id='k'}
-				<li><a data-href="{:url($k['url'])}" data-title="test" href="javascript:void(0)">{$k.name}</a></li>
-					{/volist}
-				<li><a data-href="{:url('sfdp/list')}" data-title="test" href="javascript:void(0)">111</a></li>
+					{:sfdp\\Api::sdfp_menu()}
 				</dd>
 				</dl>
 		</div>	

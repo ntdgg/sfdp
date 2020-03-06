@@ -11,14 +11,14 @@ use think\Controller;
 use think\Loader;
 use think\Url;
 use think\Db;
-use tpdf\tpdf;
+use sfdp\sfdp;
 
 class Fd extends Admin
 {
 	 public function initialize()
     {
         parent::initialize();
-        $this->tpdf = new tpdf();
+        $this->sfdp = new sfdp();
 		$this->uid = session('uid');
 	    $this->role = session('role');
     }
@@ -28,7 +28,7 @@ class Fd extends Admin
      */
     public function index($map=[])
     {
-		var_dump($this->tpdf::lists());
+		var_dump($this->sfdp::lists());
         if ($this->request->param("title")) $map[] = ['title','like',"%" . $this->request->param("title") . "%"];
         $list=controller('Base', 'event')->commonlist('fb',$map);
 		$this->assign('list', $list);
@@ -43,14 +43,14 @@ class Fd extends Admin
 		if ($this->request->isPost()) {
 			$data = input('post.');
 			$data['ziduan'] = htmlspecialchars_decode($data['ziduan']);
-			$ret = $this->tpdf->FbApi('Save',$data['id'],$data);
+			$ret = $this->sfdp->FbApi('Save',$data['id'],$data);
 			if($ret['status']==1){
 				return msg_return('修改成功！');
 				}else{
 				return msg_return($ret['msg'],1);
 			}
 	   }
-	   $info = $this->tpdf->FbApi('Desc',input('id'));
+	   $info = $this->sfdp->FbApi('Desc',input('id'));
 	   $this->assign('ziduan',$info['field']);
 	   $this->assign('fid', $info['fid']);
         return $this->view->fetch();
@@ -61,7 +61,7 @@ class Fd extends Admin
      */
 	public function edit_desc()
 	{
-		$info = $this->tpdf->FbApi('Edit',input('id'));
+		$info = $this->sfdp->FbApi('Edit',input('id'));
 		$this->assign('info',$info['info']);
 		$this->assign('ziduan',$info['info']['field']);
 		$this->assign('fid', input('id'));
@@ -73,7 +73,7 @@ class Fd extends Admin
      */
 	public function dsec_view()
 	{
-		$this->tpdf->make($this->tpdf->FbApi('Bview',input('id')),'demo');
+		$this->sfdp->make($this->sfdp->FbApi('Bview',input('id')),'demo');
 		return $this->view->fetch('demo/view');
 	}
 	/**
@@ -124,8 +124,8 @@ class Fd extends Admin
 	}
 	public function shengcheng()
 	{
-		$data = $this->tpdf->FbApi('Bview',input('id'),'Act');
-		$this->tpdf->make($data);
+		$data = $this->sfdp->FbApi('Bview',input('id'),'Act');
+		$this->sfdp->make($data);
 		controller('Base', 'event')->commonedit('fb',['id'=>input('id'),'status'=>1]);
 		controller('Base', 'event')->commonadd('menu',['url'=>$data['controller'].'/index','name'=>$data['title']]);
 		$this->success('生成成功！','/index/index/welcome');

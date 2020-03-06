@@ -1,16 +1,18 @@
 <?php
-namespace app\index\controller;
+namespace sfdp;
 
-use app\common\controller\admin;
 use think\Request;
 use think\Db;
+use think\view;
 
-class Test extends Admin
+class Api
 {
-	public function index($map='')
+	static function sdfp_menu(){
+		return '<li><a data-href="'.url('sfdp/list').'" data-title="test" href="javascript:void(0)">111</a></li>';
+	}
+	public function lists($map='')
 	{
-		
-		return $this->fetch();
+		return view(env('root_path') . 'extend/sfdp/template/index.html');
 	}
 	public function edit()
 	{
@@ -23,9 +25,6 @@ class Test extends Admin
 			return msg_return($ret['data'],1);
 		}
 	   }
-		$this->assign("type",Db::query("SELECT id,type as name FROM `wf_news_type`"));
-		$this->assign("type2",Db::query("SELECT id,type as name FROM `wf_news_type`"));
-		
 		$this->assign('vo', db('Newss')->find(input('id')));
 		return $this->fetch();
 	}
@@ -33,8 +32,7 @@ class Test extends Admin
 	{
 		$sfdp_id = db('sfdp_link')->where('work_id',2)->value('sfdp_id');
 		$json = db('fb')->find($sfdp_id);
-		$this->assign('data', $json['ziduan']);
-		return $this->fetch('edit');
+		return view(env('root_path') . 'extend/sfdp/template/edit.html',['data'=>$json['ziduan']]);
 	}
 	public function view()
 	{
