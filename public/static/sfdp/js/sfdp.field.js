@@ -11,16 +11,41 @@
 $(function(){
     $.extend({
 		tpfd_field_return:function(type,data){
+			console.log(data);
 			if (typeof(data['tpfd_name']) == 'undefined') {
-				
-				return '<label>上传控件：</label>上传';
-			}else{
 				return $.tpfd_default(type,data);
+			}else{
+				switch(type) {
+					case 'text':
+					var html ='<label>'+data.tpfd_name+'：</label><input type="text" name="'+data.tpfd_db+'"  placeholder="" >';
+					break;
+					case 'radio':
+					var html ='<label>'+data.tpfd_name+'：</label>'+tpfd_checkboxes_clss(data,'radio');
+					case 'checkboxes':
+					var html ='<label>'+data.tpfd_name+'：</label>'+tpfd_checkboxes_clss(data);
+					break;
+					case 'dropdown':
+					var html ='<label>'+data.tpfd_name+'：</label>'+$.tpfd_select(data.tpfd_data,data.tpfd_db,0);
+					break;
+					case 'textarea':
+					var html ='<label>'+data.tpfd_name+'：</label><textarea  name="'+data.tpfd_db+'"  placeholder="" ></textarea>';
+				}
 			}
-			
-			
-			
 			return html;
+        },
+		tpfd_select:function(data,field,value){
+			var datas = [];
+			for (y in data){
+				
+				datas[y] = { cid:y,clab:data[y]};
+			}
+			var json_data =JSON.parse(JSON.stringify(datas));
+				var html ='<select name="'+field+'" style="width: 80px">';
+				for (z in json_data){
+					html += '<option value="'+json_data[z]['cid']+'" '+((value) == 'yes' ? 'selected' : '') +'>'+json_data[z]['clab']+'</option>';
+				}
+				return html+'</select>';
+			
         },
 		tpfd_default:function(type,data){
 			switch(type) {
@@ -58,5 +83,29 @@ $(function(){
 		}
 		
     })
-
+	function tpfd_checkboxes_clss(data,type='checkbox'){
+			var datas = [];
+			for (y in data.tpfd_data){
+				if(isInArray(data.tpfd_check,y)){
+					var check='checked';
+				}else{
+					var check='';
+				}
+				datas[y] = { cid:y,clab:data.tpfd_data[y],checked:check};
+			}
+			var json_data =JSON.parse(JSON.stringify(datas));
+			var html ='';
+			for (z in json_data){
+				html += '<input '+json_data[z]['checked']+' name="tpfd_check" value='+z+' type="'+type+'">'+json_data[z]['clab']+'';
+			}
+			return html;
+		}
+	function isInArray(arr,value){
+		for(var i = 0; i < arr.length; i++){
+		if(value === arr[i]){
+		return true;
+		}
+		}
+		return false;
+	}
 })

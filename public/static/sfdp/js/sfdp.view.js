@@ -28,7 +28,7 @@
 		var td_data = old_data.data;
 			var json = {1:'',2:'',3:'',4:''};
 			for (x in td_data){
-				console.log(td_data[x]);
+				
 				var type = td_data[x]['td_type'];
 				var html =$.tpfd_field_return(type,td_data[x]);
 				json[td_data[x]['td']] = html;
