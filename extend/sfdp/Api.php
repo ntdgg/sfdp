@@ -4,6 +4,7 @@ namespace sfdp;
 use think\Request;
 use think\Db;
 use think\view;
+use sfdp\sfdp;
 
 class Api
 {
@@ -38,17 +39,43 @@ class Api
      */
     public function sfdp_desc($sid)
     {
-		/* if ($this->request->isPost()) {
-			$data = input('post.');
-			$data['ziduan'] = htmlspecialchars_decode($data['ziduan']);
-			$ret = $this->sfdp->FbApi('Save',$data['id'],$data);
-			if($ret['status']==1){
-				return msg_return('修改成功！');
-				}else{
-				return msg_return($ret['msg'],1);
-			}
-	   } */
 	   $info = db('fb')->find($sid);;
-      return view(env('root_path') . 'extend/sfdp/template/sfdp_desc.html',['ziduan'=>$info['ziduan'],'fid'=>$info['id']]);
+      return view(env('root_path') . 'extend/sfdp/template/sfdp_desc.html',['json'=>$info['ziduan'],'fid'=>$info['id']]);
     }
+	public function sfdp_save(){
+		$data = input('post.');
+		$search = [];
+		$list = [];
+		$data['ziduan'] = htmlspecialchars_decode($data['ziduan']);
+		$field = json_decode($data['ziduan'],true);
+		foreach($field['list'] as $k=>$v){
+			foreach($v['data'] as $v2){
+				if(isset($v2['tpfd_chaxun'])&&($v2['tpfd_chaxun']=='yes')){
+					$search[] = $v2;
+				}
+				if(isset($v2['tpfd_list'])&&($v2['tpfd_list']=='yes')){
+					$list[] = $v2;
+				}
+			}
+		}
+		$data['chaxun']=json_encode($search); 
+		$data['list']=json_encode($list); 
+		db('fb')->update($data);;
+		return json(['code'=>0]);
+	}
+	public function sfdp_db($sid){
+		$info = db('fb')->find($sid);
+		$field = json_decode($info['ziduan'],true);
+		foreach($field['list'] as $k=>$v){
+			foreach($v['data'] as $v2){
+				if(isset($v2['tpfd_db'])){
+					$search[] = $v2;
+				}
+			}
+		}
+		
+		 $sfdp = new sfdp();
+		 $sfdp->makedb($field['name_db'],$search);
+		
+	}
 }

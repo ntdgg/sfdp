@@ -99,7 +99,7 @@
    <script>
   $( function() {
 		//初始化设计数据
-		int_data();
+		int_data({$json|raw});
 		//设置拖拽单元属性
 		$( ".fbtd" ).draggable({
 		  connectToSortable: ".fb-fz",
@@ -112,7 +112,7 @@
 		var int_data = localStorage.getItem("json_data");
 		 var id='{$fid}';
 		$.ajax({  
-			 url:'{:url("desc")}',
+			 url:'{:url("/index/sfdp/sfdp_desc_save")}',
 			 data:{ziduan:int_data,id:id},  
 			 type:'post',  
 			 cache:true,  

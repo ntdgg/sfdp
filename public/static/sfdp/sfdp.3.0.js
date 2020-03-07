@@ -41,7 +41,7 @@
 	}
 	//表单构建
 	function addtr(id,old_data='',showtype=''){ 
-		if(!has_item('fb_name')){
+		if(!has_item('name')){
 			return;
 		}
 		
@@ -318,21 +318,32 @@
 		}
 	}
 	//用于初始化设计
-	function int_data(){
-		var int_data = localStorage.getItem("json_data");
-		if(int_data==null){
+	function int_data(int_data){
+		//var int_data = ;
+		if(int_data==1){
+			var local_data = localStorage.getItem("json_data");
+			if(local_data!=null){
+				var desc_data = local_data;
+				//var desc_data = JSON.parse(int_data);
+			}
+		}else{
+			var desc_data = int_data;
+		}
+		if(int_data==null||int_data==1){
 			localStorage.setItem("json_data",JSON.stringify(fb_config_data));
 		}else{
+			console.log(desc_data);
 			var r=confirm("已缓存有数据，是否继续设计？");
 			if (r==true){
+				localStorage.setItem("json_data",JSON.stringify(int_data));
 				//初始化获取已经设计的缓存数据
-				var desc_data = JSON.parse(int_data);
+				
 				$('#fb_name').html(desc_data.name+'(DbTable:'+desc_data.name_db+')');
 				 for (x in desc_data.list){
 					addtr(desc_data.list[x]['type'],desc_data.list[x]);//恢复表单布局设计
 					recovery_input(desc_data.list[x]);//用于恢复表单字段内容
 				 }
-			  localStorage.setItem("json_data",int_data);
+			  
 			  }else{
 			  localStorage.setItem("json_data",JSON.stringify(fb_config_data));
 			}
@@ -364,6 +375,7 @@
 	}
 	function showview(){
 		var int_data = localStorage.getItem("json_data");
+		
 		if(int_data==null){
 			alert('对不起，您尚未开始设计！');
 		}else{

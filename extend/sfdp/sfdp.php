@@ -71,6 +71,10 @@ class sfdp
 	static function lists(){
 		return 123;
 	}
+	public function makedb($table,$data){
+		$bulid = new BuildTable();
+		$bulid->Btable($table,$data);
+	}
     public function make($data)
     {
 		$this->data = $data;

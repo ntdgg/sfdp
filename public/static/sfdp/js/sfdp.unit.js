@@ -45,7 +45,8 @@ $(function(){
 			return html;
         },
 		tpfd_common:function(data){
-			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div>数据表段：<input name="tpfd_db" type="text" value="'+data.tpfd_db +'">  字段标题：<input name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></div>';
+			var default_field = [{cid:'int',clab:'int',checked:''},{cid:'varchar',clab:'varchar',checked:'checked'},{cid:'datetime',clab:'datetime',checked:''},{cid:'longtext',clab:'longtext',checked:''}];
+			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div>数据表段：<input style="width:40px" name="tpfd_db" type="text" value="'+data.tpfd_db +'">长度<input style="width:40px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'">类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+'  字段标题：<input name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></div>'+$.tpfd_list(data);
         },
         tpfd_xianshi:function(data){
 			
@@ -80,7 +81,7 @@ $(function(){
 			return '<div>占位内容：<input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  设置默认：<input name="tpfd_moren" type="text" value="'+data.tpfd_moren +'"></div>';
         },
 		tpfd_list:function(data){
-			return '<div>查询设置：'+$.tpfd_select('','tpfd_chaxun','yes')+'  列表设置：'+$.tpfd_select('','tpfd_list','no')+'</div>';
+			return '<div>列表设置：'+$.tpfd_select('','tpfd_list','yes')+'  查询设置：'+$.tpfd_select('','tpfd_chaxun','no')+'  字段隐藏：'+$.tpfd_select('','tpfd_show','no')+'</div>';
         },
 		tpfd_select:function(data,field,value){
 			if(data==''){
