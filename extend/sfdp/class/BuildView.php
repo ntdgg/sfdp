@@ -16,7 +16,7 @@ use think\facade\Config;
 use think\Exception;
 use think\facade\Request;
 
-require_once Tp_DF . '/config/config.php';
+require_once FILE_PATH . '/config/config.php';
 
 class BuildView{
 	public function Bview($pathView, $pathTemplate, $fileName, $code, $data)

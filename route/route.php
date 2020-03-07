@@ -11,4 +11,6 @@
 
 Route::get('index/sfdp/list/sid/:sid','\sfdp\Api@lists');
 Route::get('index/sfdp/add/sid/:sid','\sfdp\Api@add');
+Route::get('index/sfdp/desc','\sfdp\Api@sfdp');
+Route::get('index/sfdp/sfdp_desc/sid/:sid','\sfdp\Api@sfdp_desc');
 

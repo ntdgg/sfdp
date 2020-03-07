@@ -22,18 +22,7 @@ class Fd extends Admin
 		$this->uid = session('uid');
 	    $this->role = session('role');
     }
-    /**
-     * 首页
-     * @return mixed
-     */
-    public function index($map=[])
-    {
-		var_dump($this->sfdp::lists());
-        if ($this->request->param("title")) $map[] = ['title','like',"%" . $this->request->param("title") . "%"];
-        $list=controller('Base', 'event')->commonlist('fb',$map);
-		$this->assign('list', $list);
-        return $this->view->fetch();
-    }
+   
 	/**
      * 表单设计
      * @return mixed

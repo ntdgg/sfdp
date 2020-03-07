@@ -15,7 +15,7 @@ use think\Db;
 use think\facade\Config;
 use think\Exception;
 
-require_once Tp_DF . '/config/config.php';
+require_once FILE_PATH . '/config/config.php';
 
 class BuildTable{
 	/**

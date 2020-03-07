@@ -1,4 +1,4 @@
-﻿<!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html>
 <head>
 <meta charset="utf-8">
@@ -29,6 +29,38 @@
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script type="text/javascript" src="__HUIADMIN__/common.js"></script>
 <script type="text/javascript" src="__LIB__/laydate5.0.9/laydate.js"></script>
-<title>Tpflow</title>
+<title>Sfdp</title>
 </head>
 <body>
+<div class="page-container">
+<a href="{:url('add')}" class="btn btn-primary radius">新增</a>
+	<table class="table table-border table-bordered table-bg">
+		<thead>
+			<tr class="text-c">
+				<th width="25">ID</th>
+				<th width="50">名称</th>
+				<th width="150">发布时间</th>
+				<th width="100">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{volist name='list' id='k'}
+			<tr class="text-c">
+				<td>{$k.id}</td>
+				<td>{$k.title}</td>
+				<td>{$k.add_time|date='Y-m-d H:i'}</td>
+				<td class="td-manage">
+				<div class="btn-group">
+					
+					<span data-title="查看" data-href="{:url('/index/sfdp/sfdp_desc',['sid'=>$k.id])}" onclick="Hui_admin_tab(this)"  class="btn  radius size-S">表单设计</span>
+					
+				</div>
+				</td>
+			</tr>
+			{/volist}
+		</tbody>
+	</table>
+</div>
+<div class="page-bootstrap">{$list|raw}</div>
+</body>
+</html>
