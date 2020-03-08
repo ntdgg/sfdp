@@ -20,16 +20,28 @@ class Api
 	/*动态生成列表*/
 	public function lists($sid)
 	{
-		return view(env('root_path') . 'extend/sfdp/template/index.html',['sid'=>$sid]);
+		$build = db('sfdp_design')->find($sid);
+		$field = json_decode($build['ziduan'],true);
+		$list_field = json_decode($build['list'],true);
+		$topicid = ''; //变量赋值为空
+			//用foreach 遍历下二维数组
+			foreach($list_field as $key=>$vals){
+				$topicid.=$vals['tpfd_db'].',';
+				$topicname[$vals['tpfd_db']]=$vals['tpfd_db'];
+			}
+			$topicid = rtrim($topicid, ',');
+		dump($topicname);
+		$list = db($field['name_db'])->field($topicid)->paginate('10');
+		return view(env('root_path') . 'extend/sfdp/template/index.html',['sid'=>$sid,'list'=>$list,'field'=>$topicname]);
 	}
 	/*动态生成表单*/
 	public function add($sid)
 	{
-		$json = db('fb')->find($sid);
+		$json = db('sfdp_design')->find($sid);
 		return view(env('root_path') . 'extend/sfdp/template/edit.html',['data'=>$json['ziduan']]);
 	}
 	public function sfdp($sid=''){
-		$data = Db::name('fb')->paginate('10');
+		$data = Db::name('sfdp_design')->paginate('10');
 		
 		return view(env('root_path') . 'extend/sfdp/template/sfdp.html',['list'=>$data]);
 	}
@@ -39,7 +51,7 @@ class Api
      */
     public function sfdp_desc($sid)
     {
-	   $info = db('fb')->find($sid);;
+	   $info = db('sfdp_design')->find($sid);;
       return view(env('root_path') . 'extend/sfdp/template/sfdp_desc.html',['json'=>$info['ziduan'],'fid'=>$info['id']]);
     }
 	public function sfdp_save(){
@@ -60,11 +72,11 @@ class Api
 		}
 		$data['chaxun']=json_encode($search); 
 		$data['list']=json_encode($list); 
-		db('fb')->update($data);;
+		db('sfdp_design')->update($data);;
 		return json(['code'=>0]);
 	}
 	public function sfdp_db($sid){
-		$info = db('fb')->find($sid);
+		$info = db('sfdp_design')->find($sid);
 		$field = json_decode($info['ziduan'],true);
 		foreach($field['list'] as $k=>$v){
 			foreach($v['data'] as $v2){

@@ -88,7 +88,7 @@ class BuildTable{
         try {
             Db::execute($sql_drop);
             Db::execute($sql_create);
-            Db::execute("DROP TABLE IF EXISTS `{$tableName}_build_bak`");
+          //  Db::execute("DROP TABLE IF EXISTS `{$tableName}_build_bak`");
         } catch (\Exception $e) {
             // 模拟事务操作，滚回原表
             if ($tableExist) {

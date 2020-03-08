@@ -39,31 +39,29 @@
             <a href="javascript:;" onclick="layer_show('新增','{:url('index/sfdp/add',['sid'=>$sid])}','850','500')" class="btn btn-primary radius">新增</a>
         </span>
         <span class="r pt-5 pr-5">
-            共有数据 ：<strong>1</strong> 条 {$sid}
+            共有数据 ：<strong>{:count($list)}</strong> 条
         </span>
     </div>
     <table class="table table-border table-bordered table-hover table-bg mt-20">
         <thead>
         <tr class="text-c">
             <th width="25"><input type="checkbox"></th>
-            <th>新闻 type获取</th>
-            <th>inde</th>
-            <th>状态</th>
+			{volist name='field' id='k'}
+            <th>{$k}</th>
+			{/volist}
             <th width="70">操作</th>
         </tr>
         </thead>
         <tbody>
-       
+       {volist name='list' id='k'}
         <tr class="text-c">
             <td><input type="checkbox" name="id[]" ></td>
-            <td>213132</td>
-            <td>1111</td>
-            <td>222222</td>
-            <td class="f-14">
-					1123
-            </td>
+			{volist name='field' id='ks'}
+            <td>{$k["$ks"]}</td>
+			{/volist}
+             <th width="70">操作</th>
         </tr>
-        
+        {/volist}
         </tbody>
     </table>
     <div class="page-bootstrap">{$page ?? ''}</div>
