@@ -10,7 +10,7 @@ class Api
 {
 	/*构建表单目录*/
 	static function sdfp_menu(){
-		$menu  =  Db::name('fb')->select();
+		$menu  =  Db::name('sfdp_design')->select();
 		$menu_html = '';
 		foreach($menu as $k=>$v){
 			$menu_html .='<li><a data-href="'.url('sfdp/list',['sid'=>$v['id']]).'" data-title="'.$v['title'].'">'.$v['title'].'</a></li>';
@@ -30,7 +30,6 @@ class Api
 				$topicname[$vals['tpfd_db']]=$vals['tpfd_db'];
 			}
 			$topicid = rtrim($topicid, ',');
-		dump($topicname);
 		$list = db($field['name_db'])->field($topicid)->paginate('10');
 		return view(env('root_path') . 'extend/sfdp/template/index.html',['sid'=>$sid,'list'=>$list,'field'=>$topicname]);
 	}
@@ -41,8 +40,12 @@ class Api
 		return view(env('root_path') . 'extend/sfdp/template/edit.html',['data'=>$json['ziduan']]);
 	}
 	public function sfdp($sid=''){
-		$data = Db::name('sfdp_design')->paginate('10');
+		$data = Db::name('sfdp_design')->paginate('10')->each(function($item, $key){
+				$item['fix'] = Db::name('sfdp_design_ver')->where('sid',$item['id'])->order('id desc')->select();
+				return $item;
+			});
 		
+		//dump($data);
 		return view(env('root_path') . 'extend/sfdp/template/sfdp.html',['list'=>$data]);
 	}
 	/**
@@ -85,9 +88,29 @@ class Api
 				}
 			}
 		}
-		
 		 $sfdp = new sfdp();
 		 $sfdp->makedb($field['name_db'],$search);
+	}
+	public function sfdp_fix($sid){
+		 $sfdp = new sfdp();
+		$info = db('sfdp_design')->find($sid);
+		$json = json_decode($info['ziduan'],true);
+		$ver = [
+			'sid'=>$sid,
+			's_bill'=>OrderNumber(),
+			's_name'=>$json['name'],
+			's_db'=>$json['name_db'],
+			's_list'=>$info['list'],
+			's_search'=>$info['chaxun'],
+			's_fun_ver'=>'',
+			's_field'=>$info['ziduan'],
+			'add_user'=>1,
+			'status'=>1,
+			'add_time'=>time()
+		];
 		
+		$id  =  Db::name('sfdp_design_ver')->insertGetId($ver);
+		db('sfdp_design_ver')->where('id','<>',$id)->where('sid',$sid)->update(['status'=>0]);;
+		return json(['code'=>0]);
 	}
 }

@@ -52,8 +52,18 @@
 				<td class="td-manage">
 				<div class="btn-group">
 					
-					<span data-title="查看" data-href="{:url('/index/sfdp/sfdp_desc',['sid'=>$k.id])}" onclick="Hui_admin_tab(this)"  class="btn  radius size-S">表单设计</span>
-					
+					<span data-title="查看" data-href="{:url('/index/sfdp/sfdp_desc',['sid'=>$k.id])}" onclick="Hui_admin_tab(this)"  class="btn  radius size-S">设计</span>
+					<a onClick='fix({$k.id})'  class="btn  radius size-S">部署</a>
+					{if condition="count($k.fix) >0"}
+					<span   class="btn  radius size-S dropDown">
+					<a class="dropDown_A" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">版本管理</a>
+					<ul class="dropDown-menu menu radius box-shadow">
+						{volist name="$k.fix" id='s'}
+							<li><a href="#">{if condition="$s.status eq 1"}✔{/if} {$s.s_bill}</a></li>
+						{/volist}
+						</ul>
+					</span>
+					{/if}
 				</div>
 				</td>
 			</tr>
@@ -64,3 +74,24 @@
 <div class="page-bootstrap">{$list|raw}</div>
 </body>
 </html>
+<script type="text/javascript">
+/*管理员-停用*/
+function fix(id){
+	layer.confirm('部署后将生成最新版本，确定是否执行?',function(index){
+		//此处请求后台程序，下方是成功后的前台处理……
+		$.ajax({
+			type: 'GET',
+			url: '/index/sfdp/sfdp_fix/sid/'+id+'.html',
+			dataType: 'json',
+			success: function(data){
+				if(data.code==0){
+					layer.msg('启用成功！!',{icon: 5,time:1000});
+				}
+			},
+			error:function(data) {
+				console.log(data.msg);
+			},
+		});		
+	});
+}
+</script>

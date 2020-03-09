@@ -24,6 +24,7 @@ define('DS',DIRECTORY_SEPARATOR);
 
 require_once FILE_PATH . '/class/build.php';
 require_once FILE_PATH . '/config/config.php';
+require_once FILE_PATH . '/config/common.php';
 require_once FILE_PATH . '/db/FbDb.php';
 require_once FILE_PATH . '/class/BuildView.php';
 require_once FILE_PATH . '/class/BuildTable.php';
