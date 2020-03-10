@@ -12,6 +12,10 @@
 		tpfd_time:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),//表单设计时间
 		tpfd_ver:'v3.0'//表单设计器版本
 	};
+	var NameExp = /^[\u4e00-\u9fa5]{0,}$/;
+	var DbNameExp = /^(?!_)(?!.*?_$)[a-z0-9_]+$/;
+	var DbFieldExp = /^(?!_)(?!.*?_$)[a-z_]+$/;
+	var NumExp = /^[0-9]*[1-9][0-9]*$/;
 
 	// 格式化时间
 	function dateFormat(oDate, fmt) {
@@ -183,9 +187,21 @@
 		//console.log(params);
 		if($('#showtype').val()=='view'){
 			$('.tpfd-pop').fadeOut();
+			commonfun.ShowTip(' 界面预览成功 ');
 			logout('界面预览成功！');
 		}else{
 			if(params.name!=undefined){
+				console.log(1);
+				if(!NameExp.test(params.name)){
+					commonfun.ShowTip(' Name格式不正确 ');
+					return;
+				}
+				if(!DbNameExp.test(params.name_db)){
+					commonfun.ShowTip(' Dbname格式不正确 ！');
+					logout('仅允许使用小写字母和数字和下划线~');
+					return;
+				}
+				console.log(2);
 				$('#fb_name').html(params.name+'(DbTable:'+params.name_db+')');
 				var json_data = JSON.parse(localStorage.getItem("json_data"));
 					//console.log(json_data);
@@ -194,10 +210,25 @@
 					json_data['tpfd_class']=params.tpfd_class;
 					json_data['tpfd_fun']=params.tpfd_fun;
 					json_data['tpfd_script']=params.tpfd_script;
-				localStorage.setItem("json_data",JSON.stringify(json_data));
+					localStorage.setItem("json_data",JSON.stringify(json_data));
 				$('.tpfd-pop').fadeOut();
 				logout('初始化配置成功！');
 			}else{
+				if(!DbFieldExp.test(params.tpfd_db)){
+					commonfun.ShowTip('　数据表段有误　');
+					return;
+				}
+				if(!NumExp.test(params.tpfd_dbcd)){
+					commonfun.ShowTip('　字段长度有误　');
+					return;
+				}
+				if(params.tpfd_name==''){
+					commonfun.ShowTip('　标题不能为空　');
+					return;
+				}
+				
+				
+				
 				fb_set_return(params);
 				save_json(params,params.tr_id,'td_data');
 			}
@@ -231,8 +262,6 @@
 	function showLayer(type,id,parent_code){
 		
 		if(type=='config'){
-		
-			console.log(look_db)
 			var json_data = JSON.parse(localStorage.getItem("json_data"));
 			var html = '<div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div>'+
 			'<div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+' '+((look_db) == '1' ? 'disabled' : '') +' ></div>'+
