@@ -17,9 +17,9 @@ return [
     // 数据库名
     'database'        => 'tpfd3.0',
     // 用户名
-    'username'        => 'tpfd3.0',
+    'username'        => 'root',
     // 密码
-    'password'        => 'tpfd3.0',//*@!%^&%#@@@1234
+    'password'        => 'root',//*@!%^&%#@@@1234
     // 端口
     'hostport'        => '3306',
     // 连接dsn
