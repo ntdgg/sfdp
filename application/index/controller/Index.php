@@ -3,6 +3,7 @@
 namespace app\index\Controller;
 use think\Controller;
 use think\facade\Session;
+use sfdp\sfdp;
 
 class Index  extends Controller{
     public function index(){

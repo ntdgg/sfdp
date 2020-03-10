@@ -1,108 +1,44 @@
-{include file='pub/base' /}
-  <link rel="stylesheet" href="__LIB__/multiple-select/multiple-select.css" />
-<article class="page-container">
-		{present name="info.id"}
-			<form action="{:url('edit')}" method="post" name="form" id="form">
-			<input type="hidden" name="id" value="{$info.id}">
-			<input type="hidden" name="status" value="0">
-		{else /}
-			<form action="{:url('functions')}" method="post" name="form" id="form">
-			<input type="hidden" name="fid" value="{$fid}">
-		{/present}
-		<table class="table table-border table-bordered table-bg">
-			<tr>
-			<td style='width:75px'>函数名称</td><td style='width:330px'>
-			<input type="text" id='title' class="input-text" value="{$info.name ?? ''}" name="name"  datatype="*" ></td>
-			<td style='width:75px'>字段名</td><td style='width:330px' >
-			<input type="text"  class="input-text" value="{$info.name ?? ''}" name="zdname"  datatype="*" ></td>
-			</tr>
-			<tr>
-			<td style='width:75px'>函数名称</td><td style='width:330px'>
-			<ul class="cl">
-				<li class="dropDown dropDown_hover">
-					<a href="#" class="dropDown_A">Sql语句填写示例<i class="Hui-iconfont">&#xe6d5;</i></a>
-					<ul class="dropDown-menu menu radius box-shadow">
-						<li><a href="javascript:insert('SELECT id,type as name FROM `leipi_news_type`')">select</a></li>
-					</ul>
-					*应包含主键及显示字段(为 AS name)
-				</li>
-			</ul>
-			</td>
-			<td style='width:330px' colspan='2'>执行结果</td>
-			</tr>
-			<tr valign="top">
-			<td style='width:75px'>函数语句：</td><td style='width:330px' >
-			<textarea placeholder="此为SQL语句，非专业人士请勿随意提交！" id='sql' name='sql' type="text/plain" style="width:100%;height:150px;"></textarea> </td>
-		    <td style='width:330px' colspan='2'><p id="result" ></p></td>
+<!DOCTYPE html>
+<html>
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta name="renderer" content="webkit|ie-comp|ie-stand" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /> 
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" /> 
+  <meta http-equiv="Cache-Control" content="no-siteapp" /> 
+  <title>SFDP 超级表单开发平台V3.0</title> 
+ </head> 
+ <body> 
+  <link rel="stylesheet" href="__SFDP__/css/sfdp.common.css" />
+
 			
+			
+			<form action='{:url("/index/sfdp/sfdp_fun_save")}' method="post" name="form" id="form">
+<input type="hidden" name="sid" value="{$sid}">
+  <div class="page-container"> 
+		<table>
+			<tr valign="center">
+			<td style='width:35px;text-align:center'>脚本说明</td>
+			<td style='width:330px'>
+			<pre><bq>&lt;h2</bq><bq>&gt;</bq>脚本说明：<bq style="">&lt;/h2</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq>特别说明：脚本支持所有的JQ语句，但系统内置了几个常用的<bq>&lt;/p</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq>load_satr_fun();//前置函数<bq>&lt;/p</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq>前置函数在表单构建器之前会执行，比如插入必要的组件代码。<bq>&lt;/p</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq>load_end_fun();//后置函数<bq>&lt;/p</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq>后置代码用于页面加载完成后的代码执行<bq>&lt;/p</bq><bq>&gt;</bq>
+			</pre>
+			</td>
+			</tr>
+			<tr valign="center">
+			<td style='width:35px;text-align:center'>单据脚本</td><td style='width:330px' >
+			<textarea placeholder="请填写JQ脚本代码！" name='function' type="text/plain" style="width:100%;height:350px;">{$info.s_fun}</textarea> </td>
 			</tr>
 		</table>
-		
 		<div class="row cl">
 			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-				<a  class="btn btn-primary radius" id='forms'><i class="Hui-iconfont">&#xe632;</i> 测试</a>
-				<button  class="btn btn-primary radius" id='oks' type="submit" disabled="disabled"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
-				
+				<button  class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
 				<button  class="btn btn-default radius" type="button" onclick="layer_close()">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
 			</div>
 		</div>
 	</form>
+	
 </article>
 
-
-<script src="https://cdn.bootcss.com/Base64/1.0.1/base64.js"></script>
-<script type="text/javascript">
-$(function(){
-	$("[name='new_top'][value='{$info.new_top ?? ''}']").attr("checked",true);
-	$("[name='new_type']").find("[value='{$info.new_type ?? '0'}']").attr("selected",true);
-	$('.skin-minimal input').iCheck({
-		checkboxClass: 'icheckbox-blue',
-		radioClass: 'iradio-blue',
-		increaseArea: '20%'
-	});
-	$("#form").Validform({
-            tiptype:2,
-            ajaxPost:true,
-            showAllError:true,
-            callback:function(ret){
-                ajax_progress(ret);
-            }
-    });
-
-});
-function insert($sql){
-    if ($sql){
-        var table=$("#tables").val();
-        $("#sql").text($sql.replace("[table]", table));
-    }
-}
-$("#forms").click(function(){
-    var sql=$("#sql").val();
-	var title=$("#title").val();
-    if (!sql){layer.msg("SQL不能为空!!");return;}
-    $.ajax({  
-         url:'{:url("ajax_sql")}',
-         data:{sql:sql,title:title},  
-         type:'post',  
-         cache:true,  
-         dataType:'html',  
-         success:function(data) {  
-			if(data == 1){
-				$("#result").html('错误的SQL语句！<br/>'+$("#sql").val());
-			}else{
-				$('#oks').attr("disabled",false); 
-				$("#result").html(data); 
-			}
-          },  
-          error : function() {  
-              $("#result").html('错误的SQL语句！<br/>'+$("#sql").val());
-          }  
-     }); 
-      
-    
-})
-</script>
-</script>
 <!--/请在上方写此页面业务相关的脚本-->
 </body>
 </html>

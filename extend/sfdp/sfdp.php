@@ -27,6 +27,7 @@ require_once FILE_PATH . '/config/config.php';
 require_once FILE_PATH . '/config/common.php';
 require_once FILE_PATH . '/db/FbDb.php';
 require_once FILE_PATH . '/class/BuildView.php';
+require_once FILE_PATH . '/class/BuildFun.php';
 require_once FILE_PATH . '/class/BuildTable.php';
 require_once FILE_PATH . '/class/BuildController.php';
 
@@ -75,6 +76,11 @@ class sfdp
 	public function makedb($table,$data){
 		$bulid = new BuildTable();
 		$bulid->Btable($table,$data);
+	}
+	public function makefun($name,$data){
+		$fileName = 'static' . DS . 'sfdp' . DS .'user-defined'. DS .$name.'.js';
+		$bulid = new BuildFun();
+		$bulid->Bfun($fileName,$data);
 	}
     public function make($data)
     {

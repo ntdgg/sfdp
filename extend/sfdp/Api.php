@@ -46,7 +46,12 @@ class Api
 	public function add($sid)
 	{
 		$json = db('sfdp_design_ver')->find($sid);
-		return view(env('root_path') . 'extend/sfdp/template/edit.html',['data'=>$json['s_field']]);
+		if($json['s_fun_id']!=''){
+			$fun = '<script src="\static/sfdp/user-defined/'.$json['s_fun_ver'].'.js"></script>';	
+		}else{
+			$fun = '';
+		}
+		return view(env('root_path') . 'extend/sfdp/template/edit.html',['fun'=>$fun,'data'=>$json['s_field']]);
 	}
 	public function sfdp($sid=''){
 		$data = Db::name('sfdp_design')->paginate('10')->each(function($item, $key){
@@ -150,6 +155,36 @@ class Api
 			'add_time'=>time()
 		];
 		Db::name('sfdp_design')->insertGetId($ver);
+		
+	}
+	public function sfdp_fun($sid){
+		$info = db('sfdp_function')->where('sid',$sid)->find();
+		  return view(env('root_path') . 'extend/sfdp/template/sfdp_fun.html',['sid'=>$sid,'info'=>$info]);
+	}
+	public function sfdp_fun_save(){
+		$sfdp = new sfdp();
+		$data = input('post.');
+		$info = db('sfdp_function')->where('sid',$data['sid'])->find();
+		if(!$info){
+			$ver = [
+				's_bill'=>OrderNumber(),
+				'add_user'=>'Sys',
+				'sid'=>$data['sid'],
+				's_fun'=>$data['function'],
+				'add_time'=>time()
+			];
+			$id = Db::name('sfdp_function')->insertGetId($ver);
+			db('sfdp_design_ver')->where('sid',$data['sid'])->where('status',1)->update(['s_fun_id'=>$id,'s_fun_ver'=>$ver['s_bill']]);
+			
+			$sfdp->makefun($ver['s_bill'],$data['function']);
+			}else{
+			$ver = [
+				'id'=>$info['id'],
+				's_fun'=>$data['function']
+			];	
+			Db::name('sfdp_function')->update($ver);
+			$sfdp->makefun($info['s_bill'],$data['function']);
+		}
 		
 	}
 }
