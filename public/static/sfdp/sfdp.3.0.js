@@ -229,10 +229,13 @@
 
 	
 	function showLayer(type,id,parent_code){
+		
 		if(type=='config'){
+		
+			console.log(look_db)
 			var json_data = JSON.parse(localStorage.getItem("json_data"));
 			var html = '<div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div>'+
-			'<div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+'></div>'+
+			'<div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+' '+((look_db) == '1' ? 'disabled' : '') +' ></div>'+
 			'<div>设置表单样式：<input name="tpfd_class" type="text" value='+json_data.tpfd_class+'></div>'+
 			'<div>表单调用函数：<textarea name="tpfd_fun">'+json_data.tpfd_fun+'</textarea></div>'+
 			'<div>设置表单脚本：<textarea name="tpfd_script" rows="4" cols="20">'+json_data.tpfd_script+'</textarea></div>';
@@ -324,7 +327,6 @@
 			var local_data = localStorage.getItem("json_data");
 			if(local_data!=null){
 				var desc_data = local_data;
-				//var desc_data = JSON.parse(int_data);
 			}
 		}else{
 			var desc_data = int_data;
@@ -332,21 +334,20 @@
 		if(int_data==null||int_data==1){
 			localStorage.setItem("json_data",JSON.stringify(fb_config_data));
 		}else{
-			console.log(desc_data);
-			var r=confirm("已缓存有数据，是否继续设计？");
-			if (r==true){
+				
+			//var r=confirm("已缓存有数据，是否继续设计？");
+			//if (r==true){
 				localStorage.setItem("json_data",JSON.stringify(int_data));
 				//初始化获取已经设计的缓存数据
-				
 				$('#fb_name').html(desc_data.name+'(DbTable:'+desc_data.name_db+')');
 				 for (x in desc_data.list){
 					addtr(desc_data.list[x]['type'],desc_data.list[x]);//恢复表单布局设计
 					recovery_input(desc_data.list[x]);//用于恢复表单字段内容
 				 }
 			  
-			  }else{
-			  localStorage.setItem("json_data",JSON.stringify(fb_config_data));
-			}
+			 // }else{
+			//  localStorage.setItem("json_data",JSON.stringify(fb_config_data));
+			//}
 		}
 	}
 		$.fn.serializeObject = function() {  

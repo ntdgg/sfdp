@@ -8,51 +8,44 @@
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 <link rel="Bookmark" href="/favicon.ico" >
 <link rel="Shortcut Icon" href="/favicon.ico" />
-<!--[if lt IE 9]>
-<script type="text/javascript" src="lib/html5shiv.js"></script>
-<script type="text/javascript" src="lib/respond.min.js"></script>
-<![endif]-->
 <link rel="stylesheet" type="text/css" href="__HUI__/css/H-ui.min.css" />
 <link rel="stylesheet" type="text/css" href="__HUIADMIN__/css/H-ui.admin.css" />
 <link rel="stylesheet" type="text/css" href="__LIB__/Hui-iconfont/1.0.8/iconfont.css" />
 <link rel="stylesheet" type="text/css" href="__HUIADMIN__/skin/blue/skin.css" id="blue" />
 <link rel="stylesheet" type="text/css" href="__HUIADMIN__/css/style.css" />
 <link rel="stylesheet" type="text/css" href="__HUIADMIN__/common.css" />
-<!--[if IE 6]>
-<script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
-<script>DD_belatedPNG.fix('*');</script>
-<![endif]-->
 <script type="text/javascript" src="__LIB__/jquery/1.9.1/jquery.min.js"></script> 
 <script type="text/javascript" src="__LIB__/layer/2.4/layer.js"></script>
 <script type="text/javascript" src="__HUI__/js/H-ui.min.js"></script>
 <script type="text/javascript" src="__HUIADMIN__/js/H-ui.admin.js"></script>
-<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script type="text/javascript" src="__HUIADMIN__/common.js"></script>
-<script type="text/javascript" src="__LIB__/laydate5.0.9/laydate.js"></script>
 <title>Sfdp</title>
 </head>
 <body>
 <div class="page-container">
-<a href="{:url('add')}" class="btn btn-primary radius">新增</a>
+<a href="{:url('/index/sfdp/create')}" class="btn btn-primary radius">创建</a>
 	<table class="table table-border table-bordered table-bg">
 		<thead>
 			<tr class="text-c">
-				<th width="25">ID</th>
-				<th width="50">名称</th>
+				<th width="25">编码</th>
+				<th width="50">标题</th>
 				<th width="150">发布时间</th>
+				<th width="150">启用状态</th>
+				<th width="150">锁定状态</th>
 				<th width="100">操作</th>
 			</tr>
 		</thead>
 		<tbody>
 			{volist name='list' id='k'}
 			<tr class="text-c">
-				<td>{$k.id}</td>
-				<td>{$k.title}</td>
+				<td>{$k.s_bill}</td>
+				<td>{$k.s_title}</td>
 				<td>{$k.add_time|date='Y-m-d H:i'}</td>
+				<td>{$k.s_design}</td>
+				<td>{eq name='k.s_look' value='0'}未锁定{else/}已锁定（{$k.s_db}）{/eq}</td>
 				<td class="td-manage">
 				<div class="btn-group">
-					
-					<span data-title="查看" data-href="{:url('/index/sfdp/sfdp_desc',['sid'=>$k.id])}" onclick="Hui_admin_tab(this)"  class="btn  radius size-S">设计</span>
+					<span data-title="{$k.s_bill}——设计" data-href="{:url('/index/sfdp/sfdp_desc',['sid'=>$k.id])}" onclick="Hui_admin_tab(this)"  class="btn  radius size-S">设计</span>
 					<a onClick='fix({$k.id})'  class="btn  radius size-S">部署</a>
 					{if condition="count($k.fix) >0"}
 					<span   class="btn  radius size-S dropDown">

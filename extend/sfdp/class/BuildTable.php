@@ -84,7 +84,6 @@ class BuildTable{
         $sql_create = "CREATE TABLE `{$tableName}` (\n"
             . implode(",\n", array_merge($fieldAttr, $key))
             . "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$table}'";
-		
         try {
             Db::execute($sql_drop);
             Db::execute($sql_create);
