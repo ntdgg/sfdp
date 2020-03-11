@@ -132,8 +132,6 @@ class Api
 		
 		$id  =  Db::name('sfdp_design_ver')->insertGetId($ver);
 		db('sfdp_design_ver')->where('id','<>',$id)->where('sid',$sid)->update(['status'=>0]);
-		
-		
 		$field = json_decode($info['s_field'],true);
 		foreach($field['list'] as $k=>$v){
 			foreach($v['data'] as $v2){
@@ -144,6 +142,7 @@ class Api
 		}
 		 $sfdp = new sfdp();
 		 $sfdp->makedb($json['name_db'],$search);
+		 db('sfdp_design')->where('id',$sid)->update(['s_design'=>2]);
 		return json(['code'=>0]);
 	}
 	public function sfdp_create(){
@@ -155,11 +154,29 @@ class Api
 			'add_time'=>time()
 		];
 		Db::name('sfdp_design')->insertGetId($ver);
+		echo "<script language='javascript'>alert('Success,创建成功！'); window.location.reload();</script>";
 		
 	}
 	public function sfdp_fun($sid){
 		$info = db('sfdp_function')->where('sid',$sid)->find();
 		  return view(env('root_path') . 'extend/sfdp/template/sfdp_fun.html',['sid'=>$sid,'info'=>$info]);
+	}
+	public function sfdp_ui($sid){
+		$info = db('sfdp_design')->find($sid);
+		if($info['s_design']<>2){
+			echo "<script language='javascript'>alert('Err,请先设计并部署！！'); top.location.reload();</script>";
+			exit;
+		}
+		$json = db('sfdp_design_ver')->where('status',1)->where('sid',$sid)->find();
+		$field = json_decode($json['s_field'],true);
+		foreach($field['list'] as $k=>$v){
+			foreach($v['data'] as $v2){
+				if(isset($v2['tpfd_db'])){
+					$ui[] = $v2;
+				}
+			}
+		}
+		return view(env('root_path') . 'extend/sfdp/template/sfdp_ui.html',['sid'=>$sid,'ui'=>$ui]);
 	}
 	public function sfdp_fun_save(){
 		$sfdp = new sfdp();
@@ -175,7 +192,6 @@ class Api
 			];
 			$id = Db::name('sfdp_function')->insertGetId($ver);
 			db('sfdp_design_ver')->where('sid',$data['sid'])->where('status',1)->update(['s_fun_id'=>$id,'s_fun_ver'=>$ver['s_bill']]);
-			
 			$sfdp->makefun($ver['s_bill'],$data['function']);
 			}else{
 			$ver = [
@@ -184,6 +200,7 @@ class Api
 			];	
 			Db::name('sfdp_function')->update($ver);
 			$sfdp->makefun($info['s_bill'],$data['function']);
+			echo "<script language='javascript'>alert('Success,脚本生成成功！'); top.location.reload();</script>";
 		}
 		
 	}

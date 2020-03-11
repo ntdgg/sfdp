@@ -17,6 +17,7 @@ Route::get('index/sfdp/sfdp_fix/sid/:sid','\sfdp\Api@sfdp_fix');
 Route::get('index/sfdp/db/sid/:sid','\sfdp\Api@sfdp_db');
 Route::get('index/sfdp/create','\sfdp\Api@sfdp_create');
 Route::get('index/sfdp/sfdp_fun/sid/:sid','\sfdp\Api@sfdp_fun');
+Route::get('index/sfdp/sfdp_ui/sid/:sid','\sfdp\Api@sfdp_ui');
 Route::post('index/sfdp/sfdp_desc_save','\sfdp\Api@sfdp_save');
 Route::post('index/sfdp/sfdp_fun_save','\sfdp\Api@sfdp_fun_save');
 
