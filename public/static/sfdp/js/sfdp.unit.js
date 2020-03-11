@@ -13,7 +13,7 @@ $(function(){
 		tpfd_return:function(type,data){
 			switch(type) {
 				case 'text':
-					var html = $.tpfd_common(data)+$.tpfd_fun(data);
+					var html = $.tpfd_common(data)+$.tpfd_moren(data);
 					break;
 				case 'checkboxes':
 					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data);
@@ -71,14 +71,14 @@ $(function(){
 				}
 				var default_data =JSON.parse(JSON.stringify(datas));
 			}
-            return '<div><input '+((data.xx_type) == '0' ? 'checked' : 'checked') +'  name="xx_type" value=0 type="radio">静态数据：</div>'+$.tpfd_checkboxes_clss(default_data,type)+
-			'<div><input '+((data.xx_type) == '1' ? 'checked' : '') +' name="xx_type" value=1 type="radio">动态数据：<br/><input name="checkboxes_func" type="text" value="'+((data.tr_id) == '' ? 'selected' : 'func_aaaa')+'"></div>';
+            return '<div><input '+((data.xx_type) == '0' ? 'checked' : '') +'  name="xx_type" value=0 type="radio">静态数据：</div>'+$.tpfd_checkboxes_clss(default_data,type)+
+			'<div><input '+((data.xx_type) == '1' ? 'checked' : '') +' name="xx_type" value=1 type="radio">动态数据：<br/><input name="checkboxes_func" type="text" value="'+((data.checkboxes_func) == '' ? '' : data.checkboxes_func)+'"></div>';
         },
 		tpfd_fun:function(data){
 			return '<div style="font-size: 16px;font-weight: 800;">高级设置</div><div></div>';
         },
 		tpfd_moren:function(data){
-			return '<div>占位内容：<input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  设置默认：<input name="tpfd_moren" type="text" value="'+data.tpfd_moren +'"></div>';
+			return '<div>占位内容：<input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  设置默认：<input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'"></div>';
         },
 		tpfd_list:function(data){
 			return '<div>列表设置：'+$.tpfd_select('','tpfd_list','yes')+'  查询设置：'+$.tpfd_select('','tpfd_chaxun','no')+'  字段隐藏：'+$.tpfd_select('','tpfd_show','no')+'</div>';

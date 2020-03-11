@@ -2,45 +2,23 @@
 	var fb_config_data = {
 		name:'',//表单名称
 		name_db:'',//数据表名称
-		tpfd_id:'SFDP'+dateFormat(new Date(), "mmssS"),//表单ID
+		tpfd_id:'SFDP'+ commonfun.dateFormat(new Date(), "mmssS"),//表单ID
 		tpfd_class:'',//表单样式
 		tpfd_fun:'',//调用方法
 		tpfd_script:'',//数据表脚本
 		list:{
 			//设计数据
 		},
-		tpfd_time:dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),//表单设计时间
+		tpfd_time:commonfun.dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),//表单设计时间
 		tpfd_ver:'v3.0'//表单设计器版本
 	};
 	var NameExp = /^[\u4e00-\u9fa5]{0,}$/;
 	var DbNameExp = /^(?!_)(?!.*?_$)[a-z0-9_]+$/;
 	var DbFieldExp = /^(?!_)(?!.*?_$)[a-z_]+$/;
 	var NumExp = /^[0-9]*[1-9][0-9]*$/;
-
-	// 格式化时间
-	function dateFormat(oDate, fmt) {
-		var o = {
-			"M+": oDate.getMonth() + 1, //月份
-			"d+": oDate.getDate(), //日
-			"h+": oDate.getHours(), //小时
-			"m+": oDate.getMinutes(), //分
-			"s+": oDate.getSeconds(), //秒
-			"q+": Math.floor((oDate.getMonth() + 3) / 3), //季度
-			"S": oDate.getMilliseconds()//毫秒
-		};
-		if (/(y+)/.test(fmt)) {
-			fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
-		}
-		for (var k in o) {
-			if (new RegExp("(" + k + ")").test(fmt)) {
-				fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-			}
-		}
-		return fmt;
-	}
 	//日志输出区
 	function logout(info){
-		var szInfo = "<div>[" + dateFormat(new Date(), "mm:ss")+'] ' + info+"</div>";
+		var szInfo = "<div>[" + commonfun.dateFormat(new Date(), "mm:ss")+'] ' + info+"</div>";
 		$("#logout").html(szInfo + $("#logout").html());
 	}
 	//表单构建
@@ -48,31 +26,29 @@
 		if(!has_item('name')){
 			return;
 		}
-		
 		var $targetTbody= $("#table_center tbody");
 		var $tr = $targetTbody.children("tr[class='table_tr']:last");
 		if(old_data==''){
-			var code = 'Tr'+dateFormat(new Date(), "hhmmssS");
+			var code = 'Tr'+commonfun.dateFormat(new Date(), "hhmmssS");
 		}else{
 			var code = old_data['tr'];
 		}
-		
 		switch(id) {
 			case 1:
 				logs ='新增1*1单元行';
-				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span><span class="code2 fa fa-minus-square"></span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span><span class="code2">x</span></td></tr>';
 				break;
 			case 2:
 				logs ='新增1*2单元行';
-				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-2" colspan="2"></td><td id="2" colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span><span class="code2 fa      fa-minus-square"></span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-2" colspan="2"></td><td id="2" colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span><span class="code2">x</span></td></tr>';
 				break;
 			case 3:
 				logs ='新增1*3单元行';
-				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span><span class="code2 fa fa-minus-square"></span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span><span class="code2">x</span></td></tr>';
 				break;
 			case 4:
 				logs ='新增1*4单元行';
-				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" class="fb-fz x-4"></td><td id="4" class="fb-fz x-4 code_td"><span class="code">'+code+'</span><span class="code2 fa fa-minus-square"></span></td></tr>';
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" class="fb-fz x-4"></td><td id="4" class="fb-fz x-4 code_td"><span class="code">'+code+'</span><span class="code2">x</span></td></tr>';
 				break;
 			 default:
 				var html ='';
@@ -92,7 +68,7 @@
 						var type = $(this).children('a').attr("data");
 						var parent_code = $(this).parent().attr("id"); //获取Tr的ID值 
 						if($(this).html().indexOf("code") >= 0 ) { 
-							var code = '<span class="code">'+parent_code+'</span><span class="code2 fa fa-minus-square"></span>';
+							var code = '<span class="code">'+parent_code+'</span><span class="code2">x</span>';
 						}else{
 							var code = '';
 						}
@@ -121,7 +97,7 @@
 	function fb_tpl(type,code,parent_code,td_xh,old_data=0){
 		
 		if(old_data==0){
-			var td_id = type+'_'+ dateFormat(new Date(), "mmssS");
+			var td_id = type+'_'+ commonfun.dateFormat(new Date(), "mmssS");
 		}else{
 			var td_id =old_data;
 		}
@@ -176,15 +152,13 @@
 		return $.tpfd_return(type,tpfd_db);
 	}
 	function fb_set_return(data){
-		//console.log('id='+data.tpfd_id);
 		$('#label'+data.tpfd_id).html(data.tpfd_name+'：');
-		//$('#input'+data.tpfd_id).val(data.tpfd_moren);
 		$('.tpfd-pop').fadeOut();
 	}
 	//点击保存按钮
 	$('.tpfd-ok').on('click', function() {
-		var params = $("#myform").serializeObject(); //将表单序列化为JSON对象  
-		//console.log(params);
+		var params = commonfun.fromdata($("#myform")); //将表单序列化为JSON对象  
+		console.log(params);
 		if($('#showtype').val()=='view'){
 			$('.tpfd-pop').fadeOut();
 			commonfun.ShowTip(' 界面预览成功 ');
@@ -226,9 +200,6 @@
 					commonfun.ShowTip('　标题不能为空　');
 					return;
 				}
-				
-				
-				
 				fb_set_return(params);
 				save_json(params,params.tr_id,'td_data');
 			}
@@ -265,6 +236,7 @@
 			var json_data = JSON.parse(localStorage.getItem("json_data"));
 			var html = '<div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div>'+
 			'<div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+' '+((look_db) == '1' ? 'disabled' : '') +' ></div>'+
+			'<div>设置列表控件：Add Edit Del View Status WorkFlow'+
 			'<div>设置表单样式：<input name="tpfd_class" type="text" value='+json_data.tpfd_class+'></div>'+
 			'<div>表单调用函数：<textarea name="tpfd_fun">'+json_data.tpfd_fun+'</textarea></div>'+
 			'<div>设置表单脚本：<textarea name="tpfd_script" rows="4" cols="20">'+json_data.tpfd_script+'</textarea></div>';
@@ -335,7 +307,7 @@
 				var type = td_data[x]['td_type'];
 				var parent_code = old_data['tr'];
 				if($('#'+old_data['tr']).children('td').eq(td_data[x]['td']-1).html().indexOf("code") >= 0 ) { 
-					var class_code = '<span class="code">'+parent_code+'</span><span class="code2 fa fa-minus-square"></span>';
+					var class_code = '<span class="code">'+parent_code+'</span><span class="code2">x</span>';
 				}else{
 					var class_code = '';
 				}
@@ -379,21 +351,6 @@
 			//}
 		}
 	}
-		$.fn.serializeObject = function() {  
-        var o = {};  
-        var arr = this.serializeArray();  
-        $.each(arr,function(){  
-            if (o[this.name]) {  //返回json中有该属性
-                if (!o[this.name].push) { //将已存在的属性值改成数组
-                    o[this.name] = [ o[this.name] ];
-                }  
-                o[this.name].push(this.value || ''); //将值存放到数组中
-            } else {  //返回json中没有有该属性
-                o[this.name] = this.value || '';  //直接将属性和值放入返回json中
-            }  
-        });  
-        return o;  
-    }
 	function addoption(id,type='checkbox'){
 		$('#checkboxes'+id).children('span').attr("onclick","editoption("+id+")");
 		$('#checkboxes'+id).children('span').html('Del');
@@ -419,8 +376,6 @@
 					console.log(table);
 					//recovery_input(desc_data.list[x]);//用于恢复表单字段内容
 				 } 
-			  
-			 
 		}
 		
 	}

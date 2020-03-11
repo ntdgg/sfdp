@@ -19,6 +19,41 @@ var commonfun = {
 		$tip.stop(true).css('margin-left', -$tip.outerWidth() / 2).fadeIn(2000).delay(2000).fadeOut(2000);
 		setTimeout(function(){ $tip.remove(); }, 2200);
 	},
+	dateFormat : function (oDate, fmt){
+		var o = {
+			"M+": oDate.getMonth() + 1, //月份
+			"d+": oDate.getDate(), //日
+			"h+": oDate.getHours(), //小时
+			"m+": oDate.getMinutes(), //分
+			"s+": oDate.getSeconds(), //秒
+			"q+": Math.floor((oDate.getMonth() + 3) / 3), //季度
+			"S": oDate.getMilliseconds()//毫秒
+		};
+		if (/(y+)/.test(fmt)) {
+			fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
+		}
+		for (var k in o) {
+			if (new RegExp("(" + k + ")").test(fmt)) {
+				fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+			}
+		}
+		return fmt;
+	},
+	fromdata : function (froms){
+		var o = {};  
+        var arr = froms.serializeArray();  
+        $.each(arr,function(){  
+            if (o[this.name]) {  //返回json中有该属性
+                if (!o[this.name].push) { //将已存在的属性值改成数组
+                    o[this.name] = [ o[this.name] ];
+                }
+                o[this.name].push(this.value || ''); //将值存放到数组中
+            } else {  //返回json中没有有该属性
+                o[this.name] = this.value || '';  //直接将属性和值放入返回json中
+            }  
+        });  
+        return o; 
+	},
 	sPost : function(url,data,success){
         if(isDebug){
             console.log('[URL]'+url);
