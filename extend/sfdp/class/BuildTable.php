@@ -26,31 +26,16 @@ class BuildTable{
         $tableName = Config::get("database.prefix") . $table;
         $tableExist = false;// 判断表是否存在
         $ret = Db::query("SHOW TABLES LIKE '{$tableName}'");
+		$ret_bak = Db::query("SHOW TABLES LIKE '{$tableName}_bak'");
 		
+		if ($ret_bak && isset($ret_bak[0])) { 
+			return ['code'=>1,'msg'=>'备份数据表已经存在，请先删除！'];
+		}
         if ($ret && isset($ret[0])) {
-            Db::execute("RENAME TABLE {$tableName} to {$tableName}_build_bak");
+            Db::execute("RENAME TABLE {$tableName} to {$tableName}_bak");
             $tableExist = true;
 	
         }
-		
-		
-		//用户删除，则创建字段_bak
-		//
-	/* 
-		①添加字段(add):
-         alter table 表名 add 新字段名 数据类型；（添加到最后一列）
-         alter table 表名 add 新字段名 数据类型 first;(添加到第一列)
-         alter table 表名 add 新字段名 数据类型 after 字段名；（添加到指定位置之后）
-         ②删除字段（drop）
-         alter table 表名 drop 字段名；
-         ③修改数据类型（modify）
-         alter table 表名 modify 字段名 新数据类型；
-         ④表重命名（remove）
-
-          alter table 表名 remove 新表名
-         ⑤表字段的重命名（change）
-         alter table 表名 change 原名 新名 数据类型； */
-		
         $auto_create_field = ['id', 'status', 'isdelete', 'create_time', 'update_time'];
         // 强制建表和不存在原表执行建表操作
         $fieldAttr = [];
@@ -89,12 +74,31 @@ class BuildTable{
             Db::execute($sql_create);
           //  Db::execute("DROP TABLE IF EXISTS `{$tableName}_build_bak`");
         } catch (\Exception $e) {
-            // 模拟事务操作，滚回原表
-            if ($tableExist) {
-                Db::execute("RENAME TABLE {$tableName}_build_bak to {$tableName}");
-            }
+           
             throw new Exception($e->getMessage());
         }
 		return ['info'=>'创建成功！','code'=>0];
     }
+	public function hasDbbak($table){
+		$tableName = Config::get("database.prefix") . $table;
+		$ret_bak = Db::query("SHOW TABLES LIKE '{$tableName}_bak'");
+		if ($ret_bak && isset($ret_bak[0])) { 
+			return ['code'=>1,'msg'=>'备份数据表已经存在，请先删除！'];
+		}
+	}
+	public function delDbbak($table){
+		$tableName = Config::get("database.prefix") . $table;
+		$ret_bak = Db::query("SHOW TABLES LIKE '{$tableName}_bak'");
+		if ($ret_bak && isset($ret_bak[0])) { 
+			try {
+				$ret = Db::execute("DROP TABLE IF EXISTS `{$tableName}_bak`");
+			} catch (\Exception $e) {
+				return ['code'=>1,'msg'=>'系统异常。'.$e->getMessage()];
+			}
+			return ['code'=>0,'msg'=>'备份表已经删除！'];
+		}else{
+			return ['code'=>1,'msg'=>'备份表不存在！'];
+		}
+		
+	}
 }

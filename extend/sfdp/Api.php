@@ -14,6 +14,19 @@ use think\Request;
 use think\Db;
 use think\view;
 use sfdp\sfdp;
+define ( 'FILE_PATH', realpath ( dirname ( __FILE__ ) ) );
+define('APP_PATH',\Env::get('app_path') );
+define('ROOT_PATH',\Env::get('root_path') );
+define('DS',DIRECTORY_SEPARATOR);
+
+require_once FILE_PATH . '/class/build.php';
+require_once FILE_PATH . '/config/config.php';
+require_once FILE_PATH . '/config/common.php';
+require_once FILE_PATH . '/db/FbDb.php';
+require_once FILE_PATH . '/class/BuildView.php';
+require_once FILE_PATH . '/class/BuildFun.php';
+require_once FILE_PATH . '/class/BuildTable.php';
+require_once FILE_PATH . '/class/BuildController.php';
 
 class Api
 {
@@ -112,10 +125,25 @@ class Api
 		 $sfdp = new sfdp();
 		 $sfdp->makedb($field['name_db'],$search);
 	}
+	public function sfdp_deldb($sid){
+		 $bulid = new BuildTable();
+		 $info = db('sfdp_design')->find($sid);
+		 $json = json_decode($info['s_field'],true);
+		 $ret = $bulid->delDbbak($json['name_db']);
+		 if($ret['code']==0){
+			 db('sfdp_design')->where('id',$sid)->update(['s_db_bak'=>0]);
+		 }
+		 return json($ret);
+	}
 	public function sfdp_fix($sid){
-		 $sfdp = new sfdp();
+		 $sfdp = new BuildTable();
 		$info = db('sfdp_design')->find($sid);
 		$json = json_decode($info['s_field'],true);
+		$ret = $sfdp->hasDbbak($json['name_db']);
+		if($ret['code']==1){
+			db('sfdp_design')->where('id',$sid)->update(['s_db_bak'=>1]);
+			 return json($ret);
+		 }
 		$ver = [
 			'sid'=>$sid,
 			's_bill'=>OrderNumber(),
@@ -129,7 +157,6 @@ class Api
 			'status'=>1,
 			'add_time'=>time()
 		];
-		
 		$id  =  Db::name('sfdp_design_ver')->insertGetId($ver);
 		db('sfdp_design_ver')->where('id','<>',$id)->where('sid',$sid)->update(['status'=>0]);
 		$field = json_decode($info['s_field'],true);
@@ -140,9 +167,9 @@ class Api
 				}
 			}
 		}
-		 $sfdp = new sfdp();
-		 $sfdp->makedb($json['name_db'],$search);
-		 db('sfdp_design')->where('id',$sid)->update(['s_design'=>2]);
+		 $ret = $sfdp->Btable($json['name_db'],$search);
+		 
+		 db('sfdp_design')->where('id',$sid)->update(['s_design'=>2,'s_db_bak'=>1]);
 		return json(['code'=>0]);
 	}
 	public function sfdp_create(){

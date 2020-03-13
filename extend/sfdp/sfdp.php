@@ -75,8 +75,13 @@ class sfdp
 	}
 	public function makedb($table,$data){
 		$bulid = new BuildTable();
-		$bulid->Btable($table,$data);
+		return $bulid->Btable($table,$data);
 	}
+	public function hasDb($table){
+		$bulid = new BuildTable();
+		return $bulid->hasDb($table);
+	}
+
 	public function makefun($name,$data){
 		$fileName = 'static' . DS . 'sfdp' . DS .'user-defined'. DS .$name.'.js';
 		$bulid = new BuildFun();

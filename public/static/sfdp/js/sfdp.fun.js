@@ -85,14 +85,34 @@ var commonfun = {
 	openfullpage : function(title, url, opt){
 		return commonfun.openpage(title, url, $.extend({w: "100%", h: "100%"}, opt))
 	},
-	sPost : function(url,data,success){
-        if(isDebug){
-            console.log('[URL]'+url);
-            console.log('[PARM]'+JSON.stringify(data));
-        }
-        $.post(url, data, function(obj){ if(isDebug) console.log('[Res]'+JSON.stringify(obj)); success(obj); }, 'json' );
+	returnShow : function(data, callback, param){
+		 if (data.code == 0) {
+			layer.msg(data.msg,{icon:1,time: 1500},function(){
+					parent.location.reload(); // 父页面刷新
+			});          
+		} else {
+		   layer.alert(data.msg, {title: "错误信息", icon: 2});
+		}	
+	},
+	sAjax : function(url,msg='操作成功'){
+       $.ajax({
+			type: 'GET',
+			url: url,
+			dataType: 'json',
+			success: function(data){
+				if(data.code==0){
+					layer.msg('成功！!',{icon: 1,time:1000});
+				}else{
+					 layer.alert(data.msg, {title: "错误信息", icon: 2});
+				}
+			},
+			error:function(data) {
+					console.log(data);
+					layer.msg('错误!',{icon: 5,time:1000});
+			},
+		});		
     },
-	sGet : function(url,success,error){
+	sPost : function(url,data){
         if(isDebug){
             console.log('[URL]'+url);
         } 
