@@ -11,6 +11,13 @@
  <body> 
   <link rel="stylesheet" href="__SFDP__/css/sfdp.desc.css" /> 
   <link rel="stylesheet" href="__SFDP__/css/sfdp.common.css" /> 
+  <script>
+	//全局变量、锁定数据库名称不允许修改
+	 var look_db = {$look};
+	 var Login_id = 1;
+	 var Login_name = 1;
+	 var Login_role = 1;
+   </script>
   <div class="page-container"> 
    <div class="fb-main"> 
     <ul style="list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;display: block;">
@@ -91,12 +98,9 @@
 </div>
  </body>
 </html>
-<script>
-//全局变量、锁定数据库名称不允许修改
-var look_db = {$look};
-</script>
-	<script src="__SFDP__/js/jquery-1.12.4.js"></script>
-	<script src="__SFDP__/js/jquery-ui.js"></script>
+
+	<script src="__SFDP__/lib/jquery-1.12.4.js"></script>
+	<script src="__SFDP__/lib/jquery-ui.js"></script>
 	<script src="__SFDP__/js/sfdp.fun.js"></script>
 	<script src="__SFDP__/js/sfdp.unit.js"></script>
 	<script src="__SFDP__/sfdp.3.0.js"></script>
@@ -116,7 +120,8 @@ var look_db = {$look};
 	});
 	$("#save").click(function(){
 		var int_data = localStorage.getItem("json_data");
-		 var id='{$fid}';
+		var id='{$fid}';
+		
 		$.ajax({  
 			 url:'{:url("/index/sfdp/sfdp_desc_save")}',
 			 data:{ziduan:int_data,id:id},  
