@@ -13,7 +13,7 @@
 		if(int_data==null){
 			alert('对不起，您尚未开始设计！');
 		}else{
-			$('#table').html('<table id="table_view"><tr class="table_tr_view"><th  colspan="4">正在设计：<b id="fb_name_view"></b></th></tr> </table>');
+			$('#table').html('<form action="" method="post" name="form" id="form"><input type="hidden" readonly name="name_db" value="'+int_data.name_db+'"><table id="table_view"><tr class="table_tr_view"><th  colspan="4">正在设计：<b id="fb_name_view"></b></th></tr> </table><div class="row cl"><div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2"><button  class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button><button  class="btn btn-default radius" type="button" onclick="layer_close()">&nbsp;&nbsp;取消&nbsp;&nbsp;</button></div></div</form>');
 			 for (x in int_data.list){
 				var table = table_build(int_data.list[x]['type'],int_data.list[x]);//恢复表单布局设计
 				$('.table_tr_view').after(table);

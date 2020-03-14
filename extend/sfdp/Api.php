@@ -14,7 +14,7 @@ use think\Request;
 use think\Db;
 use think\view;
 use sfdp\sfdp;
-define ( 'FILE_PATH', realpath ( dirname ( __FILE__ ) ) );
+define('FILE_PATH', realpath ( dirname ( __FILE__ ) ) );
 define('APP_PATH',\Env::get('app_path') );
 define('ROOT_PATH',\Env::get('root_path') );
 define('DS',DIRECTORY_SEPARATOR);
@@ -22,7 +22,8 @@ define('DS',DIRECTORY_SEPARATOR);
 require_once FILE_PATH . '/class/build.php';
 require_once FILE_PATH . '/config/config.php';
 require_once FILE_PATH . '/config/common.php';
-require_once FILE_PATH . '/db/FbDb.php';
+require_once FILE_PATH . '/db/DescDb.php';
+require_once FILE_PATH . '/class/SfdpUnit.php';
 require_once FILE_PATH . '/class/BuildView.php';
 require_once FILE_PATH . '/class/BuildFun.php';
 require_once FILE_PATH . '/class/BuildTable.php';
@@ -30,35 +31,21 @@ require_once FILE_PATH . '/class/BuildController.php';
 
 class Api
 {
+	
 	/*构建表单目录*/
 	static function sdfp_menu(){
-		$menu  =  Db::name('sfdp_design_ver')->where('status',1)->select();
-		$menu_html = '';
-		foreach($menu as $k=>$v){
-			$menu_html .='<li><a data-href="'.url('sfdp/list',['sid'=>$v['id']]).'" data-title="'.$v['s_name'].'">'.$v['s_name'].'</a></li>';
-		}
-		return $menu_html;
+		return  SfdpUnit::Bmenu();
 	}
 	/*动态生成列表*/
 	public function lists($sid)
 	{
-		$build = db('sfdp_design_ver')->find($sid);
-		$field = json_decode($build['s_field'],true);
-		$list_field = json_decode($build['s_list'],true);
-		$topicid = ''; //变量赋值为空
-			//用foreach 遍历下二维数组
-			foreach($list_field as $key=>$vals){
-				$topicid.=$vals['tpfd_db'].',';
-				$topicname[$vals['tpfd_db']]=$vals['tpfd_db'];
-			}
-			$topicid = rtrim($topicid, ',');
-		$list = db($field['name_db'])->field($topicid)->paginate('10');
-		return view(env('root_path') . 'extend/sfdp/template/index.html',['sid'=>$sid,'list'=>$list,'field'=>$topicname]);
+		$data = DescDb::getListData($sid);
+		return view(env('root_path') . 'extend/sfdp/template/index.html',['sid'=>$sid,'list'=>$data['list'],'field'=>$data['field']['fieldname']]);
 	}
 	/*动态生成表单*/
 	public function add($sid)
 	{
-		$json = db('sfdp_design_ver')->find($sid);
+		$json = DescDb::getDescVerVal($sid);
 		if($json['s_fun_id']!=''){
 			$fun = '<script src="\static/sfdp/user-defined/'.$json['s_fun_ver'].'.js"></script>';	
 		}else{
@@ -66,13 +53,22 @@ class Api
 		}
 		return view(env('root_path') . 'extend/sfdp/template/edit.html',['fun'=>$fun,'data'=>$json['s_field']]);
 	}
+	/*创建一个新得表单*/
+	public function sfdp_create(){
+		$id = DescDb::saveDesc('','create');
+		return json(['code'=>0]);
+	}
+	/*保存设计数据*/
+	public function sfdp_save(){
+		$data = input('post.');
+		$id = DescDb::saveDesc($data,'save');
+		return json(['code'=>0]);
+	}
 	public function sfdp($sid=''){
 		$data = Db::name('sfdp_design')->paginate('10')->each(function($item, $key){
 				$item['fix'] = Db::name('sfdp_design_ver')->where('sid',$item['id'])->order('id desc')->select();
 				return $item;
 			});
-		
-		//dump($data);
 		return view(env('root_path') . 'extend/sfdp/template/sfdp.html',['list'=>$data]);
 	}
 	/**
@@ -81,37 +77,10 @@ class Api
      */
     public function sfdp_desc($sid)
     {
-	   $info = db('sfdp_design')->find($sid);;
+	  $info = db('sfdp_design')->find($sid);;
       return view(env('root_path') . 'extend/sfdp/template/sfdp_desc.html',['json'=>$info['s_field'],'fid'=>$info['id'],'look'=>$info['s_look']]);
     }
-	public function sfdp_save(){
-		$data = input('post.');
-		$search = [];
-		$list = [];
-		$data['s_field'] = htmlspecialchars_decode($data['ziduan']);
-		$field = json_decode($data['s_field'],true);
-		foreach($field['list'] as $k=>$v){
-			foreach($v['data'] as $v2){
-				if(isset($v2['tpfd_chaxun'])&&($v2['tpfd_chaxun']=='yes')){
-					$search[] = $v2;
-				}
-				if(isset($v2['tpfd_list'])&&($v2['tpfd_list']=='yes')){
-					$list[] = $v2;
-				}
-			}
-		}
-		$ver = [
-			'id'=>$data['id'],
-			's_title'=>$field['name'],
-			's_db'=>$field['name_db'],
-			's_list'=>json_encode($list),
-			's_search'=>json_encode($search),
-			's_field'=>htmlspecialchars_decode($data['ziduan']),
-			's_design'=>1
-		];
-		db('sfdp_design')->update($ver);;
-		return json(['code'=>0]);
-	}
+	
 	public function sfdp_db($sid){
 		$info = db('sfdp_design')->find($sid);
 		$field = json_decode($info['s_field'],true);
@@ -172,18 +141,7 @@ class Api
 		 db('sfdp_design')->where('id',$sid)->update(['s_design'=>2,'s_db_bak'=>1]);
 		return json(['code'=>0]);
 	}
-	public function sfdp_create(){
-		$sfdp = new sfdp();
-		$ver = [
-			's_bill'=>OrderNumber(),
-			'add_user'=>'Sys',
-			's_field'=>1,
-			'add_time'=>time()
-		];
-		Db::name('sfdp_design')->insertGetId($ver);
-		echo "<script language='javascript'>alert('Success,创建成功！'); window.location.reload();</script>";
-		
-	}
+	
 	public function sfdp_fun($sid){
 		$info = db('sfdp_function')->where('sid',$sid)->find();
 		  return view(env('root_path') . 'extend/sfdp/template/sfdp_fun.html',['sid'=>$sid,'info'=>$info]);
@@ -229,6 +187,15 @@ class Api
 			$sfdp->makefun($info['s_bill'],$data['function']);
 			echo "<script language='javascript'>alert('Success,脚本生成成功！'); top.location.reload();</script>";
 		}
+		
+	}
+	public function saveadd($sid){
+		$data = input('post.');
+		$table = $data['name_db'];
+		unset($data['name_db']);
+		unset($data['tpfd_check']);
+		db($table)->insertGetId($data);
+		echo "<script language='javascript'>alert('Success,操作成功！！');</script>"; 
 		
 	}
 }

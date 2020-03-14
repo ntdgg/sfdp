@@ -21,5 +21,6 @@ Route::get('index/sfdp/sfdp_ui/sid/:sid','\sfdp\Api@sfdp_ui');
 Route::get('index/sfdp/sfdp_deldb/sid/:sid','\sfdp\Api@sfdp_deldb');
 Route::post('index/sfdp/sfdp_desc_save','\sfdp\Api@sfdp_save');
 Route::post('index/sfdp/sfdp_fun_save','\sfdp\Api@sfdp_fun_save');
+Route::post('index/sfdp/add/sid/:sid','\sfdp\Api@saveadd');
 
 

@@ -94,23 +94,27 @@ var commonfun = {
 		   layer.alert(data.msg, {title: "错误信息", icon: 2});
 		}	
 	},
-	sAjax : function(url,msg='操作成功'){
-       $.ajax({
-			type: 'GET',
-			url: url,
-			dataType: 'json',
-			success: function(data){
-				if(data.code==0){
-					layer.msg('成功！!',{icon: 1,time:1000});
-				}else{
-					 layer.alert(data.msg, {title: "错误信息", icon: 2});
-				}
-			},
-			error:function(data) {
-					console.log(data);
-					layer.msg('错误!',{icon: 5,time:1000});
-			},
-		});		
+	Askshow : function(url,msg){
+		layer.confirm(msg,function(index){
+			commonfun.sGet(url);
+		});
+	},
+	sGet : function(url,msg='操作成功'){
+		$.get(url,function(data,status){
+			if(status=='success'){
+					 if (data.code == 0) {
+						layer.msg(msg,{icon:1,time: 1500},function(){
+							location.reload();
+						});          
+					}else{
+					   layer.alert(data.msg, {title: "错误信息", icon: 2});
+					}	
+			}else{
+				 layer.alert("状态: " + status, {title: "错误信息", icon: 2});
+			}
+			
+		});
+	
     },
 	sPost : function(url,data){
         if(isDebug){

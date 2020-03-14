@@ -15,6 +15,9 @@
 <script src="__SFDP__/lib/jquery-1.12.4.js"></script>
 <script src="__SFDP__/lib/layer/2.4/layer.js"></script>
 <script src="__SFDP__/js/sfdp.fun.js"></script>
+
+<script type="text/javascript" src="__HUI__/js/H-ui.min.js"></script>
+<script type="text/javascript" src="__HUIADMIN__/js/H-ui.admin.js"></script>
 <title>Sfdp</title>
 </head>
 <body>
@@ -22,7 +25,7 @@
 
     <div class="cl pd-5 bk-gray">
         <span class="l">
-           <a href="{:url('/index/sfdp/create')}" class="btn btn-primary radius">创建</a>
+           <a onClick='commonfun.Askshow("{:url("/index/sfdp/create")}","是否创建新版本？")' class="btn btn-primary radius">创建</a>
         </span>
         <span class="r pt-5 pr-5">
             共有数据 ：<strong>{:count($list)}</strong> 条
@@ -53,11 +56,11 @@
 					<a 
 					onClick="commonfun.openfullpage('元素管理——{$k.s_bill}','{:url('/index/sfdp/sfdp_ui',['sid'=>$k.id])}')" class="btn  radius size-S">元素</a>
 					{neq name='k.s_field' value='1'}
-					<a onClick='fix("{:url("/index/sfdp/sfdp_fix",["sid"=>$k.id])}","部署后将生成最新版本,确定是否执行?")'  class="btn  radius size-S">部署</a>
+					<a onClick='commonfun.Askshow("{:url("/index/sfdp/sfdp_fix",["sid"=>$k.id])}","部署后将生成最新版本,确定是否执行?")'  class="btn  radius size-S">部署</a>
 					<a onClick="commonfun.openfullpage('脚本管理——{$k.s_bill}','{:url('/index/sfdp/sfdp_fun',['sid'=>$k.id])}')"   class="btn  radius size-S">脚本</a>
 					{/neq}
 					{eq name='k.s_db_bak' value='1'}
-					<a onClick='fix("{:url("/index/sfdp/sfdp_deldb",["sid"=>$k.id])}","删除备份数据库,是否执行?")'  class="btn  radius size-S">DelDb</a>
+					<a onClick='commonfun.Askshow("{:url("/index/sfdp/sfdp_deldb",["sid"=>$k.id])}","删除备份数据库,是否执行?")'  class="btn  radius size-S">DelDb</a>
 					{/eq}
 					{if condition="count($k.fix) >0"}
 					<span   class="btn  radius size-S dropDown">
@@ -81,13 +84,3 @@
 <div class="page-bootstrap">{$list|raw}</div>
 </body>
 </html>
-<script type="text/javascript">
-/*管理员-停用*/
-function fix(url,msg){
-	layer.confirm(msg,function(index){
-		commonfun.sAjax(url);
-	});
-}
-/*Ajax*/
-
-</script>
