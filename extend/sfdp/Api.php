@@ -39,6 +39,29 @@ class Api
 	/*动态生成列表*/
 	public function lists($sid)
 	{
+		//get_userqj
+		//id =1
+		//pid = 2
+		$post = [
+			'id'=>1,
+			'pid'=>2,
+			'function'=>'get_userqj'
+		];
+		$key_name = [];
+		$key_val = [];
+		foreach($post as $k=>$v){
+			if($k<>'function'){
+				$key_name[] = '@'.$k;
+				$key_val[] = $v;
+			}
+		}
+		
+		dump($key_name);
+		$sql = Db::name('sfdp_function')->where('fun_name','get_userqj')->find();
+		$new_work_sql=str_replace($key_name,$key_val,$sql['function']);
+		dump($new_work_sql);
+		$json = Db::query($new_work_sql);
+		dump($json);
 		$data = DescDb::getListData($sid);
 		return view(env('root_path') . 'extend/sfdp/template/index.html',['sid'=>$sid,'list'=>$data['list'],'field'=>$data['field']['fieldname']]);
 	}
@@ -70,6 +93,10 @@ class Api
 				return $item;
 			});
 		return view(env('root_path') . 'extend/sfdp/template/sfdp.html',['list'=>$data]);
+	}
+	public function sfdp_fun($sid=''){
+		$data = Db::name('sfdp_function')->paginate('10');
+		return view(env('root_path') . 'extend/sfdp/template/sfdp_fun.html',['list'=>$data]);
 	}
 	/**
      * 表单设计
@@ -142,9 +169,9 @@ class Api
 		return json(['code'=>0]);
 	}
 	
-	public function sfdp_fun($sid){
-		$info = db('sfdp_function')->where('sid',$sid)->find();
-		  return view(env('root_path') . 'extend/sfdp/template/sfdp_fun.html',['sid'=>$sid,'info'=>$info]);
+	public function sfdp_script($sid){
+		$info = db('sfdp_script')->where('sid',$sid)->find();
+		  return view(env('root_path') . 'extend/sfdp/template/sfdp_script.html',['sid'=>$sid,'info'=>$info]);
 	}
 	public function sfdp_ui($sid){
 		$info = db('sfdp_design')->find($sid);
@@ -163,10 +190,10 @@ class Api
 		}
 		return view(env('root_path') . 'extend/sfdp/template/sfdp_ui.html',['sid'=>$sid,'ui'=>$ui]);
 	}
-	public function sfdp_fun_save(){
+	public function sfdp_script_save(){
 		$sfdp = new sfdp();
 		$data = input('post.');
-		$info = db('sfdp_function')->where('sid',$data['sid'])->find();
+		$info = db('sfdp_script')->where('sid',$data['sid'])->find();
 		if(!$info){
 			$ver = [
 				's_bill'=>OrderNumber(),
@@ -175,7 +202,7 @@ class Api
 				's_fun'=>$data['function'],
 				'add_time'=>time()
 			];
-			$id = Db::name('sfdp_function')->insertGetId($ver);
+			$id = Db::name('sfdp_script')->insertGetId($ver);
 			db('sfdp_design_ver')->where('sid',$data['sid'])->where('status',1)->update(['s_fun_id'=>$id,'s_fun_ver'=>$ver['s_bill']]);
 			$sfdp->makefun($ver['s_bill'],$data['function']);
 			}else{
@@ -183,7 +210,7 @@ class Api
 				'id'=>$info['id'],
 				's_fun'=>$data['function']
 			];	
-			Db::name('sfdp_function')->update($ver);
+			Db::name('sfdp_script')->update($ver);
 			$sfdp->makefun($info['s_bill'],$data['function']);
 			echo "<script language='javascript'>alert('Success,脚本生成成功！'); top.location.reload();</script>";
 		}
@@ -197,5 +224,27 @@ class Api
 		db($table)->insertGetId($data);
 		echo "<script language='javascript'>alert('Success,操作成功！！');</script>"; 
 		
+	}
+	public function sfdp_fun_save(){
+		$data = input('post.');
+		if(!isset($data['id'])){
+			$ver = [
+				'bill'=>OrderNumber(),
+				'title'=>$data['title'],
+				'fun_name'=>$data['name'],
+				'add_user'=>'Sys',
+				'function'=>$data['fun'],
+				'add_time'=>time()
+			];
+			$id = Db::name('sfdp_function')->insertGetId($ver);
+			return json(['code'=>0,'msg'=>'操作成功！']);
+		}else{
+			$ver = [
+				'id'=>$info['id'],
+				's_fun'=>$data['function']
+			];	
+			Db::name('sfdp_script')->update($ver);
+		
+		}
 	}
 }

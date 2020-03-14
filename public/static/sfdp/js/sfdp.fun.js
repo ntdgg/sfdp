@@ -116,6 +116,27 @@ var commonfun = {
 		});
 	
     },
+	sAjax : function(url,data){
+		$.ajax({  
+			 url:url,
+			 data:data,  
+			 type:'post',  
+			 cache:true,  
+			dataType:'json',			 
+			 success:function(ret) {  
+				 if (ret.code == 0) {
+						layer.msg(ret.msg,{icon:1,time: 1500},function(){
+							location.reload();
+						});          
+					}else{
+					   layer.alert(ret.msg, {title: "错误信息", icon: 2});
+					}
+			  },  
+			  error : function() {  
+						layer.alert('请求出错！', {title: "错误信息", icon: 2});
+			  }  
+		 }); 
+	},
 	sPost : function(url,data){
         if(isDebug){
             console.log('[URL]'+url);
