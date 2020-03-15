@@ -26,6 +26,7 @@
     <div class="cl pd-5 bk-gray">
 		  <span class="l">
            <a onClick='add_fun()' class="btn btn-primary radius">创建</a>
+		   <a onclick='test_fun()'>Test</a>
         </span>
         <span class="r pt-5 pr-5">
             共有数据 ：<strong>{:count($list)}</strong> 条
@@ -86,6 +87,13 @@ function save_fun(){
 	var url = "{:url('/index/sfdp/sfdp_fun_save')}";
 	commonfun.sAjax(url,{title:title,name:name,fun:fun});
 	
+}
+function test_fun(){
+	var url = "{:url('/index/sfdp/get_function_val')}";
+	var fun_data = commonfun.sFun(url,{id:1,fun:'get_userqj'},setActive);
+}
+function setActive(data){
+	console.log(data);
 }
 
 </script>

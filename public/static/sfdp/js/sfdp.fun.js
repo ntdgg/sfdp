@@ -137,10 +137,20 @@ var commonfun = {
 			  }  
 		 }); 
 	},
-	sPost : function(url,data){
-        if(isDebug){
-            console.log('[URL]'+url);
-        } 
-        $.get(url,function(obj){ obj = JSON.parse(obj); if(isDebug) console.log('[Res]'+JSON.stringify(obj)); success(obj); });
-    }  
+	sFun : function(url,data,setActive){
+		$.ajax({  
+			url:url,
+			data:data,  
+			type:'post', 
+			dataType:'json',			 
+			 success:function(ret) {  
+				 layer.msg('请求成功！');
+				 setActive(ret); 
+				 return ret;
+			  },  
+			  error : function() {  
+						layer.alert('请求出错！', {title: "错误信息", icon: 2});
+			  }  
+		 }); 
+	}
 }

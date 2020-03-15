@@ -39,29 +39,6 @@ class Api
 	/*动态生成列表*/
 	public function lists($sid)
 	{
-		//get_userqj
-		//id =1
-		//pid = 2
-		$post = [
-			'id'=>1,
-			'pid'=>2,
-			'function'=>'get_userqj'
-		];
-		$key_name = [];
-		$key_val = [];
-		foreach($post as $k=>$v){
-			if($k<>'function'){
-				$key_name[] = '@'.$k;
-				$key_val[] = $v;
-			}
-		}
-		
-		dump($key_name);
-		$sql = Db::name('sfdp_function')->where('fun_name','get_userqj')->find();
-		$new_work_sql=str_replace($key_name,$key_val,$sql['function']);
-		dump($new_work_sql);
-		$json = Db::query($new_work_sql);
-		dump($json);
 		$data = DescDb::getListData($sid);
 		return view(env('root_path') . 'extend/sfdp/template/index.html',['sid'=>$sid,'list'=>$data['list'],'field'=>$data['field']['fieldname']]);
 	}
@@ -246,5 +223,21 @@ class Api
 			Db::name('sfdp_script')->update($ver);
 		
 		}
+	}
+	public function get_function_val(){
+		$post = input('post.');
+		
+		$key_name = [];
+		$key_val = [];
+		foreach($post as $k=>$v){
+			if($k<>'fun'){
+				$key_name[] = '@'.$k;
+				$key_val[] = $v;
+			}
+		}
+		$sql = Db::name('sfdp_function')->where('fun_name',$post['fun'])->find();
+		$new_sql=str_replace($key_name,$key_val,$sql['function']);
+		$json = Db::query($new_sql);
+		return json($json);
 	}
 }

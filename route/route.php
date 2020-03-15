@@ -24,4 +24,7 @@ Route::post('index/sfdp/sfdp_desc_save','\sfdp\Api@sfdp_save');
 Route::post('index/sfdp/sfdp_script_save','\sfdp\Api@sfdp_script_save');
 Route::post('index/sfdp/add/sid/:sid','\sfdp\Api@saveadd');
 Route::post('index/sfdp/sfdp_fun_save','\sfdp\Api@sfdp_fun_save');
+Route::post('index/sfdp/get_function_val','\sfdp\Api@get_function_val');
+
+
 
