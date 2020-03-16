@@ -28,6 +28,13 @@ $(function(){
 					break;
 					case 'textarea':
 					var html ='<label>'+data.tpfd_name+'：</label><textarea  name="'+data.tpfd_db+'"  placeholder="" ></textarea>';
+					break;
+					case 'upload':
+					var html ='<label>'+data.tpfd_name+'：</label>';
+					break;
+					case 'date':
+					var html ='<label>'+data.tpfd_name+'：</label>';
+					break;
 				}
 			}
 			return html;

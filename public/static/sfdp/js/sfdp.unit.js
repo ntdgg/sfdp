@@ -13,22 +13,22 @@ $(function(){
 		tpfd_return:function(type,data){
 			switch(type) {
 				case 'text':
-					var html = $.tpfd_common(data)+$.tpfd_moren(data);
+					var html = $.tpfd_common(data)+$.tpfd_moren(data)+$.tpfd_gaoji(data);
 					break;
 				case 'checkboxes':
-					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data);
+					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data)+$.tpfd_gaoji(data);
 					break;
 				case 'radio':
-					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data,'radio');
+					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data,'radio')+$.tpfd_gaoji(data);
 					break;
 				case 'date':
-					var html = $.tpfd_common(data)+$.tpfd_date(data);
+					var html = $.tpfd_common(data)+$.tpfd_date(data)+$.tpfd_gaoji(data);
 					break;
 				case 'dropdown':
-					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data,'radio');
+					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data,'radio')+$.tpfd_gaoji(data);
 					break;
 				case 'textarea':
-					var html = $.tpfd_common(data)+$.tpfd_moren(data);
+					var html = $.tpfd_common(data)+$.tpfd_moren(data)+$.tpfd_gaoji(data);
 					break;
 				case 'html':
 					var html = $.tpfd_common(data)+$.tpfd_xianshi(data);
@@ -37,19 +37,36 @@ $(function(){
 					var html = $.tpfd_common(data)+$.tpfd_xianshi(data);
 					break;
 				case 'upload':    
-					var html ='<label  onclick=showLayer("upload")>上传控件：</label>上传';
+					data.tpfd_list = 'no';
+					data.tpfd_chaxun = 'no';
+					data.tpfd_show = 'no';
+					var html =$.tpfd_common(data)+$.tpfd_upload(data)+$.tpfd_gaoji(data);
 					break;
 				 default:
 					var html ='';
 			}
 			return html;
         },
+		tpfd_upload:function(data){
+			if(data.tpfd_upload_type=='undefined'){
+				var tpfd_upload_type = 0;
+				var tpfd_upload_xz = 0;
+			}else{
+				var tpfd_upload_type = data.tpfd_upload_type;
+				var tpfd_upload_xz = data.tpfd_upload_xz;
+			}
+			var default_data =[{cid:0,clab:'单文件上传'},{cid:1,clab:'多文件上传'}];
+			var word_type =[{cid:0,clab:'不限制'},{cid:1,clab:'*.jpg/*.png/*.gif'},{cid:1,clab:'*.doc/*.txt/*.xlx/*.xlxs/*.docx'}];
+			
+			return '<div style="font-size: 16px;font-weight: 800;">上传配置</div><div>上传属性：'+$.tpfd_select(default_data,'tpfd_upload_type',tpfd_upload_type)+'</div>'+
+				   '<div>文件类型：'+$.tpfd_select(word_type,'tpfd_upload_xz',tpfd_upload_xz)+'</div>'; 
+			
+		},
 		tpfd_common:function(data){
 			var default_field = [{cid:'int',clab:'int',checked:''},{cid:'varchar',clab:'varchar',checked:'checked'},{cid:'datetime',clab:'datetime',checked:''},{cid:'longtext',clab:'longtext',checked:''}];
-			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div>数据表段：<input style="width:40px" name="tpfd_db" type="text" value="'+data.tpfd_db +'">长度<input style="width:40px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'">类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+'  字段标题：<input name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></div>'+$.tpfd_list(data);
+			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div>数据表段：<input style="width:60px" name="tpfd_db" type="text" value="'+data.tpfd_db +'">长度<input style="width:40px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'">类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+'  字段标题：<input style="width:120px" name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></div>'+$.tpfd_list(data);
         },
         tpfd_xianshi:function(data){
-			
 			return '<div>显示类型：<textarea name="tpfd_moren">'+data.tpfd_moren +'</textarea>';
         },
         tpfd_date:function(data){
@@ -74,14 +91,23 @@ $(function(){
             return '<div><input '+((data.xx_type) == '0' ? 'checked' : '') +'  name="xx_type" value=0 type="radio">静态数据：</div>'+$.tpfd_checkboxes_clss(default_data,type)+
 			'<div><input '+((data.xx_type) == '1' ? 'checked' : '') +' name="xx_type" value=1 type="radio">动态数据：<br/><input name="checkboxes_func" type="text" value="'+((data.checkboxes_func) == '' ? '' : data.checkboxes_func)+'"></div>';
         },
-		tpfd_fun:function(data){
-			return '<div style="font-size: 16px;font-weight: 800;">高级设置</div><div></div>';
-        },
+		tpfd_gaoji:function(data){
+			var default_data =[{cid:0,clab:'是'},{cid:1,clab:'否'}];
+			if(data.tpfd_read=='undefined'){
+				var tpfd_read = 0;
+				var tpfd_must = 0;
+			}else{
+				var tpfd_read = data.tpfd_read;
+				var tpfd_must = data.tpfd_must;
+			}
+			return '<div style="font-size: 16px;font-weight: 800;">高级设置</div><div>只读：'+$.tpfd_select(default_data,'tpfd_read','1')+'必填：'+$.tpfd_select(default_data,'tpfd_must',tpfd_must)+'</div>'; 
+		},
 		tpfd_moren:function(data){
 			return '<div>占位内容：<input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  设置默认：<input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'"></div>';
         },
 		tpfd_list:function(data){
-			return '<div>列表设置：'+$.tpfd_select('','tpfd_list','yes')+'  查询设置：'+$.tpfd_select('','tpfd_chaxun','no')+'  字段隐藏：'+$.tpfd_select('','tpfd_show','no')+'</div>';
+			console.log(data);
+			return '<div>列表设置：'+$.tpfd_select('','tpfd_list',data.tpfd_list)+'  查询设置：'+$.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'  字段隐藏：'+$.tpfd_select('','tpfd_show',data.tpfd_show)+'</div>';
         },
 		tpfd_select:function(data,field,value){
 			if(data==''){
@@ -90,7 +116,7 @@ $(function(){
 				var html ='<select name="'+field+'" style="width: 80px">';
 				for (x in data){
 					
-					html += '<option value="'+data[x]['cid']+'" '+((value) == 'yes' ? 'selected' : '') +'>'+data[x]['clab']+'</option>';
+					html += '<option value="'+data[x]['cid']+'" '+((data[x]['cid']) == value ? 'selected' : '') +'>'+data[x]['clab']+'</option>';
 				}
 				return html+'</select>';
 			}

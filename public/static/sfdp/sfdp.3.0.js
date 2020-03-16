@@ -76,26 +76,27 @@
 						//禁止本单元格再放置其他控件
 						$(this).removeClass("fb-fz");
 						$(this).removeClass("ui-sortable");
-						//$(this).children('a').attr("data");
+						$(this).addClass("fb-disabled");
+						$( ".fb-disabled" ).sortable( "disable" );
 						$(this).html(html);
-						//console.log($(this).attr("id"));
 					}
 					
 			});
 			
-			$(".code2").unbind('click').click(function(){
-					var tr_id = $(this).parent().parent().attr("id");
-					save_json('',tr_id,'tr_del');
-					logout('删除了单元行'+tr_id);
-					$(this).parent().parent().remove();
-			});
+
+			
 		}else{
 			return html;
 		}
 	}
+	$(".code2").unbind('click').click(function(){
+					var tr_id = $(this).parent().parent().attr("id");
+					save_json('',tr_id,'tr_del');
+					logout('删除了单元行'+tr_id);
+					$(this).parent().parent().remove();
+	});
 	//文本转换
 	function fb_tpl(type,code,parent_code,td_xh,old_data=0){
-		
 		if(old_data==0){
 			var td_id = type+'_'+ commonfun.dateFormat(new Date(), "mmssS");
 		}else{
@@ -145,7 +146,7 @@
 		var all_data = JSON.parse(localStorage.getItem("json_data"));
 		var default_data = all_data['list'][parent_code]['data'][id];
 		if(default_data.tpfd_db==undefined){
-			var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "yes",tpfd_list: "no"};
+			var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_dbcd: "",tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "yes",tpfd_list: "no"};
 		}else{
 			var tpfd_db =default_data;
 		}
@@ -237,9 +238,7 @@
 			var html = '<div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div>'+
 			'<div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+' '+((look_db) == '1' ? 'disabled' : '') +' ></div>'+
 			'<div>设置列表控件：Add Edit Del View Status WorkFlow'+
-			'<div>设置表单样式：<input name="tpfd_class" type="text" value='+json_data.tpfd_class+'></div>'+
-			'<div>表单调用函数：<textarea name="tpfd_fun">'+json_data.tpfd_fun+'</textarea></div>'+
-			'<div>设置表单脚本：<textarea name="tpfd_script" rows="4" cols="20">'+json_data.tpfd_script+'</textarea></div>';
+			'<div>设置表单样式：<input name="tpfd_class" type="text" value='+json_data.tpfd_class+'></div>';
 		$('#showtype').val('config');
 		$('#table').html(html);
 		}else if(type=='view'){
@@ -373,7 +372,7 @@
 				 for (x in desc_data.list){
 					var table = addtr(desc_data.list[x]['type'],desc_data.list[x],'showview');//恢复表单布局设计
 					$('.table_tr_view').after(table);
-					console.log(table);
+					
 					//recovery_input(desc_data.list[x]);//用于恢复表单字段内容
 				 } 
 		}

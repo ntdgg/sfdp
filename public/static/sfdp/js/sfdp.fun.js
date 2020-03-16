@@ -33,11 +33,10 @@ var commonfun = {
 		}
 		return fmt;
 	},
-	
 	fromdata : function (froms){
 		var o = {};  
         var arr = froms.serializeArray();  
-        $.each(arr,function(){  
+        $.each(arr,function(){
             if (o[this.name]) {  //返回json中有该属性
                 if (!o[this.name].push) { //将已存在的属性值改成数组
                     o[this.name] = [ o[this.name] ];
@@ -45,7 +44,8 @@ var commonfun = {
                 o[this.name].push(this.value || ''); //将值存放到数组中
             } else {  //返回json中没有有该属性
                 o[this.name] = this.value || '';  //直接将属性和值放入返回json中
-            }  
+            } 
+			
         });  
         return o; 
 	},

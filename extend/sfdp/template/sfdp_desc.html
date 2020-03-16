@@ -113,6 +113,9 @@ var look_db = {$look};
 		  revert: "invalid",
 		  cursor: "move"
 		});
+		$( "#fb-fz" ).sortable({
+		  cancel: ".fb-disabled"
+		});
 	});
 	$("#save").click(function(){
 		var int_data = localStorage.getItem("json_data");

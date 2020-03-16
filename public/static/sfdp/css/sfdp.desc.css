@@ -13,7 +13,7 @@ body {line-height: 1.6;font-size: 12px;background-color: #d6d3d3;font-family: sa
 .active{font-weight: bold;padding-bottom: 5px;}
 .fb-content .section{padding: 0 20px;}
 .logout{margin: 10px;}
-.code{position: absolute;right: 5px; top: 0px;color: #01ff4f;}
+.code{position: absolute;right: 5px; top: 0px;color: #03b0f3;}
 .code_td{position: relative;}
 .code2{position: absolute;right: 5px;top: 24px;color: #010f17a6;font-size: 18px;}
 .tpfd-content div{line-height: 35px;}
@@ -23,3 +23,4 @@ body {line-height: 1.6;font-size: 12px;background-color: #d6d3d3;font-family: sa
 .tpfd-content{margin:5px 0; line-height:22px; color:#595d60; text-align:left;overflow-y: auto;height: 300px;}
 .tpfd-ok{position:absolute; right:20px; top: 90%; cursor:pointer; font-size:20px;}
 .fb-button img{width: 15px;}
+label{font-weight: 800;}
