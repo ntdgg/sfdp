@@ -44,6 +44,9 @@
         };
         var settings = $.extend({}, defaults, options);
         var $self = $(this);
+		var attr_id =$self.attr('data-attr');
+		
+			settings.url = options.url+'?attr_id='+attr_id;
         // 判断是否支持H5上传
         if (typeof XMLHttpRequest === "function" && typeof FormData === "function") {
             /* H5 上传 */
@@ -77,6 +80,7 @@
                     // INPUT[TYPE=FILE] 处理
                     filesArr[$self.attr('name')] = e.target.files || e.dataTransfer.files;
                 }
+			
                 formData = buildData(filesArr);
                 if (false === formData) {
                     return false;
@@ -131,7 +135,6 @@
                 for (var key in settings.data) {
                     formData.append(key, settings.data[key]);
                 }
-
                 return formData;
             }
 

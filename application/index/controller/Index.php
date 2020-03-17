@@ -13,4 +13,20 @@ class Index  extends Controller{
 	 
       return $this->fetch();
     }
+	public function wfupsave($attr_id)
+    {
+        $files = $this->request->file('file');
+        $insert = [];
+        foreach ($files as $file) {
+            $path = \Env::get('root_path') . '/public/uploads/';
+            $info = $file->move($path);
+            if ($info) {
+                $data[] = $info->getSaveName();
+            } else {
+                $error[] = $file->getError();
+            }
+        }
+		
+        return json(['msg'=>$data,'code'=>0,'info'=>$info->getInfo('name'),'attr_id'=>$attr_id]);
+    }
 }

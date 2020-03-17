@@ -15,14 +15,17 @@
 
 	<script src="__SFDP__/lib/jquery-1.12.4.js"></script>
 	<script src="__SFDP__/lib/jquery-ui.js"></script>
+	<script src="__SFDP__/lib/layer/2.4/layer.js"></script>
 	<script src="__SFDP__/js/sfdp.view.js"></script>
 	<script src="__SFDP__/js/sfdp.field.js"></script>
 	<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
+	<script src="__SFDP__/lib/H5upload.js"></script>
+	<script src="__SFDP__/js/sfdp.fun.js"></script>
 	<!--动态加载用户自定义脚本-->
 	{$fun|raw}
 	<!--脚本结束-->
 	   <script>
-				
+			var uploadurl = '{:url("/index/index/wfupsave")}';
 			try{
 			  load_satr_fun();//后置函数
 			}catch(e){
@@ -31,6 +34,24 @@
 
 		  $( function() {
 				showview({$data|raw});
+				 $("#file-input").tpUpload({
+					url: uploadurl,
+					start: function () {
+						layer_msg = layer.msg('正在上传中…', {time: 100000000});
+					},
+					progress: function (loaded, total, file) {
+						$('.layui-layer-msg .layui-layer-content').html('已上传' + (loaded / total * 100).toFixed(2) + '%');
+					},
+					success: function (ret) {
+						$('#'+ret.attr_id).val(ret.msg);
+					},
+					error: function (ret) {
+						layer.alert(ret);
+					},
+					end: function () {
+						layer.close(layer_msg);
+					}
+				});
 			});
 		$(document).ready(function(){
 			try{
@@ -40,6 +61,15 @@
 			}
 		});
 	
-	  </script>
+	
+        
+		
+       // 文件上传
+       
+
+
+  
+
+</script>
 </body>
 </html>

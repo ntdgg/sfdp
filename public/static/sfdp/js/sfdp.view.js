@@ -15,7 +15,6 @@
 			$('#table').html('<form action="" method="post" name="form" id="form"><input type="hidden" readonly name="name_db" value="'+int_data.name_db+'"><table id="table_view"><tbody><tr class="table_tr"><th  colspan="4">'+int_data.name+'</th></tr> <tr><td style="text-align: center;"><button  class="btn btn-primary radius" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</button><button  class="btn btn-default radius" type="button" onclick="layer_close()">&nbsp;&nbsp;取消&nbsp;&nbsp;</td></tr></tbody></table></form>');
 			 for (x in int_data.list){
 				var table = table_build(int_data.list[x]['type'],int_data.list[x]);//恢复表单布局设计
-				console.log(table);
 				var $targetTbody= $("#table_view tbody");
 				var $tr = $targetTbody.children("tr[class='table_tr']:last");
 				$tr.after(table);

@@ -99,6 +99,28 @@ var commonfun = {
 			commonfun.sGet(url);
 		});
 	},
+	H5upload : function (url,msg){
+		 $("#file-input").tpUpload({
+            url: uploadurl+'?id=upload_0739843',
+            data: {a: 'a'},
+            drag: '',
+            start: function () {
+                layer_msg = layer.msg('正在上传中…', {time: 100000000});
+            },
+            progress: function (loaded, total, file) {
+                $('.layui-layer-msg .layui-layer-content').html('已上传' + (loaded / total * 100).toFixed(2) + '%');
+            },
+            success: function (ret) {
+					console.log($('#'+ret.id).val(ret.msg));
+            },
+            error: function (ret) {
+                layer.alert(ret);
+            },
+            end: function () {
+                layer.close(layer_msg);
+            }
+        });
+	},
 	sGet : function(url,msg='操作成功'){
 		$.get(url,function(data,status){
 			if(status=='success'){
