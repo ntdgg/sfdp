@@ -21,6 +21,8 @@
 			 } 
 			$(document).attr("title",int_data.name);//修改页面标题
 		}
+		commonfun.setDate();//初始化日期选择器
+		
 		
 	}	
 	//表单构建

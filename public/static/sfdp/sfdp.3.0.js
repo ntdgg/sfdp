@@ -159,7 +159,7 @@
 	//点击保存按钮
 	$('.tpfd-ok').on('click', function() {
 		var params = commonfun.fromdata($("#myform")); //将表单序列化为JSON对象  
-		console.log(params);
+		
 		if($('#showtype').val()=='view'){
 			$('.tpfd-pop').fadeOut();
 			commonfun.ShowTip(' 界面预览成功 ');
