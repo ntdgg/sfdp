@@ -10,14 +10,12 @@
  </head> 
  <body> 
   <link rel="stylesheet" href="__SFDP__/css/sfdp.common.css" />
-<form action='{:url("/index/sfdp/sfdp_fun_save")}' method="post" name="form" id="form">
-<input type="hidden" name="sid" value="{$sid}">
   <div class="page-container"> 
 		<table>
 			<tr>
 			<td style='width:65px;text-align:left'>元素信息</td>
 			<td style='width:330px'>
-			<pre><bq>&lt;h2</bq><bq>&gt;</bq>脚本说明：<bq style="">&lt;/h2</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq>特别说明：脚本支持所有的JQ语句，但系统内置了几个常用的<bq>&lt;/p</bq><bq>&gt;</bq></pre>
+			<pre><bq>&lt;h2</bq><bq>&gt;</bq>脚本说明：<bq style="">&lt;/h2</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq>特别说明：显示设计的所有UI元素<bq>&lt;/p</bq><bq>&gt;</bq></pre>
 			</td>
 			</tr>
 			{volist name='ui' id='s'}
@@ -29,24 +27,16 @@
 			字段名：{$s.tpfd_db}({$s.tpfd_dblx})({$s.tpfd_dbcd}) |列表：{$s.tpfd_list} | 查询：{$s.tpfd_chaxun} | 隐藏：{$s.tpfd_show} <br/>
 			{present name="s.xx_type"}
 			{eq name='s.xx_type' value='1'}
-			jiaoben
+				函数名为：<font color='red'>{$s.checkboxes_func}</font>
 			{/eq}
 			{/present}
-			
 			</td>
 			</tr>
 			{/volist}
 		</table>
-		<div class="row cl">
-			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-				<button  class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
-				<button  class="btn btn-default radius" type="button" onclick="layer_close()">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
-			</div>
+		
 		</div>
-	</form>
-	
 </article>
 
-<!--/请在上方写此页面业务相关的脚本-->
 </body>
 </html>

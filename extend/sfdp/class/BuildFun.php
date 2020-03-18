@@ -21,12 +21,10 @@ class BuildFun{
 	/**
      * 创建数据表
      */
-    public function Bfun($file,$data)
+    public function Bfun($data,$name)
     {
-		
-		return file_put_contents($file, $data);
-	   
-	   
+		$fileName = 'static' . DIRECTORY_SEPARATOR . 'sfdp' . DIRECTORY_SEPARATOR .'user-defined'. DIRECTORY_SEPARATOR .$name.'.js';
+		return file_put_contents($fileName, $data);
 		return ['info'=>'创建成功！','code'=>0];
     }
 }

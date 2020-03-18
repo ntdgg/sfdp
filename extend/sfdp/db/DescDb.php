@@ -14,6 +14,25 @@ use think\Db;
 use think\facade\Session;
 
 class DescDb{
+	
+	public static function getDesign($sid){
+		$info = Db::name('sfdp_design')->find($sid);
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
+	public static function getDesignJson($sid){
+		$info = Db::name('sfdp_design')->find($sid);
+		$json = json_decode($info['s_field'],true);
+		if($info){
+			return $json;
+		}else{
+			return  false;
+		}
+	}
+	
 	 /**
      * 获取设计版本
      *
@@ -46,6 +65,7 @@ class DescDb{
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		$list_field = json_decode($sfdp_ver_info['s_list'],true);
 		$topicid = ''; //变量赋值为空
+		$topicname = []; //变量赋值为空
 			//用foreach 遍历下二维数组
 			foreach($list_field as $key=>$vals){
 				$topicid.=$vals['tpfd_db'].',';
@@ -91,6 +111,8 @@ class DescDb{
 			];
 			return Db::name('sfdp_design')->update($ver);;
 			
+		}elseif($type=='update'){
+			return Db::name('sfdp_design')->update($data);;
 		}else{
 			$ver = [
 				's_bill'=>OrderNumber(),
