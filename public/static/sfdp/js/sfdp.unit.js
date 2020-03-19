@@ -10,6 +10,61 @@
  */
 $(function(){
     $.extend({
+		tpfd_tableui:function(code,type){
+			switch(type) {
+			case 1:
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-1 code_td" colspan="4"><span class="code">'+code+'</span><span class="code2">x</span></td></tr>';
+				break;
+			case 2:
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-2" colspan="2"></td><td id="2" colspan="2"class="fb-fz code_td" ><span class="code">'+code+'</span><span class="code2">x</span></td></tr>';
+				break;
+			case 3:
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" colspan="2"class="fb-fz  x-2 code_td" ><span class="code">'+code+'</span><span class="code2">x</span></td></tr>';
+				break;
+			case 4:
+				var html ='<tr class="table_tr" id='+code+'><td id="1" class="fb-fz x-4"></td><td id="2" class="fb-fz x-4"></td><td id="3" class="fb-fz x-4"></td><td id="4" class="fb-fz x-4 code_td"><span class="code">'+code+'</span><span class="code2">x</span></td></tr>';
+				break;
+			 default:
+				var html ='';
+			} 
+			return html;
+			
+		},
+		tpfd_change:function(labid,type){
+			switch(type) {
+			case 'text':
+				var html ='<label '+labid+'>文本控件：</label><input  type="text"  placeholder="请输入信息~" disabled>';
+				break;
+			case 'upload':    
+				var html ='<label '+labid+'>上传控件：</label>上传';
+				break;
+			case 'checkboxes':
+				var html ='<label '+labid+')>多选控件：</label>选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled>';
+				break;
+			case 'radio':
+				var html ='<label '+labid+')>单选控件：</label>选项1<input type="radio"  placeholder="" disabled> 选项2<input type="radio"  placeholder="" disabled>';
+				break;
+			case 'date':
+				var html ='<label '+labid+')>时间日期：</label><input type="text"  placeholder="" disabled >';
+				break;
+			case 'dropdown':
+				var html ='<label '+labid+'>下拉选择：</label><select disabled><option value ="请选择">请选择</option></select>';
+				break;
+			case 'textarea':
+				var html ='<label '+labid+'>多行控件：</label><textarea  disabled ></textarea>';
+				break;
+			case 'html':
+				var html ='<label '+labid+'>HTML控件：</label><b style="color: blue;">Look this is a HTML</b>';
+				break;
+			case 'wenzi':
+				var html ='<label '+labid+'>文字控件：</label>默认现实的文本';
+				break;
+			 default:
+				var html ='';
+			}
+			return html;
+			
+		},
 		tpfd_return:function(type,data){
 			switch(type) {
 				case 'text':
@@ -125,9 +180,9 @@ $(function(){
 			var html ='';
 			for (x in data){
 				if(x == data.length-1){
-					var btn ='<span onclick=addoption('+x+',"'+type+'")>Add</span>';
+					var btn ='<span onclick=commonfun.addoption('+x+',"'+type+'")>Add</span>';
 				}else{
-					var btn ='<span onclick="editoption('+x+')">Del</span>';
+					var btn ='<span onclick=commonfun.editoption('+x+')>Del</span>';
 				}
 				html += '<div id="checkboxes'+x+'"><input '+data[x]['checked']+' name="tpfd_check" value='+x+' type="'+type+'"><input name="tpfd_data" type="text" value="'+data[x]['clab']+'">'+btn+'</div>';
 			}

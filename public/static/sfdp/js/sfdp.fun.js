@@ -9,9 +9,21 @@
  * Date: 2020年3月4日23:34:39
  */
 var Debug = false;//是否开启打印模式
-var commonfun = {
-	ShowTip:function(tip) {
+var commonfun = {  
+	ShowTip : function(tip) {
 		layer.msg(tip);
+	},
+	insFgf : function(id){
+		$('#'+id).val($("#"+id).val()+'@@');
+	},
+	addoption : function(id,type='checkbox'){
+		$('#checkboxes'+id).children('span').attr("onclick","editoption("+id+")");
+		$('#checkboxes'+id).children('span').html('Del');
+		var html ='<div id="checkboxes'+(id+1)+'"><input type="'+type+'" name="tpfd_check" value='+(id+1)+' ><input name="tpfd_data" type="text" value="选项'+(id+2)+'"><span onclick=addoption('+(id+1)+',"'+type+'")>Add</span></div>';
+		$('#checkboxes'+id).after(html);
+	},
+	editoption : function(id){
+		$('#checkboxes'+id).remove();
 	},
 	dateFormat : function (oDate, fmt){
 		var o = {
@@ -197,5 +209,28 @@ var commonfun = {
 						layer.alert('请求出错！', {title: "错误信息", icon: 2});
 			  }  
 		 }); 
+	},
+	dataSave : function(data,key,type){
+		//读取当前的JSON缓存
+		//save_json(type,parent_code,'tr_data');
+		var json_data = JSON.parse(localStorage.getItem("json_data"));
+		switch(type) {
+			case 'tr':
+			json_data.list[key]=data;
+			break;
+			case 'tr_del':
+			delete json_data.list[key];
+			break;
+			case 'tr_data':
+				json_data['list'][key]['data'][data.tpfd_id] = data;
+			break;
+			case 'td_data':
+				data.td = json_data['list'][key]['data'][data.tpfd_id]['td'];
+				data.td_type = json_data['list'][key]['data'][data.tpfd_id]['td_type'];
+				json_data['list'][key]['data'][data.tpfd_id] = data;
+			break;
+			default:
+		} 
+		localStorage.setItem("json_data",JSON.stringify(json_data));
 	}
 }
