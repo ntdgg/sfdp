@@ -44,7 +44,7 @@ SFDP3.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个
 
 > 演示站点：http://sfdp.cojz8.com/   
 
-> 工作流手册：编写中
+> 开发手册：编写中
 
 
 ---
@@ -55,7 +55,7 @@ SFDP 遵循 MIT 开源协议发布，并提供免费使用。
 
 本项目包含的第三方源码和二进制文件之版权信息另行标注。
 
-版权所有Copyright © 2018-2020 by Tpflow (http://cojz8.com)
+版权所有Copyright © 2018-2020 by Sfdp (http://cojz8.com)
 
 All rights reserved。
 
