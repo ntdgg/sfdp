@@ -8,12 +8,13 @@
 
 SFDP3.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个版本的迭代更新，发布全新重构的表单设计开发一体的平台。
 
+在线交流QQ群：855626871
 
 ----
 ### 作者相关开源软件
 
 
-> GVP项目PHP开源工作流：http://tpflow.cojz8.com/
+> PHP开源工作流：http://tpflow.cojz8.com/
 
 > 下载地址：https://gitee.com/ntdgg/tpflow
 
@@ -24,7 +25,7 @@ SFDP3.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个
 
 #### &hearts; 可视化表单设计器
 
-- 基于JQ UI的元素拖拽 Draggable  Sortable
+- 基于JQ UI的元素拖拽  `Draggable`   `Sortable`
 - 元素可移动拖拽设计
 - 界面布局自定义化
 
@@ -34,12 +35,12 @@ SFDP3.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个
 - 无实体页面及数据，全部由表单构建器进行管理
 
 #### &hearts; 脚本定义支持
-- load_satr_fun 页面构建前执行的函数
-- load_end_fun 页面构建完成后函数
-- 内置常见的所有脚本 Ajax Upload 支持jQ所有脚本
+-  `load_satr_fun` 页面构建前执行的函数
+- `load_end_fun` 页面构建完成后函数
+- 内置常见的所有脚本 `Ajax Upload` 支持jQ所有脚本
 
 #### &hearts; 函数定义支持
-- 支持使用 commonfun.sFun 进行数据交互，使得表单动态而又活起来。
+- 支持使用 `commonfun.sFun` 进行数据交互，使得表单动态而又活起来。
 
 ####  &hearts; 设计版本管理
 - 多版本设计支持
