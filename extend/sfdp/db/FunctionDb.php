@@ -16,6 +16,12 @@ use think\facade\Session;
 class FunctionDb{
 	
 	public static function functionSave($data){
+		$hasname = Db::name('sfdp_function')->where('fun_name',$data['name'])->find();
+		if($hasname){
+			return json(['code'=>1,'msg'=>'禁止函数名称重复！']);
+		}
+		
+		
 		if(!isset($data['id'])){
 			$ver = [
 				'bill'=>OrderNumber(),
@@ -30,6 +36,7 @@ class FunctionDb{
 		}else{
 			$ver = [
 				'id'=>$data['id'],
+				'title'=>$data['title'],
 				'fun_name'=>$data['name'],
 				'function'=>$data['fun']
 			];	

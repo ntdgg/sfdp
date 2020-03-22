@@ -22,6 +22,7 @@ require_once FILE_PATH . '/config/common.php';
 require_once FILE_PATH . '/db/DescDb.php';
 require_once FILE_PATH . '/db/ViewDb.php';
 require_once FILE_PATH . '/db/ScriptDb.php';
+require_once FILE_PATH . '/db/FunctionDb.php';
 require_once FILE_PATH . '/class/BuildFun.php';
 require_once FILE_PATH . '/class/SfdpUnit.php';
 require_once FILE_PATH . '/class/BuildTable.php';
