@@ -29,19 +29,23 @@
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script type="text/javascript" src="__HUIADMIN__/common.js"></script>
 <script type="text/javascript" src="__LIB__/laydate5.0.9/laydate.js"></script>
-<title>Sfdp</title>
+<title>{$title ?? '超级表单开发平台'} </title>
 </head>
 <body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> {$title ?? '超级表单开发平台'} 
+ <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
-    
-    <div class="cl pd-5 bg-1 bk-gray">
-        <span class="l">
+<div class="text-l">
+		<span class="l">
             <a href="javascript:;" onclick="layer_show('新增','{:url('index/sfdp/add',['sid'=>$sid])}','850','500')" class="btn btn-primary radius">新增</a>
         </span>
-        <span class="r pt-5 pr-5">
-            共有数据 ：<strong>{:count($list)}</strong> 条
-        </span>
-    </div>
+		<span class=" ml-5">
+		<input type="text" name="" id="" placeholder=" 资讯名称" style="width:250px" class="input-text">
+		<button name="" id="" class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 查询</button>
+		</span>
+</div>
+    
+
     <table class="table table-border table-bordered table-hover table-bg mt-20">
         <thead>
         <tr class="text-c">

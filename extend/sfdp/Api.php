@@ -40,8 +40,10 @@ class Api
 	/*动态生成列表*/
 	public function lists($sid)
 	{
+		
 		$data = DescDb::getListData($sid);
-		return view($this->patch.'/index.html',['sid'=>$sid,'list'=>$data['list'],'field'=>$data['field']['fieldname']]);
+		//dump($data);
+		return view($this->patch.'/index.html',['sid'=>$sid,'list'=>$data['list'],'field'=>$data['field']['fieldname'],'title'=>$data['title']]);
 	}
 	/*动态生成表单*/
 	public function add($sid)

@@ -64,15 +64,15 @@ class DescDb{
 		$sfdp_ver_info = self::getDescVerVal($sid);
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		$list_field = json_decode($sfdp_ver_info['s_list'],true);
-		$topicid = ''; //变量赋值为空
-		$topicname = []; //变量赋值为空
-			//用foreach 遍历下二维数组
+		$searct_field = json_decode($sfdp_ver_info['s_search'],true);
+		$listid = ''; //变量赋值为空
+		$listfield = []; //变量赋值为空
 			foreach($list_field as $key=>$vals){
-				$topicid.=$vals['tpfd_db'].',';
-				$topicname[$vals['tpfd_db']]=$vals['tpfd_db'];
+				$listid.=$vals['tpfd_db'].',';
+				$listfield[$vals['tpfd_db']]=$vals['tpfd_name'];
 			}
-		$topicid = rtrim($topicid, ',');
-		return ['db_name'=>$field['name_db'],'field'=>$topicid,'fieldname'=>$topicname];
+		$topicid = rtrim($listid, ',');
+		return ['db_name'=>$field['name_db'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'seaech'=>$searct_field,'title'=>$sfdp_ver_info['s_name']];
 	}
 	/**
      * 获取设计版本
@@ -82,7 +82,7 @@ class DescDb{
 	public static function getListData($sid){
 		$jsondata = self::descVerTodata($sid);
 		$list = Db::name($jsondata['db_name'])->field($jsondata['field'])->paginate('10');
-		return ['list'=>$list,'field'=>$jsondata];
+		return ['list'=>$list,'field'=>$jsondata,'search'=>$jsondata,'title'=>$jsondata['title']];
 	}
 	public static function saveDesc($data,$type='save'){
 		if($type=='save'){

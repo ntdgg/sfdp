@@ -20,8 +20,6 @@ class FunctionDb{
 		if($hasname){
 			return json(['code'=>1,'msg'=>'禁止函数名称重复！']);
 		}
-		
-		
 		if(!isset($data['id'])){
 			$ver = [
 				'bill'=>OrderNumber(),
