@@ -16,5 +16,5 @@ pre{
 pre bq{
 	color:#170
 }
-button{display:inline-block;margin:0;padding:.563rem .244rem;border:0 none;background:#3bb4f2bf;color:#fff;text-align:center;text-decoration:none;font-size:12px;line-height:1.5;cursor:pointer;border-radius:.125rem;border:thin solid #3bb4f2bf;border-bottom:2px solid #3bb4f2bf;text-align: left;margin-left: 10px;}
+.btn{display:inline-block;margin:0;padding:.563rem .244rem;border:0 none;background:#3bb4f2bf;color:#fff;text-align:center;text-decoration:none;font-size:12px;line-height:1.5;cursor:pointer;border-radius:.125rem;border:thin solid #3bb4f2bf;border-bottom:2px solid #3bb4f2bf;text-align: left;margin-left: 10px;}
 

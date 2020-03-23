@@ -232,5 +232,9 @@ var commonfun = {
 			default:
 		} 
 		localStorage.setItem("json_data",JSON.stringify(json_data));
+	},
+	layer_close : function(){
+		var index = parent.layer.getFrameIndex(window.name);
+		parent.layer.close(index);
 	}
 }

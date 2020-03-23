@@ -12,7 +12,6 @@ namespace sfdp;
 
 use think\Request;
 use think\Db;
-use think\view;
 
 define('FILE_PATH', realpath ( dirname ( __FILE__ ) ) );
 define('ROOT_PATH',\Env::get('root_path') );
@@ -30,8 +29,18 @@ require_once FILE_PATH . '/class/BuildTable.php';
 class Api
 {
 	public $patch = '';
+	public $topconfig = '';
 	function __construct() {
+		$sid = input('sid') ?? 0;
+		$this->topconfig = 
+		'<script>
+		var g_uid=2;
+		var g_role=2;
+		var g_username=2;
+		var g_sid='.$sid.';
+		</script>';
 		$this->patch =  ROOT_PATH . 'extend/sfdp/template';
+		
    }
 	/*构建表单目录*/
 	static function sdfp_menu(){
@@ -40,10 +49,16 @@ class Api
 	/*动态生成列表*/
 	public function lists($sid)
 	{
-		
-		$data = DescDb::getListData($sid);
-		//dump($data);
-		return view($this->patch.'/index.html',['sid'=>$sid,'list'=>$data['list'],'field'=>$data['field']['fieldname'],'title'=>$data['title']]);
+		$map = SfdpUnit::Bsearch(input('post.'));
+		$data = DescDb::getListData($sid,$map);
+		$config = [
+			'g_js'=>$this->topconfig,
+			'sid' =>$sid,
+			'field'=>$data['field']['fieldname'],
+			'search' =>$data['field']['search'],
+			'title' =>$data['title'],
+		];
+		return view($this->patch.'/index.html',['config'=>$config,'list'=>$data['list']]);
 	}
 	/*动态生成表单*/
 	public function add($sid)
@@ -54,7 +69,7 @@ class Api
 		}else{
 			$fun = '';
 		}
-		return view($this->patch.'/edit.html',['fun'=>$fun,'data'=>$json['s_field']]);
+		return view($this->patch.'/edit.html',['g_js'=>$this->topconfig,'fun'=>$fun,'data'=>$json['s_field']]);
 	}
 	/*创建一个新得表单*/
 	public function sfdp_create(){

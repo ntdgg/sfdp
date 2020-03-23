@@ -30,4 +30,28 @@ class SfdpUnit{
 		}
 		return $menu_html;
     }
+	public static function Bsearch($search){
+		$map =[];
+		if(count($search)<>0){
+			$search_field = json_decode(htmlspecialchars_decode($search['search']),true);
+			foreach($search_field as $k=>$v){
+				if($search[$v['tpfd_db']]<>''){
+					$map[$v['tpfd_db']] = ['eq',$search[$v['tpfd_db']]];
+				}
+			}
+		}
+		return $map;
+	}
+	public static function mergesearch($map,$jsondata){
+		if(count($map)==0){
+			$json = $jsondata;
+		}else{
+			$search_field = json_decode($jsondata,true);
+			foreach($search_field as $k=>$v){
+				$search_field[$k]['tpfd_zanwei'] = $map[$v['tpfd_db']][1] ?? '';
+			}
+			$json = json_encode($search_field);
+		}
+		return $json;
+	} 
 }

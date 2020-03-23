@@ -16,7 +16,7 @@ $(function(){
 			}else{
 				switch(type) {
 					case 'text':
-					var html ='<label>'+data.tpfd_name+'：</label><input type="text" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'">';
+					var html ='<label>'+data.tpfd_name+'：</label><input type="text" value="'+data.tpfd_zanwei+'" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'">';
 					break;
 					case 'radio':
 					var html ='<label>'+data.tpfd_name+'：</label>'+view_checkboxes_clss(data,'radio');

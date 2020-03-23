@@ -15,7 +15,7 @@
 			if(Debug==true){
 				var btn ='';
 				}else{
-				var btn = '<button  class="btn btn-primary radius" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</button><button  class="btn btn-default radius" type="button" onclick="layer_close()">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>';
+				var btn = '<a  class="btn" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</a><a class="btn" type="button" onclick=commonfun.layer_close()>&nbsp;&nbsp;取消&nbsp;&nbsp;</a>';
 			}
 			$('#table').html('<form action="" method="post" name="form" id="form"><input type="hidden" readonly name="name_db" value="'+int_data.name_db+'"><table id="table_view"><tbody><tr class="table_tr"><th  colspan="4">'+int_data.name+'</th></tr> <tr><td style="text-align: center;" colspan=4> '+btn+' </td></tr></tbody></table></form>');
 			 for (x in int_data.list){
@@ -27,7 +27,17 @@
 			$(document).attr("title",int_data.name);//修改页面标题
 		}
 		commonfun.setDate();//初始化日期选择器
-	}	
+	}
+	function showlist(int_data,Debug=false){
+		var td_data = int_data;
+			var html ='';
+			for (x in td_data){
+				var type = td_data[x]['td_type'];
+				 html += '   '+$.view_field_return(type,td_data[x]);
+			}
+			html += '   <button  class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 查询</button>';
+		$('#search').html(html);
+	}
 	//表单构建
 	function table_build(id,old_data=''){
 		var code = old_data['tr'];
