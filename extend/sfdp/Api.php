@@ -84,7 +84,7 @@ class Api
 	}
 	/*列表数据*/
 	public function sfdp($sid=''){
-		$data = Db::name('sfdp_design')->paginate('10')->each(function($item, $key){
+		$data = Db::name('sfdp_design')->order('id desc')->paginate('10')->each(function($item, $key){
 				$item['fix'] = Db::name('sfdp_design_ver')->where('sid',$item['id'])->order('id desc')->select();
 				return $item;
 			});
@@ -171,10 +171,22 @@ class Api
 	}
 	public function saveadd($sid){
 		$data = input('post.');
+		foreach($data as $k=>$v){
+			if(is_array($v)){
+				$data[$k] = implode(",", $v);
+			}
+		}
 		$table = $data['name_db'];
 		unset($data['name_db']);
 		unset($data['tpfd_check']);
 		db($table)->insertGetId($data);
 		echo "<script language='javascript'>alert('Success,操作成功！！');</script>"; 
+	}
+	public function sfdp_view($sid,$bid){
+		dump($sid.'--'.$bid);
+		$data = DescDb::getViewData($sid,$bid);
+		
+		
+		
 	}
 }

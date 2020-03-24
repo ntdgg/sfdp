@@ -11,34 +11,45 @@
 $(function(){
     $.extend({
 		view_field_return:function(type,data){
+			console.log(data);//tpfd_read  //tpfd_must
+			if(data.tpfd_must==0){
+				var maste = 'datatype="*"';
+			}else{
+				var maste = '';
+			}
+			if(data.tpfd_read==0){
+				var read = 'readonly';
+			}else{
+				var read = '';
+			}
+			var field_att = maste + read;
 			if (typeof(data['tpfd_name']) == 'undefined') {
 				return $.view_default(type,data);
 			}else{
 				switch(type) {
 					case 'text':
-					var html ='<label>'+data.tpfd_name+'：</label><input type="text" value="'+data.tpfd_zanwei+'" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'">';
+					var html ='<label>'+data.tpfd_name+'：</label><input type="text" '+field_att+' value="'+data.tpfd_zanwei+'" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'">';
 					break;
 					case 'radio':
-					var html ='<label>'+data.tpfd_name+'：</label>'+view_checkboxes_clss(data,'radio');
+					var html ='<label>'+data.tpfd_name+'：</label>'+view_checkboxes_clss(data,'radio',field_att);
 					break;
 					case 'checkboxes':
-					var html ='<label>'+data.tpfd_name+'：</label>'+view_checkboxes_clss(data);
+					var html ='<label>'+data.tpfd_name+'：</label>'+view_checkboxes_clss(data,'checkbox',field_att);
 					break;
 					case 'dropdown':
-					var html ='<label>'+data.tpfd_name+'：</label>'+$.view_select(data.tpfd_data,data.tpfd_db,0);
+					var html ='<label>'+data.tpfd_name+'：</label>'+$.view_select(data.tpfd_data,data.tpfd_db,0,field_att);
 					break;
 					case 'textarea':
-					var html ='<label>'+data.tpfd_name+'：</label><textarea  name="'+data.tpfd_db+'"  placeholder="" ></textarea>';
+					var html ='<label>'+data.tpfd_name+'：</label><textarea  name="'+data.tpfd_db+'" '+field_att+' placeholder="" ></textarea>';
 					break;
 					case 'upload':
 					var html ='<label>'+data.tpfd_name+'：</label>'+$.view_upload(data,data.tpfd_db,0);
 					break;
 					case 'date':
 					var rqtype =['yyyy','MM-dd','yyyy-MM-dd','yyyyMMdd','yyyy-MM'];
-					var html ='<label>'+data.tpfd_name+'：</label><input data-type="'+rqtype[data.xx_type]+'" class="datetime" type="text" name="'+data.tpfd_db+'"  id="'+data.tpfd_id+'">';
+					var html ='<label>'+data.tpfd_name+'：</label><input '+field_att+' '+field_att+' data-type="'+rqtype[data.xx_type]+'" class="datetime" type="text" name="'+data.tpfd_db+'"  id="'+data.tpfd_id+'">';
 					break;
 					case 'html':
-					 console.log(data);
 					var html ='<label>'+data.tpfd_name+'：</label>'+data.tpfd_moren;
 					break;
 					case 'wenzi':
@@ -48,13 +59,13 @@ $(function(){
 			}
 			return html;
         },
-		view_select:function(data,field,value){
+		view_select:function(data,field,value,att){
 			var datas = [];
 			for (y in data){
 				datas[y] = { cid:y,clab:data[y]};
 			}
 			var json_data =JSON.parse(JSON.stringify(datas));
-				var html ='<select name="'+field+'" style="width: 80px">';
+				var html ='<select name="'+field+'" style="width: 80px" '+att+'><option value="">请选择</option>';
 				for (z in json_data){
 					html += '<option value="'+json_data[z]['cid']+'" '+((value) == 'yes' ? 'selected' : '') +'>'+json_data[z]['clab']+'</option>';
 				}
@@ -101,7 +112,7 @@ $(function(){
 		}
 		
     })
-	function view_checkboxes_clss(data,type='checkbox'){
+	function view_checkboxes_clss(data,type='checkbox',att){
 			var datas = [];
 			for (y in data.tpfd_data){
 				if(isInArray(data.tpfd_check,y)){
@@ -114,7 +125,7 @@ $(function(){
 			var json_data =JSON.parse(JSON.stringify(datas));
 			var html ='';
 			for (z in json_data){
-				html += '<input '+json_data[z]['checked']+' name="'+data.tpfd_db+'" value='+z+' type="'+type+'">'+json_data[z]['clab']+'';
+				html += '<input '+att+' '+json_data[z]['checked']+' name="'+data.tpfd_db+'[]" value='+z+' type="'+type+'">'+json_data[z]['clab']+'';
 			}
 			return html;
 		}

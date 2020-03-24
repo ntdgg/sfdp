@@ -61,9 +61,15 @@ input,select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;borde
         <tr class="text-c">
             <td><input type="checkbox" name="id[]" ></td>
 			{volist name='config.field' id='ks'}
-            <td>{$k["$key"]}</td>
+            <td>{$k["$key"]|raw}</td>
 			{/volist}
-             <th width="70">操作</th>
+             <th width="70">
+			 <div class="btn-group">
+					<a onClick="commonfun.openfullpage('查看','{:url('/index/sfdp/sfdp_view',['sid'=>$config.sid,'bid'=>$k.id])}')"	class="btn  radius size-S">查看</a>
+					
+					
+				</div>
+			 </th>
         </tr>
         {/volist}
         </tbody>

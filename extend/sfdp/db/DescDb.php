@@ -71,8 +71,33 @@ class DescDb{
 				$listid.=$vals['tpfd_db'].',';
 				$listfield[$vals['tpfd_db']]=$vals['tpfd_name'];
 			}
+		$fieldArr = [];
+		$fieldArrAll = [];
+			foreach($field['list'] as $k=>$v){
+				foreach($v['data'] as $k2=>$v2){
+					//xx_type //tpfd_data //td_type
+					if(($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
+						$fieldArr[$v2['tpfd_db']]=$v2['tpfd_data'];
+					}
+					if($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
+						$fieldArrAll[$v2['tpfd_db']]=$v2['tpfd_data'];
+					}
+				}
+			}
 		$topicid = rtrim($listid, ',');
-		return ['db_name'=>$field['name_db'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name']];
+		return ['db_name'=>$field['name_db'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
+	}
+	public static function getViewData($sid,$bid){
+		$jsondata = self::descVerTodata($sid);
+		$find = Db::name($jsondata['db_name'])->find($bid);
+		foreach($find as $k=>$v){
+			foreach($jsondata['fieldArrAll'] as $k2=>$v2){
+				if($k==$k2){
+					$find[$k2] =$jsondata['fieldArrAll'][$k2][$v] ?? '<font color="red">索引出错</font>';
+				}
+			}
+		}
+		dump($find);
 	}
 	/**
      * 获取设计版本
@@ -81,8 +106,13 @@ class DescDb{
      */
 	public static function getListData($sid,$map){
 		$jsondata = self::descVerTodata($sid);
-		$list = Db::name($jsondata['db_name'])->where($map)->field($jsondata['field'])->paginate('10');
-		
+		$list = Db::name($jsondata['db_name'])->where($map)->field('id,'.$jsondata['field'])->order('id desc')->paginate(10);
+		$list = $list->all();
+		foreach ($list as $k => $v) {
+			foreach($jsondata['fieldArr'] as $k2=>$v2){
+				$list[$k][$k2] = $jsondata['fieldArr'][$k2][$v[$k2]] ?? '<font color="red">索引出错</font>';
+			}
+		}
 		$jsondata['search'] = SfdpUnit::mergesearch($map,$jsondata['search']);
 		return ['list'=>$list,'field'=>$jsondata,'title'=>$jsondata['title']];
 	}

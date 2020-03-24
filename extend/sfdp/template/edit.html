@@ -26,6 +26,7 @@
 	{$fun|raw}
 	<!--脚本结束-->
 	   <script>
+			
 			var uploadurl = '{:url("/index/index/wfupsave")}';
 			try{
 			  load_satr_fun();//后置函数
@@ -34,7 +35,23 @@
 			}
 
 		  $( function() {
+				
 				showview({$data|raw});
+				$("#form").Validform({
+					tiptype:function(msg,o,cssctl){
+					if (o.type == 3){
+						layer.msg(msg, {time: 800}); 
+					}
+					},
+					ajaxPost:true,
+					showAllError:true,
+					callback:function(ret){
+						ajax_progress(ret);
+					}
+				});
+				$(".btn").click(function(){
+					 $("#form").submit();
+				});
 			});
 		$(document).ready(function(){
 			try{
