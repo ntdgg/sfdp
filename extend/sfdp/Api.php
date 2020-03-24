@@ -183,10 +183,7 @@ class Api
 		echo "<script language='javascript'>alert('Success,操作成功！！');</script>"; 
 	}
 	public function sfdp_view($sid,$bid){
-		dump($sid.'--'.$bid);
 		$data = DescDb::getViewData($sid,$bid);
-		
-		
-		
+		return view($this->patch.'/view.html',['info'=>$data['info']]);
 	}
 }

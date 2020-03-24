@@ -173,7 +173,7 @@
 			$('#showtype').val('view');
 			var int_data = localStorage.getItem("json_data");
 			var desc_data = JSON.parse(int_data);
-			showview(desc_data,true);
+			showadd(desc_data,true);
 		}else{
 			$('#showtype').val('other');
 			$('#table').html(fb_set(type,id,parent_code));

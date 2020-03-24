@@ -88,16 +88,17 @@ class DescDb{
 		return ['db_name'=>$field['name_db'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
 	}
 	public static function getViewData($sid,$bid){
-		$jsondata = self::descVerTodata($sid);
-		$find = Db::name($jsondata['db_name'])->find($bid);
-		foreach($find as $k=>$v){
-			foreach($jsondata['fieldArrAll'] as $k2=>$v2){
-				if($k==$k2){
-					$find[$k2] =$jsondata['fieldArrAll'][$k2][$v] ?? '<font color="red">索引出错</font>';
+		
+		$sfdp_ver_info = self::getDescVerVal($sid);
+		$field = json_decode($sfdp_ver_info['s_field'],true);
+		$find = Db::name($field['name_db'])->find($bid);
+		foreach($field['list'] as $k=>$v){
+				foreach($v['data'] as $k2=>$v2){
+					$field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
 				}
-			}
 		}
-		dump($find);
+		
+		return ['info'=>json_encode($field)];
 	}
 	/**
      * 获取设计版本

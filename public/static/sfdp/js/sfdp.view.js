@@ -8,7 +8,23 @@
  *
  * Date: 2020年3月4日23:34:39
  */
-	function showview(int_data,Debug=false){
+	function showview(int_data){
+		console.log(int_data);
+		if(int_data==null){
+			layer.msg('对不起，没有任何数据~');
+		}else{
+			$('#table').html('<table id="table_view"><tbody><tr class="table_tr"></tr></tbody></table>');
+			 for (x in int_data.list){
+				var table = table_build(int_data.list[x]['type'],int_data.list[x]);//恢复表单布局设计
+				var $targetTbody= $("#table_view tbody");
+				var $tr = $targetTbody.children("tr[class='table_tr']:last");
+				$tr.after(table);
+			 } 
+			$(document).attr("title",int_data.name);//修改页面标题
+		}
+		
+	}
+	function showadd(int_data,Debug=false){
 		if(int_data==null){
 			layer.msg('对不起，没有任何数据~');
 		}else{
