@@ -236,5 +236,14 @@ var commonfun = {
 	layer_close : function(){
 		var index = parent.layer.getFrameIndex(window.name);
 		parent.layer.close(index);
+	},
+	delTr :function(){
+		$(".code2").unbind('click').click(function(){
+			var tr_id = $(this).parent().parent().attr("id");
+			commonfun.dataSave('',tr_id,'tr_del');
+			logout('删除了单元行'+tr_id);
+			$(this).parent().parent().remove();
+		});
+		
 	}
 }

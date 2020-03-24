@@ -162,7 +162,7 @@ $(function(){
         },
 		tpfd_list:function(data){
 			console.log(data);
-			return '<div>列表设置：'+$.tpfd_select('','tpfd_list',data.tpfd_list)+'  查询设置：'+$.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'  字段隐藏：'+$.tpfd_select('','tpfd_show',data.tpfd_show)+'</div>';
+			return '<div>列表设置：'+$.tpfd_select('','tpfd_list',data.tpfd_list)+'  查询设置：'+$.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'</div>';
         },
 		tpfd_select:function(data,field,value){
 			if(data==''){

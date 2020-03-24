@@ -32,6 +32,7 @@
 			var code = old_data['tr'];
 		}
 		var html = $.tpfd_tableui(code,id);
+
 		var logs ='新增1*'+id+'单元行';
 		if(old_data==''){
 			commonfun.dataSave({tr:code,data:{},type:id},code,'tr');
@@ -41,6 +42,7 @@
 		}
 		if(showtype==''){
 			$tr.after(html);
+			commonfun.delTr();
 			$( ".fb-fz" ).sortable({
 					opacity: 0.5,
 					revert: true,
@@ -65,12 +67,7 @@
 			return html;
 		}
 	}
-	$(".code2").unbind('click').click(function(){
-		var tr_id = $(this).parent().parent().attr("id");
-		commonfun.dataSave('',tr_id,'tr_del');
-		logout('删除了单元行'+tr_id);
-		$(this).parent().parent().remove();
-	});
+	
 	//文本转换
 	function fb_tpl(type,code,parent_code,td_xh,old_data=0){
 		if(old_data==0){
@@ -101,6 +98,12 @@
 		$('#label'+data.tpfd_id).html(data.tpfd_name+'：');
 		$('.tpfd-pop').fadeOut();
 	}
+	$(".code2").unbind('click').click(function(){
+		var tr_id = $(this).parent().parent().attr("id");
+		commonfun.dataSave('',tr_id,'tr_del');
+		logout('删除了单元行'+tr_id);
+		$(this).parent().parent().remove();
+	});
 	//点击保存按钮
 	$('.tpfd-ok').on('click', function() {
 		var params = commonfun.fromdata($("#myform")); //将表单序列化为JSON对象  
@@ -195,6 +198,7 @@
 	$('.tpfd-close').on('click', function() {
 		$('.tpfd-pop').fadeOut();
 	});
+	
 	function recovery_input(old_data){
 		var td_data = old_data.data;
 		//如果有设计数据，则开始恢复表单数据
@@ -210,7 +214,10 @@
 				var html =fb_tpl(type,class_code,parent_code,td_data[x]['td'],td_data[x]['tpfd_id']);
 				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).removeClass("fb-fz");
 				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).removeClass("ui-sortable");
+				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).addClass("fb-disabled");
 				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).html(html);
+				$( ".fb-disabled" ).sortable( "disable" );//阻止排序
+				commonfun.delTr();
 				if(td_data[x]['tpfd_name']!=undefined){
 					fb_set_return(td_data[x]);
 				} 
