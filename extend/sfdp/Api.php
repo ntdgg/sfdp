@@ -184,6 +184,7 @@ class Api
 	}
 	public function sfdp_view($sid,$bid){
 		$data = DescDb::getViewData($sid,$bid);
+		
 		return view($this->patch.'/view.html',['info'=>$data['info']]);
 	}
 }

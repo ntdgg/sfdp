@@ -13,9 +13,9 @@
 		if(int_data==null){
 			layer.msg('对不起，没有任何数据~');
 		}else{
-			$('#table').html('<table id="table_view"><tbody><tr class="table_tr"></tr></tbody></table>');
+			$('#table').html('<table id="table_view"><tbody><tr class="table_tr"><td>'+int_data.name+'</td></tr></tbody></table>');
 			 for (x in int_data.list){
-				var table = table_build(int_data.list[x]['type'],int_data.list[x]);//恢复表单布局设计
+				var table = table_build(int_data.list[x]['type'],int_data.list[x],'show');//恢复表单布局设计
 				var $targetTbody= $("#table_view tbody");
 				var $tr = $targetTbody.children("tr[class='table_tr']:last");
 				$tr.after(table);
@@ -35,7 +35,7 @@
 			}
 			$('#table').html('<form action="" method="post" name="form" id="form"><input type="hidden" readonly name="name_db" value="'+int_data.name_db+'"><table id="table_view"><tbody><tr class="table_tr"><th  colspan="4">'+int_data.name+'</th></tr> <tr><td style="text-align: center;" colspan=4> '+btn+' </td></tr></tbody></table></form>');
 			 for (x in int_data.list){
-				var table = table_build(int_data.list[x]['type'],int_data.list[x]);//恢复表单布局设计
+				var table = table_build(int_data.list[x]['type'],int_data.list[x],'add');//恢复表单布局设计
 				var $targetTbody= $("#table_view tbody");
 				var $tr = $targetTbody.children("tr[class='table_tr']:last");
 				$tr.after(table);
@@ -55,13 +55,17 @@
 		$('#search').html(html);
 	}
 	//表单构建
-	function table_build(id,old_data=''){
+	function table_build(id,old_data='',types){
 		var code = old_data['tr'];
 		var td_data = old_data.data;
 			var json = {1:'',2:'',3:'',4:''};
 			for (x in td_data){
 				var type = td_data[x]['td_type'];
-				var html =$.view_field_return(type,td_data[x]);
+				if(types=='add'){
+					var html =$.view_field_return(type,td_data[x]);
+				}else{
+					var html =$.show_field_return(type,td_data[x]);
+				}
 				json[td_data[x]['td']] = html;
 			}
 		switch(id) {

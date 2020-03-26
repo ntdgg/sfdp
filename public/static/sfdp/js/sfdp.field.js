@@ -10,8 +10,44 @@
  */
 $(function(){
     $.extend({
+		show_field_return:function(type,data){
+			var html ='';
+			if (typeof(data['tpfd_name']) == 'undefined') {
+				return $.view_default(type,data);
+			}else{
+				switch(type) {
+					case 'text':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+					case 'radio':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+					case 'checkboxes':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+					case 'dropdown':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+					case 'textarea':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+					case 'upload':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+					case 'date':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+					case 'html':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+					case 'wenzi':
+						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+					break;
+				}
+			}
+			return html;
+		},
 		view_field_return:function(type,data){
-			console.log(data);//tpfd_read  //tpfd_must
 			if(data.tpfd_must==0){
 				var maste = 'datatype="*"';
 			}else{

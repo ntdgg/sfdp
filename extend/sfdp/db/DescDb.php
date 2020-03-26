@@ -91,13 +91,25 @@ class DescDb{
 		
 		$sfdp_ver_info = self::getDescVerVal($sid);
 		$field = json_decode($sfdp_ver_info['s_field'],true);
+	
 		$find = Db::name($field['name_db'])->find($bid);
 		foreach($field['list'] as $k=>$v){
 				foreach($v['data'] as $k2=>$v2){
-					$field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
+					
+					if($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
+						$value_arr = explode(",",$find[$v2['tpfd_db']]);
+						$fiedsver = '';
+						foreach($value_arr as $v3){
+							$fiedsver .=$v2['tpfd_data'][$v3].',';
+						}
+						$field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
+					}else{
+						$field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
+					}
+					
 				}
 		}
-		
+		//dump($field);
 		return ['info'=>json_encode($field)];
 	}
 	/**
