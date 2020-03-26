@@ -180,11 +180,10 @@ class Api
 		unset($data['name_db']);
 		unset($data['tpfd_check']);
 		db($table)->insertGetId($data);
-		echo "<script language='javascript'>alert('Success,操作成功！！');</script>"; 
+		return json(['code'=>0]);
 	}
 	public function sfdp_view($sid,$bid){
 		$data = DescDb::getViewData($sid,$bid);
-		
 		return view($this->patch.'/view.html',['info'=>$data['info']]);
 	}
 }

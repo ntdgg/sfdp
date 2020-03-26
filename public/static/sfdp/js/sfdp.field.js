@@ -32,7 +32,7 @@ $(function(){
 						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
 					break;
 					case 'upload':
-						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
+						html ='<label>'+data.tpfd_name+'：</label><a target="_blank" href="/uploads/'+data.value+'" download="filename"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAPCAMAAADJev/pAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABa1BMVEUAAAAAAP8jKdYiJ9gmJtkZHuEiKdYiJtkiKNckKtUlKtUjKNcjKtczM8wkJdojKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYkKdYjKdYjKdYjKdcjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdcjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYAAACRoT2eAAAAeHRSTlMAAAAAAAAAAAAAAAAAAAALNFVXOA4DT7LHubjGt1kGgMxrIQodY8mMDSwzeTEowHsFXLrIxdNEFznNMHzKXx8WIAS2AZ2HAUix71TZoAJ6mZcILo/EJhK/QBWGmhM9iEW+EKdwPiUcg58HkEYGZ887c7TCSh5LXUkCRTE5AAAAAWJLR0QAiAUdSAAAAAlwSFlzAADqYAAA6mABhMnedgAAAAd0SU1FB+QDEQMWFOoAZu0AAAEbSURBVBjTTU/5OwJRFH0OUraEIaIwYynMiEiWyWQrokY0SlKWGLJv/777ar4v55d73znn3nseYzU0AXD2uHr7+qlpZg0AwsCge2jYMzLqBVosspVcXt/Y+IQoSpNT0yJgmTHjD8x65lDDvKzYUOcXgotLoeUVIBwG2rAaWQPsJAjrG5tqdEuDFItJNLK9s7tHhWE/EqjtUOOJRFyFAweHST8JR8ljrtvalVQ6nVIcgH6SOT0DyxrnPIUNOTGfF3PoIJt2kelkBfmSC3Z6F4vgZ7uAq1KZadc3tJdxyefjaXjQW7nA4HLf1X+ASsVqcP8gMJiPxlNZN01Tr1Z5Mc3s88srxYXzLWS8/8dH6ZPOdtPk13fwp4Hgb5S4P2sdNjKhHYdUAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIwLTAyLTI2VDA5OjExOjEwKzAwOjAwmvYnqAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wNC0yNVQwMjoxMDoyMCswMDowMAG1iHYAAAAgdEVYdHNvZnR3YXJlAGh0dHBzOi8vaW1hZ2VtYWdpY2sub3JnvM8dnQAAABh0RVh0VGh1bWI6OkRvY3VtZW50OjpQYWdlcwAxp/+7LwAAABh0RVh0VGh1bWI6OkltYWdlOjpIZWlnaHQAMTkyQF1xVQAAABd0RVh0VGh1bWI6OkltYWdlOjpXaWR0aAAzMDjhP6cxAAAAGXRFWHRUaHVtYjo6TWltZXR5cGUAaW1hZ2UvcG5nP7JWTgAAABd0RVh0VGh1bWI6Ok1UaW1lADE1NTYxNTgyMjDnCLouAAAAEXRFWHRUaHVtYjo6U2l6ZQA0ODUxQoxAmPUAAABadEVYdFRodW1iOjpVUkkAZmlsZTovLy9kYXRhL3d3d3Jvb3Qvd3d3LmVhc3lpY29uLm5ldC9jZG4taW1nLmVhc3lpY29uLmNuL2ZpbGVzLzEyMy8xMjMyOTc5LnBuZ6ul+WcAAAAASUVORK5CYII="></a>';
 					break;
 					case 'date':
 						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
@@ -151,7 +151,8 @@ $(function(){
 	function view_checkboxes_clss(data,type='checkbox',att){
 			var datas = [];
 			for (y in data.tpfd_data){
-				if(isInArray(data.tpfd_check,y)){
+				console.log(data.tpfd_data);
+				if(data.tpfd_check != undefined && isInArray(data.tpfd_check,y)){
 					var check='checked';
 				}else{
 					var check='';

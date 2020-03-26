@@ -85,13 +85,11 @@ class DescDb{
 				}
 			}
 		$topicid = rtrim($listid, ',');
-		return ['db_name'=>$field['name_db'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
+		return ['db_name'=>$field['name_db'],'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
 	}
 	public static function getViewData($sid,$bid){
-		
 		$sfdp_ver_info = self::getDescVerVal($sid);
 		$field = json_decode($sfdp_ver_info['s_field'],true);
-	
 		$find = Db::name($field['name_db'])->find($bid);
 		foreach($field['list'] as $k=>$v){
 				foreach($v['data'] as $k2=>$v2){
@@ -106,10 +104,8 @@ class DescDb{
 					}else{
 						$field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
 					}
-					
 				}
 		}
-		//dump($field);
 		return ['info'=>json_encode($field)];
 	}
 	/**

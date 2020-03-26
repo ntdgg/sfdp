@@ -28,7 +28,6 @@ $(function(){
 				var html ='';
 			} 
 			return html;
-			
 		},
 		tpfd_change:function(labid,type){
 			switch(type) {
@@ -134,7 +133,7 @@ $(function(){
 			}else{
 				var datas = [];
 				for (x in data.tpfd_data){
-					if(isInArray(data.tpfd_check,x)){
+					if(data.tpfd_check != undefined && isInArray(data.tpfd_check,x)){
 						var check='checked';
 					}else{
 						var check='';
