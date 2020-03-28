@@ -12,10 +12,7 @@
 namespace sfdp;
 
 use think\Db;
-use think\facade\Config;
 use think\Exception;
-
-require_once FILE_PATH . '/config/config.php';
 
 class BuildTable{
 	/**
@@ -23,7 +20,11 @@ class BuildTable{
      */
     public function Btable($table,$data)
     {
-        $tableName = Config::get("database.prefix") . $table;
+		$int_config = int_config();
+		if (in_array($table, $int_config['black_table'])) {
+			return ['info'=>'该数据表不允许创建','code'=>1];
+        }
+        $tableName = $int_config['int_db_prefix'] . $table;
         $tableExist = false;// 判断表是否存在
         $ret = Db::query("SHOW TABLES LIKE '{$tableName}'");
 		$this->hasDbbak($table);
@@ -65,14 +66,16 @@ class BuildTable{
 		return ['info'=>'创建成功！','code'=>0];
     }
 	public function hasDbbak($table){
-		$tableName = Config::get("database.prefix") . $table;
+		$int_config = int_config();
+        $tableName = $int_config['int_db_prefix'] . $table;
 		$ret_bak = Db::query("SHOW TABLES LIKE '{$tableName}_bak'");
 		if ($ret_bak && isset($ret_bak[0])) { 
 			return ['code'=>1,'msg'=>'备份数据表已经存在，请先删除！'];
 		}
 	}
 	public function delDbbak($table){
-		$tableName = Config::get("database.prefix") . $table;
+		$int_config = int_config();
+        $tableName = $int_config['int_db_prefix'] . $table;
 		$ret_bak = Db::query("SHOW TABLES LIKE '{$tableName}_bak'");
 		if ($ret_bak && isset($ret_bak[0])) { 
 			try {

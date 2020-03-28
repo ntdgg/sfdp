@@ -15,7 +15,6 @@ use think\Db;
 use think\facade\Config;
 use think\Exception;
 
-require_once FILE_PATH . '/config/config.php';
 
 class SfdpUnit{
 	/**

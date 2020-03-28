@@ -11,7 +11,6 @@
 namespace sfdp;
 
 use think\Db;
-use think\facade\Session;
 
 class FunctionDb{
 	

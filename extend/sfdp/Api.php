@@ -31,12 +31,16 @@ class Api
 	public $patch = '';
 	public $topconfig = '';
 	function __construct() {
+		$int_config = int_config();
 		$sid = input('sid') ?? 0;
+		$g_uid = input('session.'.$int_config['int_user_id']) ?? '9999';
+		$g_username = input('session.'.$int_config['int_user_name']) ?? 'admin';
+		$g_role = input('session.'.$int_config['int_user_role']) ?? '9999';
 		$this->topconfig = 
 		'<script>
-		var g_uid=2;
-		var g_role=2;
-		var g_username=2;
+		var g_uid='.$g_uid.';
+		var g_role='.$g_role.';
+		var g_username='.$g_username.';
 		var g_sid='.$sid.';
 		</script>';
 		$this->patch =  ROOT_PATH . 'extend/sfdp/template';
