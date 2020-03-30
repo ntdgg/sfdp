@@ -34,7 +34,7 @@ class Api
 		$int_config = int_config();
 		$sid = input('sid') ?? 0;
 		$g_uid = input('session.'.$int_config['int_user_id']) ?? '9999';
-		$g_username = input('session.'.$int_config['int_user_name']) ?? 'admin';
+		$g_username = input('session.'.$int_config['int_user_name']) ?? '"admin"';
 		$g_role = input('session.'.$int_config['int_user_role']) ?? '9999';
 		$this->topconfig = 
 		'<script>
@@ -61,19 +61,20 @@ class Api
 			'field'=>$data['field']['fieldname'],
 			'search' =>$data['field']['search'],
 			'title' =>$data['title'],
+			'load_file' =>$data['field']['load_file'],
 		];
 		return view($this->patch.'/index.html',['config'=>$config,'list'=>$data['list']]);
 	}
 	/*动态生成表单*/
 	public function add($sid)
 	{
-		$json = DescDb::getDescVerVal($sid);
-		if($json['s_fun_id']!=''){
-			$fun = '<script src="\static/sfdp/user-defined/'.$json['s_fun_ver'].'.js"></script>';	
-		}else{
-			$fun = '';
-		}
-		return view($this->patch.'/edit.html',['g_js'=>$this->topconfig,'fun'=>$fun,'data'=>$json['s_field']]);
+		$data = DescDb::getAddData($sid);
+		$config = [
+			'g_js'=>$this->topconfig,
+			'fun' =>$data['fun'],
+			'load_file' =>$data['load_file'],
+		];
+		return view($this->patch.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
 	}
 	/*创建一个新得表单*/
 	public function sfdp_create(){

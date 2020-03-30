@@ -53,4 +53,21 @@ class SfdpUnit{
 		}
 		return $json;
 	} 
+	public static function Loadfile($db_name,$css,$js){
+		$js_str = '';
+		if($js!=''){
+			$js_arry = explode("@@",$js);
+			foreach($js_arry as $v){
+				$js_str .= '<script src="\static/sfdp/user-class/'.$db_name.'/'.$v.'"></script>';
+			}
+		}
+		$css_str = '';
+		if($css!=''){
+			$css_arry = explode("@@",$css);
+			foreach($css_arry as $v){
+				$css_str .= '<link rel="stylesheet" href="\\static/sfdp/user-class/'.$db_name.'/'.$v.'" />';
+			}
+		}
+		return ['js'=>$js_str,'css'=>$css_str];
+	}
 }

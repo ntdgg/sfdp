@@ -21,11 +21,14 @@
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script type="text/javascript" src="__HUIADMIN__/common.js"></script>
 <script type="text/javascript" src="__LIB__/laydate5.0.9/laydate.js"></script>
+{$config.load_file.css|raw}
 <style>
 input[type=text], select,textarea {width: 150px;padding: 12px 20px;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}
 input,select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}
 </style>
 {$config.g_js|raw}
+{$config.load_file.js|raw}
+
 <title>{$config.title ?? '超级表单开发平台'} </title>
 </head>
 <body>

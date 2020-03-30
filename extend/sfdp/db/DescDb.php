@@ -83,8 +83,21 @@ class DescDb{
 					}
 				}
 			}
-		$topicid = rtrim($listid, ',');
-		return ['db_name'=>$field['name_db'],'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
+		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
+		return ['db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
+	}
+	public static function getAddData($sid){
+		
+		$sfdp_ver_info = self::getDescVerVal($sid);
+		if($sfdp_ver_info['s_fun_id']!=''){
+			$fun = '<script src="\static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js"></script>';	
+		}else{
+			$fun = '';
+		}
+		$field = json_decode($sfdp_ver_info['s_field'],true);
+		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
+		return ['info'=>$sfdp_ver_info,'fun'=>$fun,'load_file'=>$load_file];
+		
 	}
 	public static function getViewData($sid,$bid){
 		$sfdp_ver_info = self::getDescVerVal($sid);

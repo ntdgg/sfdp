@@ -9,8 +9,9 @@
   <title></title> 
  </head> 
  <body>
+	{$config.load_file.css|raw}
 	<!--加载全局变量函数-->
-	{$g_js|raw}
+	{$config.g_js|raw}
 	<script src="__SFDP__/lib/jquery-1.12.4.js"></script>
 	<script src="__SFDP__/lib/jquery-ui.js"></script>
 	<script src="__SFDP__/lib/layer/2.4/layer.js"></script>
@@ -20,10 +21,11 @@
 	<script src="__SFDP__/lib/H5upload.js"></script>
 	<script src="__SFDP__/lib/laydate5.0.9/laydate.js"></script>
 	<script src="__SFDP__/js/sfdp.fun.js"></script> 
+	{$config.load_file.js|raw}
 <link rel="stylesheet" href="__SFDP__/css/sfdp.common.css" />
 <div class="page-container"><div class="tpfd-content" id='table'></div></div>
 	<!--动态加载用户自定义脚本-->
-	{$fun|raw}
+	{$config.fun|raw}
 	<!--脚本结束-->
 	   <script>
 			
