@@ -56,7 +56,7 @@ SFDP3.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个
 
 > 演示站点：http://sfdp.cojz8.com/   
 
-> 开发手册：编写中
+> 开发手册：https://www.kancloud.cn/guowenbin/sfdp `付费文档` 
 
 
 ---
