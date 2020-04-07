@@ -93,7 +93,7 @@ class Api
 				$item['fix'] = Db::name('sfdp_design_ver')->where('sid',$item['id'])->order('id desc')->select();
 				return $item;
 			});
-		return view($this->patch.'/sfdp.html',['list'=>$data]);
+		return view($this->patch.'/sfdp.html',['list'=>$data,'patch'=>$this->patch]);
 	}
 	/*函数列表*/
 	public function sfdp_fun($sid=''){

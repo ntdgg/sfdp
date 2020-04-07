@@ -21,10 +21,10 @@
 			{volist name='ui' id='s'}
 			<tr valign="top">
 			<td style='width:35px;text-align:left'>
-			元素标识：{$s.tr_id}<br/>
+			元素标识：{$s.tpfd_id}<br/>
 			元素名称：{$s.tpfd_name}({$s.td_type})
 			</td><td style='width:330px' >
-			字段名：{$s.tpfd_db}({$s.tpfd_dblx})({$s.tpfd_dbcd}) |列表：{$s.tpfd_list} | 查询：{$s.tpfd_chaxun} | 隐藏：{$s.tpfd_show} <br/>
+			字段名：{$s.tpfd_db}({$s.tpfd_dblx})({$s.tpfd_dbcd}) |列表：{$s.tpfd_list} | 查询：{$s.tpfd_chaxun} <br/>
 			{present name="s.xx_type"}
 			{eq name='s.xx_type' value='1'}
 				函数名为：<font color='red'>{$s.checkboxes_func}</font>

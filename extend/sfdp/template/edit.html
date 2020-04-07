@@ -28,14 +28,12 @@
 	{$config.fun|raw}
 	<!--脚本结束-->
 	   <script>
-			
 			var uploadurl = '{:url("/index/index/wfupsave")}';
 			try{
 			  load_satr_fun();//后置函数
 			}catch(e){
 			  console.log('page no load star fun ~');
 			}
-
 		  $( function() {
 				
 				showadd({$data|raw});
