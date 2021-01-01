@@ -12,6 +12,6 @@ namespace sfdp;
 
 function OrderNumber()
 {
-    $code = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
+    $code = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'H', 'I');
 	return $code[intval(date('Y')) - 2011] . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
 }
