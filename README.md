@@ -1,12 +1,12 @@
-# 欢迎使用SFDP3.0超级表单开发平台
+# 欢迎使用SFDP5.0超级表单开发平台
 
-**SFDP3.0是一个快速构建表单的插件平台**
+**SFDP5.0是一个快速构建表单的插件平台**
 
 
 ![SFDP Logo](http://sfdp.cojz8.com/logo.png "SFDP Logo")
 
 
-SFDP3.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个版本的迭代更新，发布全新重构的表单设计开发一体的平台。
+SFDP5.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个版本的迭代更新，发布全新重构的表单设计开发一体的平台。
 
 在线交流QQ群：855626871
 
@@ -21,7 +21,7 @@ SFDP3.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个
 
 
 ----
-### 3.0版本主要特性 Characteristic
+### 5.0版本主要特性 Characteristic
 
 #### &hearts; 可视化表单设计器
 
