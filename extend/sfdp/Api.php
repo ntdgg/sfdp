@@ -13,18 +13,21 @@ namespace sfdp;
 use think\Request;
 use think\Db;
 
+use sfdp\service\Control;//引入核心控制器
+use sfdp\db\DescDb;
+use sfdp\db\ViewDb;
+use sfdp\db\ScriptDb;
+use sfdp\db\FunctionDb;
+
+use sfdp\fun\BuildFun;
+use sfdp\fun\SfdpUnit;
+use sfdp\fun\BuildTable;
+
+
 define('FILE_PATH', realpath ( dirname ( __FILE__ ) ) );
-define('ROOT_PATH',\Env::get('root_path') );
+define('ROOT_PATH',\Env::get('root_path'). 'extend/sfdp/template' );
 
 require_once FILE_PATH . '/config/config.php';
-require_once FILE_PATH . '/config/common.php';
-require_once FILE_PATH . '/db/DescDb.php';
-require_once FILE_PATH . '/db/ViewDb.php';
-require_once FILE_PATH . '/db/ScriptDb.php';
-require_once FILE_PATH . '/db/FunctionDb.php';
-require_once FILE_PATH . '/class/BuildFun.php';
-require_once FILE_PATH . '/class/SfdpUnit.php';
-require_once FILE_PATH . '/class/BuildTable.php';
 
 class Api
 {
@@ -43,9 +46,27 @@ class Api
 		var g_username='.$g_username.';
 		var g_sid='.$sid.';
 		</script>';
-		$this->patch =  ROOT_PATH . 'extend/sfdp/template';
-		
+		$this->patch =  ROOT_PATH;
    }
+   /**
+	  * Tpflow 5.0统一接口流程审批接口
+	  * @param string $act 调用接口方法
+	  * 调用 tpflow\adaptive\Control 的核心适配器进行API接口的调用
+	  */
+	 public function sfdpApi($act='list',$sid=''){
+		if($act=='list'){
+			return Control::Api($act);
+		}
+		if($act=='desc'){
+			return Control::Api($act,$sid);
+		}
+		if($act=='save'){
+			$data = input('post.');
+			return Control::Api($act,$data);
+		}
+		
+	}
+   
 	/*构建表单目录*/
 	static function sdfp_menu(){
 		return  SfdpUnit::Bmenu();
@@ -81,30 +102,12 @@ class Api
 		$id = DescDb::saveDesc('','create');
 		return json(['code'=>0]);
 	}
-	/*保存设计数据*/
-	public function sfdp_save(){
-		$data = input('post.');
-		$id = DescDb::saveDesc($data,'save');
-		return json(['code'=>0]);
-	}
-	/*列表数据*/
-	public function sfdp($sid=''){
-		$data = Db::name('sfdp_design')->order('id desc')->paginate('10')->each(function($item, $key){
-				$item['fix'] = Db::name('sfdp_design_ver')->where('sid',$item['id'])->order('id desc')->select();
-				return $item;
-			});
-		return view($this->patch.'/sfdp.html',['list'=>$data,'patch'=>$this->patch]);
-	}
+	
 	/*函数列表*/
 	public function sfdp_fun($sid=''){
 		$data = Db::name('sfdp_function')->paginate('10');
 		return view($this->patch.'/sfdp_fun.html',['list'=>$data]);
 	}
-	/*表单设计*/
-    public function sfdp_desc($sid){
-	  $info = DescDb::getDesign($sid);
-      return view($this->patch.'/sfdp_desc.html',['json'=>$info['s_field'],'fid'=>$info['id'],'look'=>$info['s_look']]);
-    }
 	/*删除备份数据库*/
 	public function sfdp_deldb($sid){
 		 $bulid = new BuildTable();
@@ -120,6 +123,9 @@ class Api
 		$bulid = new BuildTable();
 		$info = DescDb::getDesign($sid);
 		$json = DescDb::getDesignJson($sid);
+		if($info['s_list']=='[]'){
+			return json(['code'=>1,'msg'=>'Error,对不起您没有配置列表选项']);
+		}
 		$ret = $bulid->hasDbbak($json['name_db']);
 		if($ret['code']==1){
 			DescDb::saveDesc(['s_db_bak'=>1,'id'=>$sid],'update');

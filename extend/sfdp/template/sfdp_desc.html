@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /> 
   <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" /> 
   <meta http-equiv="Cache-Control" content="no-siteapp" /> 
-  <title>SFDP 超级表单开发平台V3.0</title> 
+  <title>SFDP 超级表单开发平台V5.0</title> 
  </head> 
  <body> 
   <link rel="stylesheet" href="__SFDP__/css/sfdp.desc.css" /> 
@@ -14,7 +14,7 @@
   <div class="page-container"> 
    <div class="fb-main"> 
     <ul style="list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;display: block;">
-     <li><h3>SFDP 超级表单开发平台—V3.0</h3></li>
+     <li><h3>SFDP 超级表单开发平台—V5.0</h3></li>
     </ul> 
     <div class="fb-left"> 
      <ul class="fb-ul">
@@ -123,7 +123,7 @@ var look_db = {$look};
 		var int_data = localStorage.getItem("json_data");
 		 var id='{$fid}';
 		$.ajax({  
-			 url:'{:url("/index/sfdp/sfdp_desc_save")}',
+			 url:'{:url("/index/sfdp/sfdpApi",["act"=>"save"])}',
 			 data:{ziduan:int_data,id:id},  
 			 type:'post',  
 			 cache:true,  

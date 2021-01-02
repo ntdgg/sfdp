@@ -9,11 +9,12 @@
  *+------------------
  */
 
-namespace sfdp;
+namespace sfdp\fun;
 
 use think\Db;
 use think\facade\Config;
 use think\Exception;
+use sfdp\db\DescDb;
 
 
 class SfdpUnit{

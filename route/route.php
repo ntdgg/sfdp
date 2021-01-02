@@ -9,6 +9,7 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+Route::rule('index/sfdp/sfdpApi','\sfdp\Api@sfdpApi');
 
 Route::get('index/sfdp/add/sid/:sid','\sfdp\Api@add');
 Route::get('index/sfdp/desc','\sfdp\Api@sfdp');

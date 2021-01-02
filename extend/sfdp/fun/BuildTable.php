@@ -9,7 +9,7 @@
  *+------------------
  */
 
-namespace sfdp;
+namespace sfdp\fun;
 
 use think\Db;
 use think\Exception;

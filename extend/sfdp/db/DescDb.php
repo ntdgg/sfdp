@@ -8,9 +8,15 @@
  * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
-namespace sfdp;
+namespace sfdp\db;
 
 use think\Db;
+
+use sfdp\fun\BuildFun;
+use sfdp\fun\SfdpUnit;
+use sfdp\fun\BuildTable;
+
+
 
 class DescDb{
 	
