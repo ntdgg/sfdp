@@ -12,6 +12,7 @@ namespace sfdp\db;
 
 use think\Db;
 use sfdp\db\DescDb;
+use sfdp\lib\unit;
 
 class FunctionDb{
 	
@@ -22,7 +23,7 @@ class FunctionDb{
 		}
 		if(!isset($data['id'])){
 			$ver = [
-				'bill'=>OrderNumber(),
+				'bill'=>unit::OrderNumber(),
 				'title'=>$data['title'],
 				'fun_name'=>$data['name'],
 				'add_user'=>'Sys',

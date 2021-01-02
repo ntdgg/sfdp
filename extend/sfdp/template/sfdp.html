@@ -39,13 +39,13 @@
 				<td class="text-l">
 					<a onClick="commonfun.openfullpage('设计——{$k.s_bill}','{:url('/index/sfdp/sfdpApi',['act'=>'desc','sid'=>$k.id])}')"	class="button">设计</a>
 					<a 
-					onClick="commonfun.openfullpage('元素管理——{$k.s_bill}','{:url('/index/sfdp/sfdp_ui',['sid'=>$k.id])}')" class="button">元素</a>
+					onClick="commonfun.openfullpage('元素管理——{$k.s_bill}','{:url('/index/sfdp/sfdpApi',['act'=>'ui','sid'=>$k.id])}')" class="button">元素</a>
 					{neq name='k.s_field' value='1'}
-					<a onClick='commonfun.Askshow("{:url("/index/sfdp/sfdp_fix",["sid"=>$k.id])}","部署后将生成最新版本,确定是否执行?")'  class="button">部署</a>
-					<a onClick="commonfun.openfullpage('脚本管理——{$k.s_bill}','{:url('/index/sfdp/sfdp_script',['sid'=>$k.id])}')"   class="button">脚本</a>
+					<a onClick='commonfun.Askshow("{:url("/index/sfdp/sfdpApi",["act"=>"fix","sid"=>$k.id])}","部署后将生成最新版本,确定是否执行?")'  class="button">部署</a>
+					<a onClick="commonfun.openfullpage('脚本管理——{$k.s_bill}','{:url('/index/sfdp/sfdpApi',['act'=>'script','sid'=>$k.id])}')"   class="button">脚本</a>
 					{/neq}
 					{eq name='k.s_db_bak' value='1'}
-					<a onClick='commonfun.Askshow("{:url("/index/sfdp/sfdp_deldb",["sid"=>$k.id])}","删除备份数据库,是否执行?")'  class="button">DelDb</a>
+					<a onClick='commonfun.Askshow("{:url("/index/sfdp/sfdpApi",["act"=>"deldb","sid"=>$k.id])}","删除备份数据库,是否执行?")'  class="button">DelDb</a>
 					<span   class="button">版本</span>
 					{/eq}
 					

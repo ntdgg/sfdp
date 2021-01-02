@@ -12,7 +12,7 @@ namespace sfdp\db;
 
 use think\Db;
 use sfdp\db\DescDb;
-
+use sfdp\lib\unit;
 class ViewDb{
 	
 	public static function ver($sid){
@@ -32,7 +32,7 @@ class ViewDb{
 		$json = DescDb::getDesignJson($sid);
 		$ver = [
 			'sid'=>$sid,
-			's_bill'=>OrderNumber(),
+			's_bill'=>unit::OrderNumber(),
 			's_name'=>$json['name'],
 			's_db'=>$json['name_db'],
 			's_list'=>$info['s_list'],

@@ -12,15 +12,7 @@
 Route::rule('index/sfdp/sfdpApi','\sfdp\Api@sfdpApi');
 
 Route::get('index/sfdp/add/sid/:sid','\sfdp\Api@add');
-Route::get('index/sfdp/desc','\sfdp\Api@sfdp');
-Route::get('index/sfdp/sfdp_desc/sid/:sid','\sfdp\Api@sfdp_desc');
-Route::get('index/sfdp/sfdp_fix/sid/:sid','\sfdp\Api@sfdp_fix');
 Route::get('index/sfdp/create','\sfdp\Api@sfdp_create');
-Route::get('index/sfdp/sfdp_script/sid/:sid','\sfdp\Api@sfdp_script');
-Route::get('index/sfdp/sfdp_ui/sid/:sid','\sfdp\Api@sfdp_ui');
-Route::get('index/sfdp/sfdp_deldb/sid/:sid','\sfdp\Api@sfdp_deldb');
-Route::get('index/sfdp/sfdp_fun','\sfdp\Api@sfdp_fun');
-Route::post('index/sfdp/sfdp_desc_save','\sfdp\Api@sfdp_save');
 Route::post('index/sfdp/sfdp_script_save','\sfdp\Api@sfdp_script_save');
 Route::post('index/sfdp/add/sid/:sid','\sfdp\Api@saveadd');
 Route::post('index/sfdp/sfdp_fun_save','\sfdp\Api@sfdp_fun_save');

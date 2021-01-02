@@ -54,17 +54,16 @@ class Api
 	  * 调用 tpflow\adaptive\Control 的核心适配器进行API接口的调用
 	  */
 	 public function sfdpApi($act='list',$sid=''){
-		if($act=='list'){
+		if($act=='list' || $act=='fun' ){
 			return Control::Api($act);
 		}
-		if($act=='desc'){
+		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb'){
 			return Control::Api($act,$sid);
 		}
 		if($act=='save'){
 			$data = input('post.');
 			return Control::Api($act,$data);
 		}
-		
 	}
    
 	/*构建表单目录*/
@@ -107,49 +106,6 @@ class Api
 	public function sfdp_fun($sid=''){
 		$data = Db::name('sfdp_function')->paginate('10');
 		return view($this->patch.'/sfdp_fun.html',['list'=>$data]);
-	}
-	/*删除备份数据库*/
-	public function sfdp_deldb($sid){
-		 $bulid = new BuildTable();
-		 $json = DescDb::getDesignJson($sid);
-		 $ret = $bulid->delDbbak($json['name_db']);
-		 if($ret['code']==0){
-			 DescDb::saveDesc(['s_db_bak'=>0,'id'=>$sid],'update');
-		 }
-		 return json($ret);
-	}
-	/*部署生成*/
-	public function sfdp_fix($sid){
-		$bulid = new BuildTable();
-		$info = DescDb::getDesign($sid);
-		$json = DescDb::getDesignJson($sid);
-		if($info['s_list']=='[]'){
-			return json(['code'=>1,'msg'=>'Error,对不起您没有配置列表选项']);
-		}
-		$ret = $bulid->hasDbbak($json['name_db']);
-		if($ret['code']==1){
-			DescDb::saveDesc(['s_db_bak'=>1,'id'=>$sid],'update');
-			 return json($ret);
-		 }
-		//添加并返回
-		$tablefield = ViewDb::verAdd($sid);
-		$ret = $bulid->Btable($json['name_db'],$tablefield['db']);
-		 DescDb::saveDesc(['s_db_bak'=>1,'s_design'=>2,'id'=>$sid],'update');
-		return json(['code'=>0]);
-	}
-	/*脚本功能*/
-	public function sfdp_script($sid){
-		  return view($this->patch.'/sfdp_script.html',['sid'=>$sid,'info'=>ScriptDb::script($sid)]);
-	}
-	/*元素Ui功能*/
-	public function sfdp_ui($sid){
-		$info = DescDb::getDesign($sid);
-		if($info['s_design']<>2){
-			echo "<script language='javascript'>alert('Err,请先设计并部署！！'); top.location.reload();</script>";
-			exit;
-		}
-		$json = ViewDb::ver($sid);
-		return view($this->patch.'/sfdp_ui.html',['sid'=>$sid,'ui'=>$json['db']]);
 	}
 	/*脚本保存*/
 	public function sfdp_script_save(){
