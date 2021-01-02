@@ -23,7 +23,7 @@ use sfdp\fun\BuildTable;
 
 class Control{
 	
-	static function Api($act,$sid=''){
+	static function api($act,$sid=''){
 		//获取流程信息
 		if($act =='list'){
 			$list = Db::name('sfdp_design')->order('id desc')->select();
@@ -80,6 +80,34 @@ class Control{
 		}
         return $act.'参数出错';
 	}
+	static function curd($act,$sid='',$data='',$g_js){
+		
+		if($act =='index'){
+			$map = SfdpUnit::Bsearch($data);
+			$list = DescDb::getListData($sid,$map);
+			$config = [
+				'g_js'=>$g_js,
+				'sid' =>$sid,
+				'field'=>$list['field']['fieldname'],
+				'search' =>$list['field']['search'],
+				'title' =>$list['title'],
+				'load_file' =>$list['field']['load_file'],
+			];
+		return view(ROOT_PATH.'/index.html',['config'=>$config,'list'=>$list['list']]);
+		}
+		if($act =='add'){
+			$data = DescDb::getAddData($sid);
+			$config = [
+				'g_js'=>$g_js,
+				'fun' =>$data['fun'],
+				'load_file' =>$data['load_file'],
+			];
+			return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
+		}
+		
+		
+	}
+	
 	
 	
 	

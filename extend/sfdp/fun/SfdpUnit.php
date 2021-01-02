@@ -26,7 +26,7 @@ class SfdpUnit{
 		$menu = DescDb::getDescVer();
 		$menu_html = '';
 		foreach($menu as $k=>$v){
-			$menu_html .='<li><a data-href="'.url('sfdp/list',['sid'=>$v['id']]).'" data-title="'.$v['s_name'].'">'.$v['s_name'].'</a></li>';
+			$menu_html .='<li><a data-href="'.url('sfdp/sfdpCurd',['act'=>'index','sid'=>$v['id']]).'" data-title="'.$v['s_name'].'">'.$v['s_name'].'</a></li>';
 		}
 		return $menu_html;
     }

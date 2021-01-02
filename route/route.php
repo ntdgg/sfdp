@@ -10,8 +10,9 @@
 // +----------------------------------------------------------------------
 
 Route::rule('index/sfdp/sfdpApi','\sfdp\Api@sfdpApi');
+Route::rule('index/sfdp/sfdpCurd','\sfdp\Api@sfdpCurd');
 
-Route::get('index/sfdp/add/sid/:sid','\sfdp\Api@add');
+
 Route::get('index/sfdp/create','\sfdp\Api@sfdp_create');
 Route::post('index/sfdp/sfdp_script_save','\sfdp\Api@sfdp_script_save');
 Route::post('index/sfdp/add/sid/:sid','\sfdp\Api@saveadd');

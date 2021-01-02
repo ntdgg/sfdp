@@ -55,47 +55,49 @@ class Api
 	  */
 	 public function sfdpApi($act='list',$sid=''){
 		if($act=='list' || $act=='fun' ){
-			return Control::Api($act);
+			return Control::api($act);
 		}
 		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb'){
-			return Control::Api($act,$sid);
+			return Control::api($act,$sid);
 		}
 		if($act=='save'){
 			$data = input('post.');
-			return Control::Api($act,$data);
+			return Control::api($act,$data);
 		}
 	}
+	public function sfdpCurd($act='index',$sid=''){
+	
+		if($act=='index'){
+			$data = input('post.');
+			return Control::curd($act,$sid,$data,$this->topconfig);
+		}
+		if($act=='add'){
+			return Control::curd($act,$sid,'',$this->topconfig);
+		}
+		if($act=='GetData'){
+			$data = input('post.');
+			$map = SfdpUnit::Bsearch($data);
+			$list = DescDb::getListData($sid,$map);
+			foreach($list['list'] as $k=>$v){
+				$list['list'][$k]['url'] = url('/index/sfdp/sfdp_view',['sid'=>$sid,'bid'=>$v['id']]);
+				
+			}
+			
+			return json(['data'=>$list['list'],'status'=>true,"recordsTotal"=>100000,"recordsFiltered"=> 100000]);
+		}
+		
+		
+		
+		
+	}
+	
    
 	/*构建表单目录*/
 	static function sdfp_menu(){
 		return  SfdpUnit::Bmenu();
 	}
-	/*动态生成列表*/
-	public function lists($sid)
-	{
-		$map = SfdpUnit::Bsearch(input('post.'));
-		$data = DescDb::getListData($sid,$map);
-		$config = [
-			'g_js'=>$this->topconfig,
-			'sid' =>$sid,
-			'field'=>$data['field']['fieldname'],
-			'search' =>$data['field']['search'],
-			'title' =>$data['title'],
-			'load_file' =>$data['field']['load_file'],
-		];
-		return view($this->patch.'/index.html',['config'=>$config,'list'=>$data['list']]);
-	}
-	/*动态生成表单*/
-	public function add($sid)
-	{
-		$data = DescDb::getAddData($sid);
-		$config = [
-			'g_js'=>$this->topconfig,
-			'fun' =>$data['fun'],
-			'load_file' =>$data['load_file'],
-		];
-		return view($this->patch.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
-	}
+	
+	
 	/*创建一个新得表单*/
 	public function sfdp_create(){
 		$id = DescDb::saveDesc('','create');
