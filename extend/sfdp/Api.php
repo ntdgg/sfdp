@@ -83,7 +83,7 @@ class Api
 				
 			}
 			
-			return json(['data'=>$list['list'],'status'=>true,"recordsTotal"=>100000,"recordsFiltered"=> 100000]);
+			return json(['data'=>$list['list'],'status'=>true,"recordsTotal"=>count($list['list']),"recordsFiltered"=> count($list['list'])]);
 		}
 		
 		
