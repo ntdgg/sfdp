@@ -73,38 +73,11 @@ input,select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;borde
 		showlist({$config['search']|raw});
 	
 $("#table_id").dataTable({
-            processing: true,
-            serverSide: true, //开启后端模式
+			deferRender: true,
+			bFilter: false,    //去掉搜索框方法三：这种方法可以
+        bLengthChange: false,   //去掉每页显示多少条数据方法
 			ajax : "{:url('index/sfdp/sfdpCurd',['act'=>'GetData','sid'=>$config.sid])}",	
-			columns: [
-				{
-					"data": "id",
-					"name" : "id",
-					"sDefaultContent":"",  //默认空字符串
-					"sClass": "text-center"
-				},
-				{
-					"orderable" : false,
-					"data": "title",		        	
-					'sClass': "text-center"		         		        	
-				},		        
-				{
-					"orderable" : false,
-					"data": "times",	        	
-					'sClass': "text-center"	 	         	       	
-				 },{
-				 "data": "url", 
-				 "render": function ( data, type, full, meta ) {  
-                        return '<a onClick=commonfun.openfullpage("查看","'+data+'")	class="btn  radius size-S">查看</a>';  
-                    }  
-
-				 }
-			]
-            ,
             paging: true,//开启分页
-            ordering: true,//开启排序
-            searching: true,//开启搜索
-            iDisplayLength : 50//默认长度
  　　});
  });
 </script>

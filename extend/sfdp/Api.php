@@ -78,12 +78,15 @@ class Api
 			$data = input('post.');
 			$map = SfdpUnit::Bsearch($data);
 			$list = DescDb::getListData($sid,$map);
+			$data = [];
 			foreach($list['list'] as $k=>$v){
-				$list['list'][$k]['url'] = url('/index/sfdp/sfdp_view',['sid'=>$sid,'bid'=>$v['id']]);
+				$list['list'][$k]['url'] = '<a onClick=commonfun.openfullpage("查看","'.url('/index/sfdp/sfdp_view',['sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
+				$data[$k] = array_values($list['list'][$k]);
+				
 				
 			}
 			
-			return json(['data'=>$list['list'],'status'=>true,"recordsTotal"=>count($list['list']),"recordsFiltered"=> count($list['list'])]);
+			return json(['data'=>$data]);
 		}
 		
 		
