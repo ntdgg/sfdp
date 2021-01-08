@@ -23,7 +23,7 @@ use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
 use sfdp\fun\BuildTable;
 
-
+use sfdp\lib\unit;
 define('FILE_PATH', realpath ( dirname ( __FILE__ ) ) );
 define('ROOT_PATH',\Env::get('root_path'). 'extend/sfdp/template' );
 
@@ -72,7 +72,15 @@ class Api
 			return Control::curd($act,$sid,$data,$this->topconfig);
 		}
 		if($act=='add'){
-			return Control::curd($act,$sid,'',$this->topconfig);
+			
+			if (unit::is_post()) {
+				$data = input('post.');
+				return Control::curd($act,$sid,$data,$this->topconfig);
+			 }else{
+               return Control::curd($act,$sid,'',$this->topconfig);
+			 }
+			
+			
 		}
 		if($act=='GetData'){
 			$data = input('post.');

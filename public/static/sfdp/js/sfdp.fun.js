@@ -13,6 +13,15 @@ var commonfun = {
 	ShowTip : function(tip) {
 		layer.msg(tip);
 	},
+	common_return : function(data) {
+		if (data.code == 0) {
+			layer.msg(data.msg,{icon:1,time: 1500},function(){
+					parent.location.reload(); // 父页面刷新
+			});          
+		} else {
+		   layer.alert(data.msg, {title: "错误信息", icon: 2});
+		}
+	},
 	insFgf : function(id){
 		$('#'+id).val($("#"+id).val()+'@@');
 	},

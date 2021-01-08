@@ -162,6 +162,10 @@ class DescDb{
 					}
 				}
 			}
+			if(empty($list)){
+				return ['code'=>1,'msg'=>'Sorry,未能找到列表参数'];
+			}
+			
 			$ver = [
 				'id'=>$data['id'],
 				's_title'=>$field['name'],
@@ -171,7 +175,11 @@ class DescDb{
 				's_field'=>htmlspecialchars_decode($data['ziduan']),
 				's_design'=>1
 			];
-			return Db::name('sfdp_design')->update($ver);;
+			if(Db::name('sfdp_design')->update($ver)){
+				return ['code'=>0,'msg'=>'Success'];
+			}else{
+				return ['code'=>1,'msg'=>'Sorry,更新失败~'];
+			}
 			
 		}elseif($type=='update'){
 			return Db::name('sfdp_design')->update($data);;

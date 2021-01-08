@@ -131,6 +131,8 @@ var look_db = {$look};
 			 success:function(data) {  
 				if(data.code==0){
 					commonfun.ShowTip('success');
+				}else{
+					commonfun.ShowTip(data.msg);
 				}
 			  },  
 			  error : function() {  
