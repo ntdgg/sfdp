@@ -16,6 +16,8 @@ use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
 use sfdp\fun\BuildTable;
 
+use sfdp\lib\unit;
+
 
 
 class DescDb{
@@ -175,7 +177,7 @@ class DescDb{
 			return Db::name('sfdp_design')->update($data);;
 		}else{
 			$ver = [
-				's_bill'=>OrderNumber(),
+				's_bill'=>unit::OrderNumber(),
 				'add_user'=>'Sys',
 				's_field'=>1,
 				'add_time'=>time()

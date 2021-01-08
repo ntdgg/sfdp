@@ -117,8 +117,8 @@ $(function(){
 			
 		},
 		tpfd_common:function(data){
-			var default_field = [{cid:'int',clab:'int',checked:''},{cid:'varchar',clab:'varchar',checked:'checked'},{cid:'datetime',clab:'datetime',checked:''},{cid:'longtext',clab:'longtext',checked:''}];
-			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div>数据表段：<input style="width:60px" name="tpfd_db" type="text" value="'+data.tpfd_db +'">长度<input style="width:40px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'">类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+'  字段标题：<input style="width:120px" name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></div>'+$.tpfd_list(data);
+			var default_field = [{cid:'int',clab:'int',checked:''},{cid:'time',clab:'time',checked:''},{cid:'varchar',clab:'varchar',checked:'checked'},{cid:'datetime',clab:'datetime',checked:''},{cid:'longtext',clab:'longtext',checked:''}];
+			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div><table><tr><td>字段标题：</td><td><input  name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></td></tr><tr><td>数据表段:</td><td><input name="tpfd_db" style="width:200px" type="text" value="'+data.tpfd_db +'"> 类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+' 长度<input style="width:80px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'"></td></tr>'+$.tpfd_list(data) +'</table></div>';
         },
         tpfd_xianshi:function(data){
 			return '<div>显示类型：<textarea name="tpfd_moren">'+data.tpfd_moren +'</textarea>';
@@ -160,8 +160,7 @@ $(function(){
 			return '<div>占位内容：<input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  设置默认：<input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'"></div>';
         },
 		tpfd_list:function(data){
-			console.log(data);
-			return '<div>列表设置：'+$.tpfd_select('','tpfd_list',data.tpfd_list)+'  查询设置：'+$.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'</div>';
+			return '<tr><td>列表显示：</td><td>'+$.tpfd_select('','tpfd_list',data.tpfd_list)+' </td></tr><tr><td>查询字段：</td><td>'+$.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'</td></tr>';
         },
 		tpfd_select:function(data,field,value){
 			if(data==''){
@@ -169,7 +168,6 @@ $(function(){
 			}else{
 				var html ='<select name="'+field+'" style="width: 80px">';
 				for (x in data){
-					
 					html += '<option value="'+data[x]['cid']+'" '+((data[x]['cid']) == value ? 'selected' : '') +'>'+data[x]['clab']+'</option>';
 				}
 				return html+'</select>';

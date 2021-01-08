@@ -4,6 +4,7 @@
 		name_db:'',//数据表名称
 		tpfd_id:'SFDP'+ commonfun.dateFormat(new Date(), "mmssS"),//表单ID
 		tpfd_script:'',//数据表脚本
+		tpfd_class :'',//数据表脚本
 		list:{
 			//设计数据
 		},
@@ -88,7 +89,7 @@
 		var all_data = JSON.parse(localStorage.getItem("json_data"));
 		var default_data = all_data['list'][parent_code]['data'][id];
 		if(default_data.tpfd_db==undefined){
-			var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_dbcd: "",tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "yes",tpfd_list: "no"};
+			var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_dbcd: "",tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "no",tpfd_list: "no"};
 		}else{
 			var tpfd_db =default_data;
 		}
