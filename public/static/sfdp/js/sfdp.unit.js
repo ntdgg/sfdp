@@ -67,7 +67,7 @@ $(function(){
 		tpfd_return:function(type,data){
 			switch(type) {
 				case 'text':
-					var html = $.tpfd_common(data)+$.tpfd_moren(data)+$.tpfd_gaoji(data);
+					var html = '<table>'+$.tpfd_common(data)+$.tpfd_moren(data)+$.tpfd_gaoji(data)+'</table>';
 					break;
 				case 'checkboxes':
 					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data)+$.tpfd_gaoji(data);
@@ -118,7 +118,7 @@ $(function(){
 		},
 		tpfd_common:function(data){
 			var default_field = [{cid:'int',clab:'int',checked:''},{cid:'time',clab:'time',checked:''},{cid:'varchar',clab:'varchar',checked:'checked'},{cid:'datetime',clab:'datetime',checked:''},{cid:'longtext',clab:'longtext',checked:''}];
-			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div><table><tr><td>字段标题：</td><td><input  name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></td></tr><tr><td>数据表段:</td><td><input name="tpfd_db" style="width:200px" type="text" value="'+data.tpfd_db +'"> 类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+' 长度<input style="width:80px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'"></td></tr>'+$.tpfd_list(data) +'</table></div>';
+			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div><tr><td>字段标题：</td><td><input  name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></td></tr><tr><td>数据表段:</td><td><input name="tpfd_db" style="width:200px" type="text" value="'+data.tpfd_db +'"> 类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+' 长度<input style="width:80px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'"></td></tr>'+$.tpfd_list(data) +'</div>';
         },
         tpfd_xianshi:function(data){
 			return '<div>显示类型：<textarea name="tpfd_moren">'+data.tpfd_moren +'</textarea>';
@@ -154,13 +154,13 @@ $(function(){
 				var tpfd_read = data.tpfd_read;
 				var tpfd_must = data.tpfd_must;
 			}
-			return '<div style="font-size: 16px;font-weight: 800;">高级设置</div><div>只读：'+$.tpfd_select(default_data,'tpfd_read','1')+'必填：'+$.tpfd_select(default_data,'tpfd_must',tpfd_must)+'</div>'; 
+			return '<tr><td><div style="font-weight: 800;">高级设置</div><div></td><td>只读：'+$.tpfd_select(default_data,'tpfd_read','1')+'必填：'+$.tpfd_select(default_data,'tpfd_must',tpfd_must)+'</div></td></tr>'; 
 		},
 		tpfd_moren:function(data){
-			return '<div>占位内容：<input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  设置默认：<input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'"></div>';
+			return '<tr><td><div>占位内容：</td><td><input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  </td></tr><tr><td>设置默认：</td><td><input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'"></div></td></tr>';
         },
 		tpfd_list:function(data){
-			return '<tr><td>列表显示：</td><td>'+$.tpfd_select('','tpfd_list',data.tpfd_list)+' </td></tr><tr><td>查询字段：</td><td>'+$.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'</td></tr>';
+			return '<tr><td>列表组件：</td><td>列表：'+$.tpfd_select('','tpfd_list',data.tpfd_list)+' 查询：'+$.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'</td></tr>';
         },
 		tpfd_select:function(data,field,value){
 			if(data==''){
