@@ -70,31 +70,31 @@ $(function(){
 					var html = '<table>'+$.tpfd_common(data)+$.tpfd_moren(data)+$.tpfd_gaoji(data)+'</table>';
 					break;
 				case 'checkboxes':
-					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data)+$.tpfd_gaoji(data);
+					var html = '<table>'+$.tpfd_common(data)+$.tpfd_checkboxes(data)+$.tpfd_gaoji(data)+'</table>';
 					break;
 				case 'radio':
-					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data,'radio')+$.tpfd_gaoji(data);
+					var html = '<table>'+$.tpfd_common(data)+$.tpfd_checkboxes(data,'radio')+$.tpfd_gaoji(data)+'</table>';
 					break;
 				case 'date':
-					var html = $.tpfd_common(data)+$.tpfd_date(data)+$.tpfd_gaoji(data);
+					var html = '<table>'+$.tpfd_common(data)+$.tpfd_date(data)+$.tpfd_gaoji(data)+'</table>';
 					break;
 				case 'dropdown':
-					var html = $.tpfd_common(data)+$.tpfd_checkboxes(data,'radio')+$.tpfd_gaoji(data);
+					var html = '<table>'+$.tpfd_common(data)+$.tpfd_checkboxes(data,'radio')+$.tpfd_gaoji(data)+'</table>';
 					break;
 				case 'textarea':
-					var html = $.tpfd_common(data)+$.tpfd_moren(data)+$.tpfd_gaoji(data);
+					var html = '<table>'+$.tpfd_common(data)+$.tpfd_moren(data)+$.tpfd_gaoji(data)+'</table>';
 					break;
 				case 'html':
-					var html = $.tpfd_common(data)+$.tpfd_xianshi(data);
+					var html = '<table>'+$.tpfd_common(data)+$.tpfd_xianshi(data)+'</table>';
 					break;
 				case 'wenzi':
-					var html = $.tpfd_common(data)+$.tpfd_xianshi(data);
+					var html = '<table>'+$.tpfd_common(data)+$.tpfd_xianshi(data)+'</table>';
 					break;
 				case 'upload':    
 					data.tpfd_list = 'no';
 					data.tpfd_chaxun = 'no';
 					data.tpfd_show = 'no';
-					var html =$.tpfd_common(data)+$.tpfd_upload(data)+$.tpfd_gaoji(data);
+					var html ='<table>'+$.tpfd_common(data)+$.tpfd_upload(data)+$.tpfd_gaoji(data)+'</table>';
 					break;
 				 default:
 					var html ='';
@@ -112,8 +112,8 @@ $(function(){
 			var default_data =[{cid:0,clab:'单文件上传'},{cid:1,clab:'多文件上传'}];
 			var word_type =[{cid:0,clab:'不限制'},{cid:1,clab:'*.jpg/*.png/*.gif'},{cid:1,clab:'*.doc/*.txt/*.xlx/*.xlxs/*.docx'}];
 			
-			return '<div style="font-size: 16px;font-weight: 800;">上传配置</div><div>上传属性：'+$.tpfd_select(default_data,'tpfd_upload_type',tpfd_upload_type)+'</div>'+
-				   '<div>文件类型：'+$.tpfd_select(word_type,'tpfd_upload_xz',tpfd_upload_xz)+'</div>'; 
+			return '<tr><td><div>上传配置</div><div></td><td>属性：'+$.tpfd_select(default_data,'tpfd_upload_type',tpfd_upload_type)+''+
+				   ' 类型：'+$.tpfd_select(word_type,'tpfd_upload_xz',tpfd_upload_xz)+'</div></td></tr>'; 
 			
 		},
 		tpfd_common:function(data){
@@ -142,8 +142,8 @@ $(function(){
 				}
 				var default_data =JSON.parse(JSON.stringify(datas));
 			}
-            return '<div><input '+((data.xx_type) == '0' ? 'checked' : '') +'  name="xx_type" value=0 type="radio">静态数据：</div>'+$.tpfd_checkboxes_clss(default_data,type)+
-			'<div><input '+((data.xx_type) == '1' ? 'checked' : '') +' name="xx_type" value=1 type="radio">动态数据：<br/><input name="checkboxes_func" type="text" value="'+((data.checkboxes_func) == '' ? '' : data.checkboxes_func)+'"></div>';
+            return '<tr><td><div><input '+((data.xx_type) == '0' ? 'checked' : '') +'  name="xx_type" value=0 type="radio">静态：</div></td><td>'+$.tpfd_checkboxes_clss(default_data,type)+
+			'<div></td></tr><tr><td><input '+((data.xx_type) == '1' ? 'checked' : '') +' name="xx_type" value=1 type="radio">动态：</td><td><input name="checkboxes_func" type="text" value="'+((data.checkboxes_func) == '' ? '' : data.checkboxes_func)+'">*方法函数名</div></td></tr>';
         },
 		tpfd_gaoji:function(data){
 			var default_data =[{cid:0,clab:'是'},{cid:1,clab:'否'}];
@@ -154,7 +154,7 @@ $(function(){
 				var tpfd_read = data.tpfd_read;
 				var tpfd_must = data.tpfd_must;
 			}
-			return '<tr><td><div style="font-weight: 800;">高级设置</div><div></td><td>只读：'+$.tpfd_select(default_data,'tpfd_read','1')+'必填：'+$.tpfd_select(default_data,'tpfd_must',tpfd_must)+'</div></td></tr>'; 
+			return '<tr><td><div>高级设置</div><div></td><td>只读：'+$.tpfd_select(default_data,'tpfd_read','1')+'必填：'+$.tpfd_select(default_data,'tpfd_must',tpfd_must)+'</div></td></tr>'; 
 		},
 		tpfd_moren:function(data){
 			return '<tr><td><div>占位内容：</td><td><input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  </td></tr><tr><td>设置默认：</td><td><input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'"></div></td></tr>';
