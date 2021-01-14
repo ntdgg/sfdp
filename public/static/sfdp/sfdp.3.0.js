@@ -163,11 +163,11 @@
 	function showLayer(type,id,parent_code){
 		if(type=='config'){
 			var json_data = JSON.parse(localStorage.getItem("json_data"));
-			var html = '<div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div>'+
-			'<div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+' '+((look_db) == '1' ? 'readonly' : '') +' ></div>'+
-			'<div>设置列表控件：<input  name="tpfd_btn" value=add type="checkbox" checked readonly>Add <input  name="tpfd_btn" value=Edit type="checkbox" checked readonly>Edit <input  name="tpfd_btn" value=Del type="checkbox" checked readonly>Del <input  name="tpfd_btn" value=View type="checkbox" checked readonly>View <input  name="tpfd_btn" value=Status type="checkbox">Status <input  name="tpfd_btn" value=WorkFlow type="checkbox">WorkFlow'+
-			'<div>设置表单样式：<textarea id="tpfd_class" name="tpfd_class">'+json_data.tpfd_class +'</textarea><a onclick=commonfun.insFgf("tpfd_class")>分割</a>'+
-			'<div>加载脚本控件：<textarea id="tpfd_script" name="tpfd_script">'+json_data.tpfd_script +'</textarea><a onclick=commonfun.insFgf("tpfd_script")>分割</a><br/>(一个脚本文件，后面需要加一个分隔符@@)</div>';
+			var html = '<table><tr><td><div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div></td></tr>'+
+			'<tr><td><div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+' '+((look_db) == '1' ? 'readonly' : '') +' ></div></td></tr>'+
+			'<tr><td><div>设置列表控件：<input  name="tpfd_btn" value=add type="checkbox" checked readonly>Add <input  name="tpfd_btn" value=Edit type="checkbox" checked readonly>Edit <input  name="tpfd_btn" value=Del type="checkbox" checked readonly>Del <input  name="tpfd_btn" value=View type="checkbox" checked readonly>View <input  name="tpfd_btn" value=Status type="checkbox">Status <input  name="tpfd_btn" value=WorkFlow type="checkbox">WorkFlow </td></tr>'+
+			'<tr><td><div>设置表单样式：<textarea id="tpfd_class" name="tpfd_class">'+json_data.tpfd_class +'</textarea><a onclick=commonfun.insFgf("tpfd_class")>分割</a></td></tr>'+
+			'<tr><td><div>加载脚本控件：<textarea id="tpfd_script" name="tpfd_script">'+json_data.tpfd_script +'</textarea><a onclick=commonfun.insFgf("tpfd_script")>分割</a><br/>(一个脚本文件，后面需要加一个分隔符@@)</div></td></tr></table>';
 		$('#showtype').val('config');
 		$('#table').html(html);
 		}else if(type=='view'){

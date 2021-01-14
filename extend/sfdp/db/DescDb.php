@@ -165,6 +165,13 @@ class DescDb{
 			if(empty($list)){
 				return ['code'=>1,'msg'=>'Sorry,未能找到列表参数'];
 			}
+		
+			$isTable=Db::query('SHOW TABLES LIKE '."'wf_".$field['name_db']."'");
+			if($isTable){
+				return ['code'=>1,'msg'=>'数据表名已经存在~'];
+			}
+
+			
 			
 			$ver = [
 				'id'=>$data['id'],

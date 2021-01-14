@@ -118,14 +118,14 @@ $(function(){
 		},
 		tpfd_common:function(data){
 			var default_field = [{cid:'int',clab:'int',checked:''},{cid:'time',clab:'time',checked:''},{cid:'varchar',clab:'varchar',checked:'checked'},{cid:'datetime',clab:'datetime',checked:''},{cid:'longtext',clab:'longtext',checked:''}];
-			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div><tr><td>字段标题：</td><td><input  name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></td></tr><tr><td>数据表段:</td><td><input name="tpfd_db" style="width:200px" type="text" value="'+data.tpfd_db +'"> 类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+' 长度<input style="width:80px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'"></td></tr>'+$.tpfd_list(data) +'</div>';
+			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div><tr><td>字段标题：</td><td><input  name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></td></tr><tr><td>数据表段:</td><td><input name="tpfd_db" style="width:160px" type="text" value="'+data.tpfd_db +'"> 类型:'+$.tpfd_select(default_field,'tpfd_dblx','varchar')+' 长度<input style="width:80px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'"></td></tr>'+$.tpfd_list(data) +'</div>';
         },
         tpfd_xianshi:function(data){
-			return '<div>显示类型：<textarea name="tpfd_moren">'+data.tpfd_moren +'</textarea>';
+			return '<tr><td><div>显示类型：</td><td><textarea name="tpfd_moren">'+data.tpfd_moren +'</textarea></td></tr>';
         },
         tpfd_date:function(data){
 			var default_data =[{cid:0,clab:'yyyy'},{cid:1,clab:'MM-dd'},{cid:2,clab:'yyyy-MM-dd'},{cid:3,clab:'yyyyMMdd'},{cid:4,clab:'yyyy-MM'}];
-			return '<div>显示类型：'+$.tpfd_select(default_data,'xx_type','2');
+			return '<tr><td>显示类型：</td><td>'+$.tpfd_select(default_data,'xx_type','2') +'</td></tr>';
         },
 		tpfd_checkboxes:function(data,type='checkbox'){
 			if(data.tpfd_data==undefined){
@@ -166,7 +166,7 @@ $(function(){
 			if(data==''){
 				return '<select name="'+field+'" style="width: 80px"><option value="yes" '+((value) == 'yes' ? 'selected' : '') +'>是</option><option value="no" '+((value) == 'no' ? 'selected' : '') +'>否</option></select>';
 			}else{
-				var html ='<select name="'+field+'" style="width: 80px">';
+				var html ='<select name="'+field+'" style="width: 120px">';
 				for (x in data){
 					html += '<option value="'+data[x]['cid']+'" '+((data[x]['cid']) == value ? 'selected' : '') +'>'+data[x]['clab']+'</option>';
 				}
