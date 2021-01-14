@@ -15,13 +15,11 @@ use think\Db;
 use think\facade\Config;
 use think\Exception;
 
-require_once FILE_PATH . '/config/config.php';
-
 class BuildFun{
 	/**
      * 创建数据表
      */
-    public function Bfun($data,$name)
+    public static function Bfun($data,$name)
     {
 		$fileName = 'static' . DIRECTORY_SEPARATOR . 'sfdp' . DIRECTORY_SEPARATOR .'user-defined'. DIRECTORY_SEPARATOR .$name.'.js';
 		return file_put_contents($fileName, $data);

@@ -20,5 +20,7 @@
 		'int_user_id'=> 'uid',//定义用户id
 		'int_user_role'=> 'role',//定义用户角色
 		'black_table'=>['sfdp_design','sfdp_design_ver','sfdp_function','sfdp_script'],//黑名单表，防止重复
+		'db_namespace'=>'',
+		'db_mode'=>1
 	];
 

@@ -14,7 +14,7 @@ namespace sfdp\fun;
 use think\Db;
 use think\facade\Config;
 use think\Exception;
-use sfdp\db\DescDb;
+use sfdp\adaptive\Design;
 
 
 class SfdpUnit{
@@ -23,7 +23,7 @@ class SfdpUnit{
      */
     public static function Bmenu()
     {
-		$menu = DescDb::getDescVer();
+		$menu = Design::getDesignVer();
 		$menu_html = '';
 		foreach($menu as $k=>$v){
 			$menu_html .='<li><a data-href="'.url('sfdp/sfdpCurd',['act'=>'index','sid'=>$v['id']]).'" data-title="'.$v['s_name'].'">'.$v['s_name'].'</a></li>';

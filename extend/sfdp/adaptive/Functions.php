@@ -8,13 +8,13 @@
  * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
-namespace sfdp\db;
+namespace sfdp\adaptive;
 
 use think\Db;
-use sfdp\db\DescDb;
+
 use sfdp\lib\unit;
 
-class FunctionDb{
+class Functions{
 	
 	public static function functionSave($data){
 		$hasname = Db::name('sfdp_function')->where('fun_name',$data['name'])->find();

@@ -8,20 +8,22 @@
  * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
-namespace sfdp\db;
+namespace sfdp\adaptive;
 
 use think\Db;
-use sfdp\db\DescDb;
-class ScriptDb{
+
+use sfdp\lib\unit;
+
+class Script{
 	
 	public static function script($sid){
 		return Db::name('sfdp_script')->where('sid',$sid)->find();
 	}
 	public static function scriptSave($data){
-		$info = self::ver($data['sid']);
+		$info = self::script($data['sid']);
 		if(!$info){
 			$ver = [
-				's_bill'=>OrderNumber(),
+				's_bill'=>unit::OrderNumber(),
 				'add_user'=>'Sys',
 				'sid'=>$data['sid'],
 				's_fun'=>$data['function'],

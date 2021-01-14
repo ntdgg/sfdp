@@ -8,7 +8,7 @@
  * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
-namespace sfdp\db;
+namespace sfdp\adaptive;
 
 use think\Db;
 
@@ -19,19 +19,34 @@ use sfdp\fun\BuildTable;
 use sfdp\lib\unit;
 
 
+class Design{
 
-class DescDb{
-	
-	public static function getDesign($sid){
-		$info = Db::name('sfdp_design')->find($sid);
-		if($info){
-			return  $info;
+	protected $mode ; 
+    public function  __construct(){
+		if(unit::gconfig('db_mode')==1){
+			$className = '\\sfdp\\custom\\AdapteeDesign';
 		}else{
-			return  false;
+			$className = unit::gconfig('db_namespace').'AdapteeDesign';
 		}
-	}
-	public static function getDesignJson($sid){
-		$info = Db::name('sfdp_design')->find($sid);
+		$this->mode = new $className();
+    }
+	/**
+     * find 获取设计信息  getDesign
+     * @param array $whereRaw raw查询条件
+	 * @param array $map 查询条件
+     */
+    static function find($sid)
+    {
+		return (new Design())->mode->find($sid);
+    }
+	/**
+     * getDesignJson 获取设计信息  getDesign
+     * @param array $whereRaw raw查询条件
+	 * @param array $map 查询条件
+     */
+
+	static function getDesignJson($sid){
+		$info = (new Design())->mode->find($sid);
 		$json = json_decode($info['s_field'],true);
 		if($info){
 			return $json;
@@ -39,36 +54,31 @@ class DescDb{
 			return  false;
 		}
 	}
-	
 	 /**
      * 获取设计版本
      *
      * @param $status 版本状态 0为禁用 1为启用
      */
-	 public static function getDescVer($status=1)
+	static function getDesignVer($status=1)
     {
-		 $info = Db::name('sfdp_design_ver')->where('status',$status)->select();
-        return $info;
-		
+		return (new Design())->mode->getDesignVer($status);
 	}
 	/**
-     * 获取设计版本
+     * 获取设计版本 getDescVerVal
      *
      * @param $status 版本状态 0为禁用 1为启用
      */
-	 public static function getDescVerVal($id)
+	static function findVer($id)
     {
-		 $info = Db::name('sfdp_design_ver')->find($id);
-        return $info;
-		
+		return (new Design())->mode->findVer($id);
 	}
 	/**
-     * 获取设计版本
+     * 获取设计版本  descVerTodata
      *
      * @param $status 版本状态 0为禁用 1为启用
      */
-	public static function descVerTodata($sid){
-		$sfdp_ver_info = self::getDescVerVal($sid);
+	static function descVerTodata($sid){
+		$sfdp_ver_info =(new Design())->mode->findVer($sid);
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		$list_field = json_decode($sfdp_ver_info['s_list'],true);
 		$searct_field = $sfdp_ver_info['s_search'];
@@ -94,26 +104,23 @@ class DescDb{
 		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
 		return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
 	}
-	public static function getAddData($sid){
-		
-		$sfdp_ver_info = self::getDescVerVal($sid);
+	static function getAddData($sid){
+		$sfdp_ver_info = (new Design())->mode->findVer($sid);
 		if($sfdp_ver_info['s_fun_id']!=''){
-			$fun = '<script src="\static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js"></script>';	
+			$fun = '<script src="/static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js"></script>';	
 		}else{
 			$fun = '';
 		}
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
 		return ['info'=>$sfdp_ver_info,'fun'=>$fun,'load_file'=>$load_file];
-		
 	}
-	public static function getViewData($sid,$bid){
-		$sfdp_ver_info = self::getDescVerVal($sid);
+	static function getViewData($sid,$bid){
+		$sfdp_ver_info = (new Design())->mode->findVer($sid);
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		$find = Db::name($field['name_db'])->find($bid);
 		foreach($field['list'] as $k=>$v){
 				foreach($v['data'] as $k2=>$v2){
-					
 					if($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
 						$value_arr = explode(",",$find[$v2['tpfd_db']]);
 						$fiedsver = '';
@@ -133,7 +140,7 @@ class DescDb{
      *
      * @param $status 版本状态 0为禁用 1为启用
      */
-	public static function getListData($sid,$map){
+	static function getListData($sid,$map){
 		$jsondata = self::descVerTodata($sid);
 		$list = Db::name($jsondata['db_name'])->where($map)->field('id,'.$jsondata['field'])->order('id desc')->paginate(10);
 		$list = $list->all();
@@ -145,8 +152,7 @@ class DescDb{
 		$jsondata['search'] = SfdpUnit::mergesearch($map,$jsondata['search']);
 		return ['list'=>$list,'field'=>$jsondata,'title'=>$jsondata['title']];
 	}
-	
-	public static function saveDesc($data,$type='save'){
+	static function saveDesc($data,$type='save'){
 		if($type=='save'){
 			$search = [];
 			$list = [];
@@ -168,11 +174,8 @@ class DescDb{
 		
 			$isTable=Db::query('SHOW TABLES LIKE '."'wf_".$field['name_db']."'");
 			if($isTable){
-				return ['code'=>1,'msg'=>'数据表名已经存在~'];
+				//return ['code'=>1,'msg'=>'数据表名已经存在~'];
 			}
-
-			
-			
 			$ver = [
 				'id'=>$data['id'],
 				's_title'=>$field['name'],
@@ -199,7 +202,5 @@ class DescDb{
 			];
 			return Db::name('sfdp_design')->insertGetId($ver);
 		}
-		
-		
 	}
 }

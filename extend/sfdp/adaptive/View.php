@@ -8,12 +8,12 @@
  * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
-namespace sfdp\db;
+namespace sfdp\adaptive;
 
 use think\Db;
-use sfdp\db\DescDb;
 use sfdp\lib\unit;
-class ViewDb{
+
+class View{
 	
 	public static function ver($sid){
 		$json = Db::name('sfdp_design_ver')->where('status',1)->where('sid',$sid)->find();
@@ -28,8 +28,8 @@ class ViewDb{
 		return ['db'=>$data_ver_db];
 	}
 	public static function verAdd($sid){
-		$info = DescDb::getDesign($sid);
-		$json = DescDb::getDesignJson($sid);
+		$info = Design::find($sid);
+		$json = Design::getDesignJson($sid);
 		$ver = [
 			'sid'=>$sid,
 			's_bill'=>unit::OrderNumber(),

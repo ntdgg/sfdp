@@ -12,10 +12,10 @@ namespace sfdp\service;
 
 use think\Db;
 
-use sfdp\db\DescDb;
-use sfdp\db\ViewDb;
-use sfdp\db\ScriptDb;
-use sfdp\db\FunctionDb;
+use sfdp\adaptive\Design;
+use sfdp\adaptive\View;
+use sfdp\adaptive\Script;
+use sfdp\adaptive\Functions;
 
 use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
@@ -34,56 +34,65 @@ class Control{
 			return view(ROOT_PATH.'/sfdp_fun.html',['list'=>$list]);
 		}
 		if($act =='desc'){
-			 $info = DescDb::getDesign($sid);
+			 $info = Design::find($sid);
 			 return view(ROOT_PATH.'/sfdp_desc.html',['json'=>$info['s_field'],'fid'=>$info['id'],'look'=>$info['s_look']]);
 		}
 		if($act =='script'){
-			return view(ROOT_PATH.'/sfdp_script.html',['sid'=>$sid,'info'=>ScriptDb::script($sid)]);
+			if($sid !='' && is_array($sid)){
+				$bill = Script::scriptSave($sid);
+				BuildFun::Bfun($sid['function'],$bill);
+				echo "<script language='javascript'>alert('Success,脚本生成成功！'); top.location.reload();</script>";
+			}
+			return view(ROOT_PATH.'/sfdp_script.html',['sid'=>$sid,'info'=>Script::script($sid)]);
 		}
 		if($act =='ui'){
-			$info = DescDb::getDesign($sid);
+			$info = Design::find($sid);
 			if($info['s_design']<>2){
 				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); top.location.reload();</script>";
 				exit;
 			}
-			$json = ViewDb::ver($sid);
+			$json = View::ver($sid);
 			return view(ROOT_PATH.'/sfdp_ui.html',['sid'=>$sid,'ui'=>$json['db']]);
 		}
 		if($act =='save'){
-			return json(DescDb::saveDesc($sid,'save'));
+			return json(Design::saveDesc($sid,'save'));
 		}
 		if($act =='deldb'){
-			 $json = DescDb::getDesignJson($sid);
+			 $json = Design::getDesignJson($sid);
 			 $ret = BuildTable::delDbbak($json['name_db']);
 			 if($ret['code']==0){
-				 DescDb::saveDesc(['s_db_bak'=>0,'id'=>$sid],'update');
+				 Design::saveDesc(['s_db_bak'=>0,'id'=>$sid],'update');
 			 }
 			 return json($ret);
 		}
 		if($act =='fix'){
-			$info = DescDb::getDesign($sid);
-			$json = DescDb::getDesignJson($sid);
+			$info = Design::find($sid);
+			$json = Design::getDesignJson($sid);
 			if($info['s_list']=='[]'){
 				return json(['code'=>1,'msg'=>'Error,对不起您没有配置列表选项']);
 			}
 			$ret =  BuildTable::hasDbbak($json['name_db']);
 			if($ret['code']==1){
-				DescDb::saveDesc(['s_db_bak'=>1,'id'=>$sid],'update');
+				Design::saveDesc(['s_db_bak'=>1,'id'=>$sid],'update');
 				 return json($ret);
 			 }
 			//添加并返回
-			$tablefield = ViewDb::verAdd($sid);
+			$tablefield = View::verAdd($sid);
 			$ret = BuildTable::Btable($json['name_db'],$tablefield['db']);
-			 DescDb::saveDesc(['s_db_bak'=>1,'s_design'=>2,'id'=>$sid],'update');
+			 Design::saveDesc(['s_db_bak'=>1,'s_design'=>2,'id'=>$sid],'update');
 			return json(['code'=>0]);
+		}
+		if($act=='fun_save'){
+			return Functions::functionSave($sid);
+			
 		}
         return $act.'参数出错';
 	}
-	static function curd($act,$sid='',$data='',$g_js){
+	static function curd($act,$sid='',$data='',$g_js=''){
 		
 		if($act =='index'){
 			$map = SfdpUnit::Bsearch($data);
-			$list = DescDb::getListData($sid,$map);
+			$list = Design::getListData($sid,$map);
 			$config = [
 				'g_js'=>$g_js,
 				'sid' =>$sid,
@@ -92,7 +101,23 @@ class Control{
 				'title' =>$list['title'],
 				'load_file' =>$list['field']['load_file'],
 			];
-		return view(ROOT_PATH.'/index.html',['config'=>$config,'list'=>$list['list']]);
+			return view(ROOT_PATH.'/index.html',['config'=>$config,'list'=>$list['list']]);
+		}
+		if($act =='GetData'){
+			$map = SfdpUnit::Bsearch($data);
+			$list = Design::getListData($sid,$map);
+			$jsondata = [];
+			foreach($list['list'] as $k=>$v){
+				$list['list'][$k]['url'] = '<a onClick=commonfun.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
+				$jsondata[$k] = array_values($list['list'][$k]);
+			}
+			return json(['data'=>$jsondata]);
+			
+		}
+		if($act=='view'){
+			$info = Design::getViewData($sid,$data);
+			return view(ROOT_PATH.'/view.html',['info'=>$info['info']]);
+			
 		}
 		if($act =='add'){
 			if($data !=''){
@@ -107,7 +132,7 @@ class Control{
 				db($table)->insertGetId($data);
 				return json(['code'=>0]);
 			}
-			$data = DescDb::getAddData($sid);
+			$data = Design::getAddData($sid);
 			$config = [
 				'g_js'=>$g_js,
 				'fun' =>$data['fun'],
