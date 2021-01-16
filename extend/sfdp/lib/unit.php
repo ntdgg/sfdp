@@ -1,13 +1,15 @@
 <?php
 /**
-*+------------------
-* Tpflow 公共类，模板文件
-*+------------------
-* Copyright (c) 2006~2018 http://cojz8.cn All rights reserved.
-*+------------------
-* Author: guoguo(1838188896@qq.com)
-*+------------------ 
-*/
+  *+------------------
+  * SFDP-超级表单开发平台V5.0
+  *+------------------
+  * Sfdp 工具类
+  *+------------------
+  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  *+------------------
+  * Author: guoguo(1838188896@qq.com)
+  *+------------------ 
+  */
 namespace sfdp\lib;
 
 

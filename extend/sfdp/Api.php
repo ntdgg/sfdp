@@ -1,13 +1,15 @@
 <?php
 /**
- *+------------------
- * SFDP-超级表单开发平台V3.0
- *+------------------
- * Copyright (c) 2018~2020 http://cojz8.cn All rights reserved.
- *+------------------
- * Author: guoguo(1838188896@qq.com)
- *+------------------
- */
+  *+------------------
+  * SFDP-超级表单开发平台V5.0
+  *+------------------
+  * Sfdp Api接口类
+  *+------------------
+  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  *+------------------
+  * Author: guoguo(1838188896@qq.com)
+  *+------------------ 
+  */
 namespace sfdp;
 
 use think\Request;
@@ -18,7 +20,7 @@ use sfdp\service\Control;//引入核心控制器
 use sfdp\fun\SfdpUnit;
 
 use sfdp\lib\unit;
-define('FILE_PATH', realpath ( dirname ( __FILE__ ) ) );
+
 define('ROOT_PATH',\Env::get('root_path'). 'extend/sfdp/template' );
 
 class Api
@@ -85,8 +87,6 @@ class Api
 			return Control::curd($act,$sid,$data,$this->topconfig);
 		}
 	}
-	
-   
 	/*构建表单目录*/
 	static function sdfp_menu(){
 		return  SfdpUnit::Bmenu();

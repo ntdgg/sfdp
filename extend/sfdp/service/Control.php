@@ -1,13 +1,15 @@
 <?php
 /**
- *+------------------
- * SFDP-超级表单开发平台V5.0
- *+------------------
- * Copyright (c) 2018~2020 http://cojz8.cn All rights reserved.
- *+------------------
- * Author: guoguo(1838188896@qq.com)
- *+------------------
- */
+  *+------------------
+  * SFDP-超级表单开发平台V5.0
+  *+------------------
+  * Sfdp 核心驱动类
+  *+------------------
+  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  *+------------------
+  * Author: guoguo(1838188896@qq.com)
+  *+------------------ 
+  */
 namespace sfdp\service;
 
 use think\Db;
@@ -122,7 +124,6 @@ class Control{
 		if($act=='view'){
 			$info = Data::getViewData($sid,$data);
 			return view(ROOT_PATH.'/view.html',['info'=>$info['info']]);
-			
 		}
 		if($act =='add'){
 			if($data !=''){
@@ -137,13 +138,5 @@ class Control{
 			];
 			return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
 		}
-		
-		
 	}
-	
-	
-	
-	
-	
-	
 }
