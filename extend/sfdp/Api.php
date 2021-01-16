@@ -43,7 +43,7 @@ class Api
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
 	 public function sfdpApi($act='list',$sid=''){
-		if($act=='list' || $act=='fun' ){
+		if($act=='list' || $act=='fun' || $act=='create'){
 			return Control::api($act);
 		}
 		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb'){

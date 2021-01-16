@@ -16,6 +16,7 @@ use sfdp\adaptive\Design;
 use sfdp\adaptive\View;
 use sfdp\adaptive\Script;
 use sfdp\adaptive\Functions;
+use sfdp\adaptive\Data;
 
 use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
@@ -86,13 +87,17 @@ class Control{
 			return Functions::functionSave($sid);
 			
 		}
+		if($act=='create'){
+			$id = Design::saveDesc('','create');
+			return json(['code'=>0]);
+		}
         return $act.'参数出错';
 	}
 	static function curd($act,$sid='',$data='',$g_js=''){
 		
 		if($act =='index'){
 			$map = SfdpUnit::Bsearch($data);
-			$list = Design::getListData($sid,$map);
+			$list = Data::getListData($sid,$map);
 			$config = [
 				'g_js'=>$g_js,
 				'sid' =>$sid,
@@ -105,7 +110,7 @@ class Control{
 		}
 		if($act =='GetData'){
 			$map = SfdpUnit::Bsearch($data);
-			$list = Design::getListData($sid,$map);
+			$list = Data::getListData($sid,$map);
 			$jsondata = [];
 			foreach($list['list'] as $k=>$v){
 				$list['list'][$k]['url'] = '<a onClick=commonfun.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
@@ -115,24 +120,16 @@ class Control{
 			
 		}
 		if($act=='view'){
-			$info = Design::getViewData($sid,$data);
+			$info = Data::getViewData($sid,$data);
 			return view(ROOT_PATH.'/view.html',['info'=>$info['info']]);
 			
 		}
 		if($act =='add'){
 			if($data !=''){
-				foreach($data as $k=>$v){
-					if(is_array($v)){
-						$data[$k] = implode(",", $v);
-					}
-				}
-				$table = $data['name_db'];
-				unset($data['name_db']);
-				unset($data['tpfd_check']);
-				db($table)->insertGetId($data);
+				Data::add($sid,$data);
 				return json(['code'=>0]);
 			}
-			$data = Design::getAddData($sid);
+			$data = Data::getAddData($sid);
 			$config = [
 				'g_js'=>$g_js,
 				'fun' =>$data['fun'],

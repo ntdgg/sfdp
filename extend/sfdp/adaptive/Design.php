@@ -10,8 +10,6 @@
  */
 namespace sfdp\adaptive;
 
-use think\Db;
-
 use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
 use sfdp\fun\BuildTable;
@@ -115,43 +113,7 @@ class Design{
 		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
 		return ['info'=>$sfdp_ver_info,'fun'=>$fun,'load_file'=>$load_file];
 	}
-	static function getViewData($sid,$bid){
-		$sfdp_ver_info = (new Design())->mode->findVer($sid);
-		$field = json_decode($sfdp_ver_info['s_field'],true);
-		$find = Db::name($field['name_db'])->find($bid);
-		foreach($field['list'] as $k=>$v){
-				foreach($v['data'] as $k2=>$v2){
-					if($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
-						$value_arr = explode(",",$find[$v2['tpfd_db']]);
-						$fiedsver = '';
-						foreach($value_arr as $v3){
-							$fiedsver .=$v2['tpfd_data'][$v3].',';
-						}
-						$field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
-					}else{
-						$field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
-					}
-				}
-		}
-		return ['info'=>json_encode($field)];
-	}
-	/**
-     * 获取设计版本
-     *
-     * @param $status 版本状态 0为禁用 1为启用
-     */
-	static function getListData($sid,$map){
-		$jsondata = self::descVerTodata($sid);
-		$list = Db::name($jsondata['db_name'])->where($map)->field('id,'.$jsondata['field'])->order('id desc')->paginate(10);
-		$list = $list->all();
-		foreach ($list as $k => $v) {
-			foreach($jsondata['fieldArr'] as $k2=>$v2){
-				$list[$k][$k2] = $jsondata['fieldArr'][$k2][$v[$k2]] ?? '<font color="red">索引出错</font>';
-			}
-		}
-		$jsondata['search'] = SfdpUnit::mergesearch($map,$jsondata['search']);
-		return ['list'=>$list,'field'=>$jsondata,'title'=>$jsondata['title']];
-	}
+	
 	static function saveDesc($data,$type='save'){
 		if($type=='save'){
 			$search = [];
@@ -171,11 +133,6 @@ class Design{
 			if(empty($list)){
 				return ['code'=>1,'msg'=>'Sorry,未能找到列表参数'];
 			}
-		
-			$isTable=Db::query('SHOW TABLES LIKE '."'wf_".$field['name_db']."'");
-			if($isTable){
-				//return ['code'=>1,'msg'=>'数据表名已经存在~'];
-			}
 			$ver = [
 				'id'=>$data['id'],
 				's_title'=>$field['name'],
@@ -185,14 +142,14 @@ class Design{
 				's_field'=>htmlspecialchars_decode($data['ziduan']),
 				's_design'=>1
 			];
-			if(Db::name('sfdp_design')->update($ver)){
+			if((new Design())->mode->update($ver)){
 				return ['code'=>0,'msg'=>'Success'];
 			}else{
 				return ['code'=>1,'msg'=>'Sorry,更新失败~'];
 			}
 			
 		}elseif($type=='update'){
-			return Db::name('sfdp_design')->update($data);;
+			return (new Design())->mode->update($data);
 		}else{
 			$ver = [
 				's_bill'=>unit::OrderNumber(),
@@ -200,7 +157,7 @@ class Design{
 				's_field'=>1,
 				'add_time'=>time()
 			];
-			return Db::name('sfdp_design')->insertGetId($ver);
+			return (new Design())->mode->insert($ver);
 		}
 	}
 }

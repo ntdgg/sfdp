@@ -37,7 +37,22 @@ class AdapteeDesign{
 			return  false;
 		}
 	}
-	
+	function update($data){
+		$info = Db::name('sfdp_design')->update($data);
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
+	function insert($data){
+		$info = Db::name('sfdp_design')->insertGetId($data);
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
 	function getDesignVer($status=1){
 		return Db::name('sfdp_design_ver')->where('status',$status)->select();
 	}
