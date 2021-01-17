@@ -1,5 +1,6 @@
 {
     "name": "guoguo/sfdp",
+	"license": "MIT",
     "description": "SFDP 超级表单开发平台",
     "authors": [
         {
