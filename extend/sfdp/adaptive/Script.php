@@ -12,14 +12,21 @@
   */
 namespace sfdp\adaptive;
 
-use think\Db;
-
 use sfdp\lib\unit;
 
 class Script{
 	
+	protected $mode ; 
+    public function  __construct(){
+		if(unit::gconfig('db_mode')==1){
+			$className = '\\sfdp\\custom\\AdapteeScript';
+		}else{
+			$className = unit::gconfig('db_namespace').'AdapteeScript';
+		}
+		$this->mode = new $className();
+    }
 	public static function script($sid){
-		return Db::name('sfdp_script')->where('sid',$sid)->find();
+		return (new Script())->mode->findWhere([['sid','=',$sid]]);
 	}
 	public static function scriptSave($data){
 		$info = self::script($data['sid']);
@@ -31,15 +38,13 @@ class Script{
 				's_fun'=>$data['function'],
 				'add_time'=>time()
 			];
-			$id = Db::name('sfdp_script')->insertGetId($ver);
-				  Db::name('sfdp_design_ver')->where('sid',$data['sid'])->where('status',1)->update(['s_fun_id'=>$id,'s_fun_ver'=>$ver['s_bill']]);
+			$id = (new Script())->mode->insert($ver);
+			$map[] = ['sid','=',$data['sid']];
+			$map[] = ['status','=',1];
+			Design::updateVerWhere($map,['s_fun_id'=>$id,'s_fun_ver'=>$ver['s_bill']);
 			$bill = $ver['s_bill'];
 		}else{
-			$ver = [
-				'id'=>$info['id'],
-				's_fun'=>$data['function']
-			];	
-			Db::name('sfdp_script')->update($ver);
+			(new Script())->mode->update(['id'=>$info['id'],'s_fun'=>$data['function']]);
 			$bill=$info['s_bill'];
 		}	
 		return $bill;

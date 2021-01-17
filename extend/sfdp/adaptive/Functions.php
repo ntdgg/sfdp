@@ -12,14 +12,27 @@
   */
 namespace sfdp\adaptive;
 
-use think\Db;
-
 use sfdp\lib\unit;
 
 class Functions{
 	
+	protected $mode ; 
+    public function  __construct(){
+		if(unit::gconfig('db_mode')==1){
+			$className = '\\sfdp\\custom\\AdapteeFunctions';
+		}else{
+			$className = unit::gconfig('db_namespace').'AdapteeFunctions';
+		}
+		$this->mode = new $className();
+    }
+	
+	static function findWhere($map)
+    {
+		return (new Functions())->mode->findWhere($map);
+    }
 	public static function functionSave($data){
-		$hasname = Db::name('sfdp_function')->where('fun_name',$data['name'])->find();
+		$map[] = ['fun_name','=',$data['name']];
+		$hasname = self::findWhere($map);
 		if($hasname){
 			return json(['code'=>1,'msg'=>'禁止函数名称重复！']);
 		}
@@ -32,8 +45,12 @@ class Functions{
 				'function'=>$data['fun'],
 				'add_time'=>time()
 			];
-			$id = Db::name('sfdp_function')->insertGetId($ver);
-			return json(['code'=>0,'msg'=>'操作成功！']);
+			$ret = (new Functions())->mode->insert($ver);
+			if($ret){
+				return json(['code'=>0,'msg'=>'操作成功！']);
+			}else{
+				return json(['code'=>-1,'msg'=>'更新出错']);
+			}
 		}else{
 			$ver = [
 				'id'=>$data['id'],
@@ -41,8 +58,13 @@ class Functions{
 				'fun_name'=>$data['name'],
 				'function'=>$data['fun']
 			];	
-			Db::name('sfdp_function')->update($ver);
-			return json(['code'=>0,'msg'=>'操作成功！']);
+			$ret = (new Functions())->mode->update($ver);
+			if($ret){
+				return json(['code'=>0,'msg'=>'操作成功！']);
+			}else{
+				return json(['code'=>-1,'msg'=>'更新出错']);
+			}
+			
 		}
 	}
 }

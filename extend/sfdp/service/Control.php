@@ -12,13 +12,12 @@
   */
 namespace sfdp\service;
 
-use think\Db;
-
 use sfdp\adaptive\Design;
 use sfdp\adaptive\View;
 use sfdp\adaptive\Script;
 use sfdp\adaptive\Functions;
 use sfdp\adaptive\Data;
+use sfdp\adaptive\Common;
 
 use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
@@ -29,11 +28,11 @@ class Control{
 	static function api($act,$sid=''){
 		//获取流程信息
 		if($act =='list'){
-			$list = Db::name('sfdp_design')->order('id desc')->select();
+			$list = Design::select();
 			return view(ROOT_PATH.'/sfdp.html',['list'=>$list,'patch'=>ROOT_PATH]);
 		}
 		if($act =='fun'){
-			$list = Db::name('sfdp_function')->order('id desc')->select();
+			$list = Design::select();
 			return view(ROOT_PATH.'/sfdp_fun.html',['list'=>$list]);
 		}
 		if($act =='desc'){
@@ -138,5 +137,18 @@ class Control{
 			];
 			return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
 		}
+	}
+	static function fapi($post){
+		$key_name = [];
+		$key_val = [];
+		foreach($post as $k=>$v){
+			if($k<>'fun'){
+				$key_name[] = '@'.$k;
+				$key_val[] = $v;
+			}
+		}
+		$sql = Functions::findWhere([['fun_name','=',$post['fun']]]);;
+		$new_sql=str_replace($key_name,$key_val,$sql['function']);
+		return Common::query($new_sql);
 	}
 }

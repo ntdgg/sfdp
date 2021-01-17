@@ -31,6 +31,9 @@ class AdapteeDesign{
 			return  false;
 		}
 	}
+	function select($map,$order){
+		return Db::name('sfdp_design')->where($map)->order($order)->select();
+	}
 	function findVer($sid){
 		$info = Db::name('sfdp_design_ver')->find($sid);
 		if($info){
@@ -49,6 +52,30 @@ class AdapteeDesign{
 	}
 	function insert($data){
 		$info = Db::name('sfdp_design')->insertGetId($data);
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
+	function updateVerWhere($map,$data){
+		$info = Db::name('sfdp_design_ver')->where($map)->update($data);
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
+	function findVerWhere($map){
+		$info = Db::name('sfdp_design_ver')->where($map)->find();
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
+	function insertVer($data){
+		$info = Db::name('sfdp_design_ver')->insertGetId($data);
 		if($info){
 			return  $info;
 		}else{

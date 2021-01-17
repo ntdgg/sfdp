@@ -12,12 +12,8 @@
   */
 namespace sfdp\adaptive;
 
-use think\Db;
 
-use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
-use sfdp\fun\BuildTable;
-
 use sfdp\lib\unit;
 
 class Data{

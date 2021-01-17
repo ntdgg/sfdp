@@ -39,6 +39,10 @@ class Design{
     {
 		return (new Design())->mode->find($sid);
     }
+	static function select($map,$order='id desc')
+    {
+		return (new Design())->mode->select($map,$order);
+    }
 	/**
      * getDesignJson 获取设计信息  getDesign
      * @param array $whereRaw raw查询条件
@@ -54,6 +58,19 @@ class Design{
 			return  false;
 		}
 	}
+	static function insertVer($data)
+    {
+		return (new Design())->mode->insertVer($data);
+    }
+	static function updateVerWhere($data)
+    {
+		return (new Design())->mode->updateVerWhere($data);
+    }
+	static function findVerWhere($data)
+    {
+		return (new Design())->mode->findVerWhere($data);
+    }
+	
 	 /**
      * 获取设计版本
      *

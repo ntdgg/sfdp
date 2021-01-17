@@ -13,10 +13,10 @@
 
 namespace sfdp\fun;
 
-use think\Db;
 use think\Exception;
-
 use sfdp\lib\unit;
+use sfdp\adaptive\Common;
+
 
 class BuildTable{
 	/**
@@ -29,10 +29,10 @@ class BuildTable{
         }
         $tableName = unit::gconfig('int_db_prefix') . $table;
         $tableExist = false;// 判断表是否存在
-        $ret = Db::query("SHOW TABLES LIKE '{$tableName}'");
+        $ret = Common::query("SHOW TABLES LIKE '{$tableName}'");
 		self::hasDbbak($table);
         if ($ret && isset($ret[0])) {
-            Db::execute("RENAME TABLE {$tableName} to {$tableName}_bak");
+            Common::execute("RENAME TABLE {$tableName} to {$tableName}_bak");
             $tableExist = true;
         }
         $auto_create_field = ['id', 'status', 'create_time', 'update_time'];
@@ -61,8 +61,8 @@ class BuildTable{
             . implode(",\n", array_merge($fieldAttr, $key))
             . "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$table}'";
         try {
-            Db::execute($sql_drop);
-            Db::execute($sql_create);
+            Common::execute($sql_drop);
+            Common::execute($sql_create);
         } catch (\Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -70,17 +70,17 @@ class BuildTable{
     }
 	static function hasDbbak($table){
         $tableName = unit::gconfig('int_db_prefix') . $table;
-		$ret_bak = Db::query("SHOW TABLES LIKE '{$tableName}_bak'");
+		$ret_bak = Common::query("SHOW TABLES LIKE '{$tableName}_bak'");
 		if ($ret_bak && isset($ret_bak[0])) { 
 			return ['code'=>1,'msg'=>'备份数据表已经存在，请先删除！'];
 		}
 	}
 	static function delDbbak($table){
         $tableName = unit::gconfig('int_db_prefix') . $table;
-		$ret_bak = Db::query("SHOW TABLES LIKE '{$tableName}_bak'");
+		$ret_bak = Common::query("SHOW TABLES LIKE '{$tableName}_bak'");
 		if ($ret_bak && isset($ret_bak[0])) { 
 			try {
-				$ret = Db::execute("DROP TABLE IF EXISTS `{$tableName}_bak`");
+				$ret = Common::execute("DROP TABLE IF EXISTS `{$tableName}_bak`");
 			} catch (\Exception $e) {
 				return ['code'=>1,'msg'=>'系统异常。'.$e->getMessage()];
 			}

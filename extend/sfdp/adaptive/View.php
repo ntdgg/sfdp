@@ -12,13 +12,12 @@
   */
 namespace sfdp\adaptive;
 
-use think\Db;
 use sfdp\lib\unit;
 
 class View{
 	
 	public static function ver($sid){
-		$json = Db::name('sfdp_design_ver')->where('status',1)->where('sid',$sid)->find();
+		$json = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
 		$field = json_decode($json['s_field'],true);
 		foreach($field['list'] as $k=>$v){
 			foreach($v['data'] as $v2){
@@ -45,8 +44,10 @@ class View{
 			'status'=>1,
 			'add_time'=>time()
 		];
-		$id  =  Db::name('sfdp_design_ver')->insertGetId($ver);
-		Db::name('sfdp_design_ver')->where('id','<>',$id)->where('sid',$sid)->update(['status'=>0]);
+		$id  = Design::insertVer($ver);
+		$map[] = ['id','<>',$id];
+		$map[] = ['sid','=',$sid];
+		Design::updateVerWhere($map,['status'=>0]);
 		return self::ver($sid);
 		
 	}

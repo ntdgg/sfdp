@@ -88,25 +88,21 @@ class Api
 			return Control::curd($act,$sid,$data,$this->topconfig);
 		}
 	}
-	/*构建表单目录*/
+	/**
+	  * Sfdp 5.0 内部目录调用方法
+	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
+	  */
 	static function sdfp_menu(){
 		return  SfdpUnit::Bmenu();
 	}
 	
-	/*函数方法*/
+	/**
+	  * Sfdp 5.0 函数调用API
+	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
+	  */
 	public function fApi(){
 		$post = input('post.');
-		$key_name = [];
-		$key_val = [];
-		foreach($post as $k=>$v){
-			if($k<>'fun'){
-				$key_name[] = '@'.$k;
-				$key_val[] = $v;
-			}
-		}
-		$sql = Db::name('sfdp_function')->where('fun_name',$post['fun'])->find();
-		$new_sql=str_replace($key_name,$key_val,$sql['function']);
-		$json = Db::query($new_sql);
+		$json = Control::fApi($post);;
 		return json($json);
 	}
 
