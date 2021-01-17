@@ -27,15 +27,16 @@ class Api
 {
 	public $topconfig = '';
 	function __construct() {
+		$ginfo = unit::getuserinfo();
+		if($ginfo==-1){
+			echo 'Access Error!';exit;
+		}
 		$sid = input('sid') ?? 0;
-		$g_uid = input('session.'.unit::gconfig('int_user_id')) ?? '9999';
-		$g_username = input('session.'.unit::gconfig('int_user_name')) ?? '"admin"';
-		$g_role = input('session.'.unit::gconfig('int_user_role')) ?? '9999';
 		$this->topconfig = 
 		'<script>
-		var g_uid='.$g_uid.';
-		var g_role='.$g_role.';
-		var g_username='.$g_username.';
+		var g_uid='.$ginfo['uid'].';
+		var g_role='.$ginfo['role'].';
+		var g_username='.$ginfo['username'].';
 		var g_sid='.$sid.';
 		</script>';
    }

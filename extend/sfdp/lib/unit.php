@@ -38,7 +38,34 @@ class unit{
 		}
 		return new $className($id,$run_id,$data);
 	} 
-	
+	/**
+	* 获取定义的信息
+	* @param string $key
+	**/
+	public static function getuserinfo($key='') {
+		if(unit::gconfig('gateway_mode')==1){
+			$user_info = [
+				'uid'=>session(self::gconfig('int_user_id')) ?? '9999',
+				'username'=>session(self::gconfig('int_user_name')) ?? '"admin"',
+				'role'=>session(self::gconfig('int_user_role')) ?? '9999',
+			];
+		}else{
+			$className = unit::gconfig('gateway_action');
+			if(!class_exists($className)){
+				return -1;
+			}
+			$user_info = (new $className())->GetUserInfo();;
+		}
+		if($user_info['uid']==''||$user_info['role']==''||$user_info['username']==''){
+			return -1;
+		}
+		if($key==''){
+			return $user_info;
+		}else{
+			return $user_info[$key] ?? '';
+		}
+		
+	}
 	/**
 	 * 根据键值加载全局配置文件
 	 *
