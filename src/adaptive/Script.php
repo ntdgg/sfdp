@@ -41,7 +41,7 @@ class Script{
 			$id = (new Script())->mode->insert($ver);
 			$map[] = ['sid','=',$data['sid']];
 			$map[] = ['status','=',1];
-			Design::updateVerWhere($map,['s_fun_id'=>$id,'s_fun_ver'=>$ver['s_bill']);
+			Design::updateVerWhere($map,['s_fun_id'=>$id,'s_fun_ver'=>$ver['s_bill']]);
 			$bill = $ver['s_bill'];
 		}else{
 			(new Script())->mode->update(['id'=>$info['id'],'s_fun'=>$data['function']]);

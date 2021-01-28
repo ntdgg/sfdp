@@ -22,39 +22,49 @@ use sfdp\adaptive\Common;
 use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
 use sfdp\fun\BuildTable;
+use sfdp\lib\lib;
+
+use sfdp\lib\unit;
 
 class Control{
 	
 	static function api($act,$sid=''){
 		//获取流程信息
 		if($act =='list'){
-			$list = Design::select([]);
-			return view(ROOT_PATH.'/sfdp.html',['list'=>$list,'patch'=>ROOT_PATH]);
+			$list = Design::select();
+			return lib::index($list);
 		}
 		if($act =='fun'){
-			$list = Design::select();
-			return view(ROOT_PATH.'/sfdp_fun.html',['list'=>$list]);
+			$list = Functions::select();
+			
+			return lib::fun($list);
 		}
 		if($act =='desc'){
 			 $info = Design::find($sid);
+			 return lib::desc($info['s_field'],$info['id'],$info['s_look']);
+			 
 			 return view(ROOT_PATH.'/sfdp_desc.html',['json'=>$info['s_field'],'fid'=>$info['id'],'look'=>$info['s_look']]);
 		}
 		if($act =='script'){
 			if($sid !='' && is_array($sid)){
 				$bill = Script::scriptSave($sid);
 				BuildFun::Bfun($sid['function'],$bill);
-				echo "<script language='javascript'>alert('Success,脚本生成成功！'); top.location.reload();</script>";
+				$urls= unit::gconfig('url');
+				$action = $urls['api'].'?act=script&sid='.$sid['sid'];
+				echo "<script language='javascript'>alert('Success,脚本生成成功！'); location.assign('".$action."');</script>";exit;
 			}
-			return view(ROOT_PATH.'/sfdp_script.html',['sid'=>$sid,'info'=>Script::script($sid)]);
+			
+			return lib::script(Script::script($sid),$sid);
 		}
 		if($act =='ui'){
 			$info = Design::find($sid);
 			if($info['s_design']<>2){
-				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); top.location.reload();</script>";
+				$action = $urls['api'].'?act=ui&sid='.$sid;
+				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); location.assign('".$action."');</script>";
 				exit;
 			}
 			$json = View::ver($sid);
-			return view(ROOT_PATH.'/sfdp_ui.html',['sid'=>$sid,'ui'=>$json['db']]);
+			return lib::ui($json['db']);
 		}
 		if($act =='save'){
 			return json(Design::saveDesc($sid,'save'));

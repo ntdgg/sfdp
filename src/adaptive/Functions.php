@@ -25,7 +25,10 @@ class Functions{
 		}
 		$this->mode = new $className();
     }
-	
+	static function select($map=[],$order='id desc')
+    {
+		return (new Functions())->mode->select($map,$order);
+    }
 	static function findWhere($map)
     {
 		return (new Functions())->mode->findWhere($map);

@@ -23,6 +23,9 @@ use sfdp\lib\unit;
 
 class AdapteeFunctions{
 	
+	function select($map,$order){
+		return Db::name('sfdp_function')->where($map)->order($order)->select();
+	}
 	function findWhere($map){
 		$info = Db::name('sfdp_function')->where($map)->find();
 		if($info){

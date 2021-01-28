@@ -58,7 +58,7 @@ class AdapteeDesign{
 			return  false;
 		}
 	}
-	function updateVerWhere($map,$data){
+	function updateVerWhere($map=[],$data=[]){
 		$info = Db::name('sfdp_design_ver')->where($map)->update($data);
 		if($info){
 			return  $info;

@@ -17,10 +17,10 @@ use think\facade\Db;
 class AdapteeCommon{
 
 	function query($sql){
-		return Db::query($sql)
+		return Db::query($sql);
 	}
 	function execute($sql){
-		return Db::execute($sql)
+		return Db::execute($sql);
 	}
 	
 	
