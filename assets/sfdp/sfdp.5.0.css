@@ -1,0 +1,196 @@
+html,body{height:100%;}
+
+.page-container {
+	padding: 10px;
+}
+.calendar {
+	background: #fff;
+	border: 1px solid #a4bed4;
+	padding: 1px;
+	overflow: hidden
+}
+.layout-panel {
+	position: absolute;
+	overflow: hidden
+}
+.panel-east,.panel-west {
+	z-index: 2;
+	background1: #fff
+}
+.split-east {
+	border-left: 5px solid #d2e0f2
+}
+.split-west {
+	border-right: 5px solid #d2e0f2
+}
+.panel {
+	overflow: hidden;
+	font-size: 12px
+}
+.panel-header {
+	padding: 5px;
+	line-height: 15px;
+	height: 15px;
+	color: #15428b;
+	font-weight: 700;
+	font-size: 12px;
+	background: url(images/panel_title.png) repeat-x;
+	position: relative;
+	border: 1px solid #99bbe8;
+	background: #e0ecff;
+	border-top-width: 0;
+	cursor: pointer
+}
+.panel-body {
+	background: #fff;
+	overflow: hidden;
+	overflow: auto;
+	border: 1px solid #99bbe8;
+	border-top-width: 0;
+	padding: 0px;
+	min-height:820px
+}
+.process-step{position: absolute; cursor: move; min-width: 100px; line-height: 28px}
+.process-step span{cursor: pointer;}
+
+/*连接线提示*/
+.component {
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+  z-index: 20;
+}
+.wf_btn {
+	padding: 4px 8px;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: center;
+    -moz-padding-start: npx;
+    -moz-padding-end: npx;
+    border: solid 1px #ddd;
+    background-color: #fff;
+    width: auto;
+}
+.smalls{
+    width: 90px;
+	padding: 4px 6px;
+	display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+	border: 1px solid #cccccc;
+	background-color: #ffffff;
+}
+.tables th, .tables td {
+    padding: 6px;
+    line-height: 18px;
+    text-align: left;
+    vertical-align: top;
+    border-top: 1px solid #dddddd;
+	border-left: 1px solid #dddddd;
+	border-right: 1px solid #dddddd;
+}
+
+.table
+{
+	 border-radius: 5px;
+	width: 100%;
+		empty-cells: show;
+		background-color: transparent;
+		border-spacing: 0;
+		border: 1px solid #ddd;
+		border-left: 0;
+	border-collapse: collapse;
+	margin: 0 auto;
+	text-align: center;
+}
+.table td, table th
+{
+	border: 1px solid #cad9ea;
+	color: #666;
+	height: 30px;
+}
+.table th
+{
+	width: 100px;
+	font-weight: bold;
+	background-color: #f5fafe;
+    border-left: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	padding: 8px;
+    line-height: 20px;
+    word-break: break-all;
+}
+
+.table td {
+    border-left: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	padding: 8px;
+    line-height: 20px;
+    word-break: break-all;
+}
+ul
+{
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
+ul li
+{
+    background-repeat: no-repeat;
+    background-position: 0px 5px; 
+    padding-left: 14px; 
+}
+
+.button{
+    display: inline-block;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 400;
+    white-space: nowrap;
+    vertical-align: middle;
+    border: solid 1px #ddd;
+    width: auto;
+    transition: background-color .1s linear;
+	line-height: 21px;
+	color: #fff;
+    background-color: #2b85e4;
+	padding: 4px 12px;
+	border-radius: 4px;
+}
+#wfatt  li{
+   display: block;
+   text-align: center;
+   width: 80px;
+   float: left; list-style: none;cursor: pointer;height: 30px;line-height: 30px;
+}
+#wfatt .choice{
+	   background: #409EFF;color: #fff;
+}
+#box .tab-item{
+   display: none;
+}
+#box .show{
+   display: block;
+}
+#box  .hide{
+   display: none;
+}
+
+.TpflowForm{
+   border-bottom: 1px solid #e8eaec;line-height: 1;
+}
+
+.TpflowController{
+   border-bottom: 1px solid #e8eaec;padding:8px;line-height: 1;
+}
+
+.TpflowHead{
+  color: #333; padding: 14px 16px;background-color: #f8f8f9;border-color: #ddd;
+}
+
+pre{
+	font:100 12px/18px monaco, andale mono, courier new;padding:1px 2px;border:#ccc 1px solid;border-left-width:4px;background-color:#fefefe;box-shadow:0 0 4px #eee;word-break:break-all;word-wrap:break-word;color:#444
+}
+pre bq{
+	color:#170
+}
