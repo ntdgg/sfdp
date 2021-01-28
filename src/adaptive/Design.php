@@ -39,7 +39,7 @@ class Design{
     {
 		return (new Design())->mode->find($sid);
     }
-	static function select($map,$order='id desc')
+	static function select($map=[],$order='id desc')
     {
 		return (new Design())->mode->select($map,$order);
     }

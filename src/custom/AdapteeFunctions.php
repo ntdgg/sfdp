@@ -12,7 +12,7 @@
   */
 namespace sfdp\custom;
 
-use think\Db;
+use think\facade\Db;
 
 use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;

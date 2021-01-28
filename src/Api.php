@@ -21,7 +21,7 @@ use sfdp\fun\SfdpUnit;
 
 use sfdp\lib\unit;
 
-define('ROOT_PATH',\Env::get('root_path'). 'extend/sfdp/template' );
+define('ROOT_PATH',dirname(dirname(__DIR__) . DIRECTORY_SEPARATOR, 1) . DIRECTORY_SEPARATOR . 'sfdp' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'template');
 
 class Api
 {

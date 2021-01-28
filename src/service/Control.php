@@ -28,7 +28,7 @@ class Control{
 	static function api($act,$sid=''){
 		//获取流程信息
 		if($act =='list'){
-			$list = Design::select();
+			$list = Design::select([]);
 			return view(ROOT_PATH.'/sfdp.html',['list'=>$list,'patch'=>ROOT_PATH]);
 		}
 		if($act =='fun'){
