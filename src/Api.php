@@ -49,6 +49,11 @@ class Api
 		if($act=='list' || $act=='fun' || $act=='create'){
 			return Control::api($act);
 		}
+		if($act=='node'){
+			$node = input('node');
+			$data = ['sid'=>$sid,'node'=>$node];
+			return Control::api($act,$data);
+		}
 		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb'){
 			if (unit::is_post()) {
 				$data = input('post.');

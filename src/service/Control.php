@@ -102,6 +102,20 @@ class Control{
 			$id = Design::saveDesc('','create');
 			return json(['code'=>0]);
 		}
+		if($act=='node'){
+			
+			$className = unit::gconfig('node_action');
+			if(!class_exists($className)){
+				return 'Sorry,未找到node_action类，请先配置~';
+			}
+			$Node = (new $className())->SaveNode(Design::descVerTodata($sid['sid']),$sid['node']);//获取目录节点信息	
+			if($Node['code']==0){
+				return json(['code'=>0]);
+			}else{
+				return json(['code'=>1,'msg'=>$Node['msg']]);
+			}
+			
+		}
         return $act.'参数出错';
 	}
 	static function curd($act,$sid='',$data='',$g_js=''){

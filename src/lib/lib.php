@@ -19,6 +19,18 @@ class lib{
 		$tmp = self::commontmp('Sfdp超级表单设计器');
 		$urls= unit::gconfig('url');
 		$tr = '';
+		
+		if(unit::gconfig('node_mode')==2){
+			$className = unit::gconfig('node_action');
+			if(!class_exists($className)){
+				return 'Sorry,未找到node_action类，请先配置~';
+			}
+			$Node = (new $className())->GetNode();//获取目录节点信息	
+		}else{
+			$Node = unit::gconfig('node_data');
+		}
+		$node_url =$urls['api'].'?act=node';
+		
 		foreach($data as $k=>$v){
 		   $status = ['未锁定','已锁定'];
 		   $btn = '<a onClick=commonfun.openfullpage("设计——'.$k['s_bill'].'","'.$urls['api'].'?act=desc&sid='.$v['id'].'") class="button">设计</a><a onClick=commonfun.openfullpage("元素管理——'.$k['s_bill'].'","'.$urls['api'].'?act=ui&sid='.$v['id'].'") class="button">元素</a>';
@@ -28,6 +40,7 @@ class lib{
 		   }
 		   if($v['s_db_bak']==1){
 			   $btn .='<a onClick=commonfun.Askshow("'.$urls['api'].'?act=deldb&sid='.$v['id'].'","删除备份数据库,是否执行?")  class="button">DelDb</a>';
+			   $btn .='<a onClick=add_fun('.$v['id'].')  class="button">Menu</a>';
 		   }
 		   $tr .='<tr class="text-c"><td>'.$v['s_bill'].'</td><td>'.$v['s_title'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$k['s_design'].'</td><td>'.$status[$v['s_look']].'（'.$k['s_db'].'）</td><td>'.$btn.'</td></tr>';	
 		}
@@ -46,7 +59,30 @@ class lib{
 				</table>
 			</div>
 		</div>
-		
+		<div id='menu' style='display:none'>
+		{$Node['html']}	
+		</div>
+		<script>
+		function add_fun(sid){
+			var htmls = '<div style="margin:10px;">节点：<select id="nodesss" class="select" ><option value="">请选择挂带节点</option>'+$('#menu').html()+'</select>　<a onClick=getmenu('+sid+')  class="button">创建节点</a></div>';
+				layer.open({
+				  title: '选择挂带节点信息',
+				  type: 1,
+				  area: ['520px', '150px'], //宽高
+				  content: htmls
+				});
+		}
+		function getmenu(sid){
+			var node = $('#nodesss').val();
+			if(node==''){
+				commonfun.ShowTip('请选择节点信息！');
+				return;
+			}
+			var url = "{$node_url}&sid="+sid+"&node="+node;
+			commonfun.Askshow(url,"再次确认是否创建目录，,是否执行?");
+			
+		}
+		</script>
 		</body>
 		</html>
 php;
