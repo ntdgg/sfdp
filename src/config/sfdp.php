@@ -16,7 +16,13 @@ return [
 	'black_table'=>['sfdp_design','sfdp_design_ver','sfdp_function','sfdp_script'],//黑名单表，防止重复
 	'db_namespace'=>'',
 	'db_mode'=>1,
-	'static_url'=>'/static/work/',//资源目录
+	'static_url'=>'/static/sfdp/',//资源目录
 	'gateway_mode' =>1,//1,默认使用Tp的助手函数
 	'gateway_action' =>'\\bill\\Gateway',//自定义方法返回数据 命名空间 中的GetUserInfo
+	'url' => [
+		'api'=>"/gadmin/sfdp/sfdpApi.html",
+		'start'=>"/gadmin/wf/wfstart.html", //表名
+		'wfapi'=>"/gadmin/wf/wfapi.html", //表名
+		'designapi'=>"/gadmin/wf/designapi.html", //表名
+	],
 ];
