@@ -32,8 +32,11 @@ class AdapteeData{
 			return  false;
 		}
 	}
-	function select($table,$map=[],$field=''){
-		return Db::name($table)->where($map)->field('id,'.$field)->order('id desc')->paginate(10);;
+	function select($table,$map=[],$field='',$page=1,$limit=10){
+		$offset = ($page-1)*$limit;  
+		$list = Db::name($table)->where($map)->limit($offset,$limit)->order('id desc')->select()->toarray();
+		$count = Db::name($table)->where($map)->count();
+		return ['data'=>$list,'count'=>$count];
 	}
 	
 	

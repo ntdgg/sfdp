@@ -38,17 +38,18 @@ class Data{
 		unset($data['tpfd_check']);
 		return (new Data())->mode->add($table,$data);		
 	}
-	static function getListData($sid,$map){
+	static function getListData($sid,$map,$page=1,$limit=10){
 		$jsondata = Design::descVerTodata($sid);
-		$list = (new Data())->mode->select($jsondata['db_name'],$map,$jsondata['field']);
-		$list = $list->all();
-		foreach ($list as $k => $v) {
+		$list = (new Data())->mode->select($jsondata['db_name'],$map,$jsondata['field'],$page,$limit);
+		$json = $list['data'];
+		
+		foreach ($json as $k => $v) {
 			foreach($jsondata['fieldArr'] as $k2=>$v2){
-				$list[$k][$k2] = $jsondata['fieldArr'][$k2][$v[$k2]] ?? '<font color="red">索引出错</font>';
+				$json[$k][$k2] = $jsondata['fieldArr'][$k2][$v[$k2]] ?? '<font color="red">索引出错</font>';
 			}
 		}
 		$jsondata['search'] = SfdpUnit::mergesearch($map,$jsondata['search']);
-		return ['list'=>$list,'field'=>$jsondata,'title'=>$jsondata['title']];
+		return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
 	}
 	static function getViewData($sid,$bid){
 		$sfdp_ver_info = Design::findVer($sid);

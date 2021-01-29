@@ -140,19 +140,17 @@ class Control{
 		}
 		if($act =='GetData'){
 			$map = SfdpUnit::Bsearch($data);
-			$list = Data::getListData($sid,$map);
+			$list = Data::getListData($sid,$map,$data['page'],$data['limit']);
 			$jsondata = [];
 			foreach($list['list'] as $k=>$v){
 				$list['list'][$k]['url'] = '<a onClick=commonfun.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
 				$jsondata[$k] = array_values($list['list'][$k]);
 			}
 			if(unit::gconfig('return_mode')==1){
-				return json(['data'=>$jsondata]);
+				return json(['data'=>$jsondata,'count'=>$list['count']]);
 				}else{
-				return ['data'=>$jsondata,'list'=>$list];
+				return ['data'=>$jsondata,'list'=>$list,'count'=>$list['count']];
 			}
-			
-			
 		}
 		if($act=='view'){
 			$info = Data::getViewData($sid,$data);
@@ -168,7 +166,7 @@ class Control{
 				Data::add($sid,$data);
 				return json(['code'=>0]);
 			}
-			$data = Data::getAddData($sid);
+			$data = Design::getAddData($sid);
 			$config = [
 				'g_js'=>$g_js,
 				'fun' =>$data['fun'],

@@ -31,7 +31,9 @@ class SfdpUnit{
     }
 	public static function Bsearch($search){
 		$map =[];
+		
 		if(isset($search['search']) && count($search)<>0){
+			
 			$search_field = json_decode(htmlspecialchars_decode($search['search']),true);
 			foreach($search_field as $k=>$v){
 				if($search[$v['tpfd_db']]<>''){
