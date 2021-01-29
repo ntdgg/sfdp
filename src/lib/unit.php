@@ -45,9 +45,9 @@ class unit{
 	public static function getuserinfo($key='') {
 		if(unit::gconfig('gateway_mode')==1){
 			$user_info = [
-				'uid'=>session(self::gconfig('int_user_id')) ?? '9999',
-				'username'=>session(self::gconfig('int_user_name')) ?? '"admin"',
-				'role'=>session(self::gconfig('int_user_role')) ?? '9999',
+				'uid'=>session(self::gconfig('int_user_id')),
+				'username'=>session(self::gconfig('int_user_name')),
+				'role'=>session(self::gconfig('int_user_role')),
 			];
 		}else{
 			$className = unit::gconfig('gateway_action');

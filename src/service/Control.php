@@ -29,6 +29,7 @@ use sfdp\lib\unit;
 class Control{
 	
 	static function api($act,$sid=''){
+		$urls= unit::gconfig('url');
 		//获取流程信息
 		if($act =='list'){
 			$list = Design::select();
@@ -49,7 +50,6 @@ class Control{
 			if($sid !='' && is_array($sid)){
 				$bill = Script::scriptSave($sid);
 				BuildFun::Bfun($sid['function'],$bill);
-				$urls= unit::gconfig('url');
 				$action = $urls['api'].'?act=script&sid='.$sid['sid'];
 				echo "<script language='javascript'>alert('Success,脚本生成成功！'); location.assign('".$action."');</script>";exit;
 			}
@@ -60,7 +60,7 @@ class Control{
 			$info = Design::find($sid);
 			if($info['s_design']<>2){
 				$action = $urls['api'].'?act=ui&sid='.$sid;
-				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); location.assign('".$action."');</script>";
+				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); </script>";
 				exit;
 			}
 			$json = View::ver($sid);
@@ -131,7 +131,12 @@ class Control{
 				'title' =>$list['title'],
 				'load_file' =>$list['field']['load_file'],
 			];
-			return view(ROOT_PATH.'/index.html',['config'=>$config,'list'=>$list['list']]);
+			if(unit::gconfig('return_mode')==1){
+				return view(ROOT_PATH.'/index.html',['config'=>$config,'list'=>$list['list']]);
+				}else{
+				return ['config'=>$config,'list'=>$list['list']];
+			}
+			
 		}
 		if($act =='GetData'){
 			$map = SfdpUnit::Bsearch($data);
@@ -141,12 +146,22 @@ class Control{
 				$list['list'][$k]['url'] = '<a onClick=commonfun.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
 				$jsondata[$k] = array_values($list['list'][$k]);
 			}
-			return json(['data'=>$jsondata]);
+			if(unit::gconfig('return_mode')==1){
+				return json(['data'=>$jsondata]);
+				}else{
+				return ['data'=>$jsondata,'list'=>$list];
+			}
+			
 			
 		}
 		if($act=='view'){
 			$info = Data::getViewData($sid,$data);
-			return view(ROOT_PATH.'/view.html',['info'=>$info['info']]);
+			if(unit::gconfig('return_mode')==1){
+				return view(ROOT_PATH.'/view.html',['info'=>$info['info']]);
+				}else{
+				return ['info'=>$info['info']];
+			}
+			
 		}
 		if($act =='add'){
 			if($data !=''){
@@ -159,7 +174,11 @@ class Control{
 				'fun' =>$data['fun'],
 				'load_file' =>$data['load_file'],
 			];
-			return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
+			if(unit::gconfig('return_mode')==1){
+				return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
+				}else{
+				return ['config'=>$config,'data'=>$data['info']['s_field']];
+			}
 		}
 	}
 	static function fapi($post){

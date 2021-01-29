@@ -26,17 +26,20 @@ define('ROOT_PATH',dirname(dirname(__DIR__) . DIRECTORY_SEPARATOR, 1) . DIRECTOR
 class Api
 {
 	public $topconfig = '';
-	function __construct() {
+	function __construct($sid='') {
 		$ginfo = unit::getuserinfo();
 		if($ginfo==-1){
 			echo 'Access Error!';exit;
 		}
-		$sid = input('sid') ?? 0;
+		if($sid==''){
+			$sid = input('sid');
+		}
+		
 		$this->topconfig = 
 		'<script>
 		var g_uid='.$ginfo['uid'].';
 		var g_role='.$ginfo['role'].';
-		var g_username='.$ginfo['username'].';
+		var g_username="'.$ginfo['username'].'";
 		var g_sid='.$sid.';
 		</script>';
    }
