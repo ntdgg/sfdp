@@ -30,6 +30,7 @@ class lib{
 			$Node = unit::gconfig('node_data');
 		}
 		$node_url =$urls['api'].'?act=node';
+		$create_url =$urls['api'].'?act=create';
 		
 		foreach($data as $k=>$v){
 		   $status = ['未锁定','已锁定'];
@@ -50,7 +51,7 @@ class lib{
 		<body>
 		<div class="page-container">
 			<div style='float: left;width:8%'>
-				<a onClick='commonfun.Askshow("{:url("sfdp/sfdpApi",["act"=>"create"])}","是否创建新表单？")' class="button">创建</a><hr/><a onclick="location.reload();" class="button ">刷新</a>
+				<a onClick='commonfun.Askshow("{$create_url}","是否创建新表单？")' class="button">创建</a><hr/><a onclick="location.reload();" class="button ">刷新</a>
 			</div>
 			<div style='float: left;width:92%'>
 				<table class="table" >

@@ -34,7 +34,7 @@ class AdapteeData{
 	}
 	function select($table,$map=[],$field='',$page=1,$limit=10){
 		$offset = ($page-1)*$limit;  
-		$list = Db::name($table)->where($map)->limit($offset,$limit)->order('id desc')->select()->toarray();
+		$list = Db::name($table)->where($map)->limit($offset,$limit)->field('id,'.$field)->order('id desc')->select()->toarray();
 		$count = Db::name($table)->where($map)->count();
 		return ['data'=>$list,'count'=>$count];
 	}

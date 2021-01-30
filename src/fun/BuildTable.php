@@ -60,12 +60,15 @@ class BuildTable{
         $sql_create = "CREATE TABLE `{$tableName}` (\n"
             . implode(",\n", array_merge($fieldAttr, $key))
             . "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$table}'";
-        try {
-            Common::execute($sql_drop);
-            Common::execute($sql_create);
-        } catch (\Exception $e) {
-            throw new Exception($e->getMessage());
-        }
+        
+        $ret = Common::execute($sql_drop);
+		if($ret['code']==-1){
+			return ['msg'=>'<h2>系统级错误：'.$ret['msg'].'</h2>','code'=>-1];
+		}
+        $ret2 = Common::execute($sql_create);
+       if($ret2['code']==-1){
+			return ['msg'=>'<h2>系统级错误：'.$ret2['msg'].'</h2>','code'=>-1];
+		}
 		return ['info'=>'创建成功！','code'=>0];
     }
 	static function hasDbbak($table){

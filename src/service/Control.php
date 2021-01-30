@@ -43,8 +43,6 @@ class Control{
 		if($act =='desc'){
 			 $info = Design::find($sid);
 			 return lib::desc($info['s_field'],$info['id'],$info['s_look']);
-			 
-			 return view(ROOT_PATH.'/sfdp_desc.html',['json'=>$info['s_field'],'fid'=>$info['id'],'look'=>$info['s_look']]);
 		}
 		if($act =='script'){
 			if($sid !='' && is_array($sid)){
@@ -90,8 +88,13 @@ class Control{
 			 }
 			//添加并返回
 			$tablefield = View::verAdd($sid);
-			$ret = BuildTable::Btable($json['name_db'],$tablefield['db']);
-			 Design::saveDesc(['s_db_bak'=>1,'s_design'=>2,'id'=>$sid],'update');
+			$ret2 = BuildTable::Btable($json['name_db'],$tablefield['db']);
+			if($ret2['code']==-1){
+				return json($ret2);
+			}
+			
+			$ret = Design::saveDesc(['s_db_bak'=>1,'s_design'=>2,'id'=>$sid],'update');
+			
 			return json(['code'=>0]);
 		}
 		if($act=='fun_save'){
@@ -108,7 +111,8 @@ class Control{
 			if(!class_exists($className)){
 				return 'Sorry,未找到node_action类，请先配置~';
 			}
-			$Node = (new $className())->SaveNode(Design::descVerTodata($sid['sid']),$sid['node']);//获取目录节点信息	
+			$ver = Design::findVerWhere([['status','=',1],['sid','=',$sid['sid']]]);//取得版本ID
+			$Node = (new $className())->SaveNode(Design::descVerTodata($ver['id']),$sid['node']);//获取目录节点信息	
 			if($Node['code']==0){
 				return json(['code'=>0]);
 			}else{
@@ -160,6 +164,26 @@ class Control{
 				return ['info'=>$info['info']];
 			}
 			
+		}
+		if($act =='edit'){
+			if($data !=''){
+				Data::add($sid,$data);
+				return json(['code'=>0]);
+			}
+			
+			$data = Data::getViewData($sid,1);
+			dump($data);
+			
+			$config = [
+				'g_js'=>$g_js,
+				'fun' =>$data['fun'],
+				'load_file' =>$data['load_file'],
+			];
+			if(unit::gconfig('return_mode')==1){
+				return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
+				}else{
+				return ['config'=>$config,'data'=>$data['info']['s_field']];
+			}
 		}
 		if($act =='add'){
 			if($data !=''){

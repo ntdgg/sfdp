@@ -17,10 +17,21 @@ use think\facade\Db;
 class AdapteeCommon{
 
 	function query($sql){
-		return Db::query($sql);
+		try{
+			$data = Db::query($sql);
+			return ['code'=>0,'msg'=>$data];
+		}catch(\Exception $e){
+			return ['code'=>-1,'msg'=>'SQL_Err:'.$sql];
+		}
 	}
 	function execute($sql){
-		return Db::execute($sql);
+		try{
+			$data = Db::execute($sql);
+			return ['code'=>0,'msg'=>$data];
+		}catch(\Exception $e){
+			return ['code'=>-1,'msg'=>'SQL_Err:'.$sql];
+		}
+		
 	}
 	
 	

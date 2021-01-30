@@ -75,7 +75,7 @@ class Api
 	  * @param string $act 调用接口方法
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
-	public function sfdpCurd($act='index',$sid=''){
+	public function sfdpCurd($act='index',$sid='',$bid=''){
 		if($act=='index'){
 			$data = input('post.');
 			return Control::curd($act,$sid,$data,$this->topconfig);
@@ -88,8 +88,16 @@ class Api
                return Control::curd($act,$sid,'',$this->topconfig);
 			 }
 		}
+		if($act=='edit'){
+			if (unit::is_post()) {
+				$data = input('post.');
+				return Control::curd($act,$sid,$data,$this->topconfig);
+			 }else{
+               return Control::curd($act,$sid,'',$this->topconfig);
+			 }
+		}
 		if($act=='view'){
-			return Control::curd($act,$sid,input('bid'));
+			return Control::curd($act,$sid,$bid);
 		}
 		if($act=='GetData'){
 			$data = input('post.');
