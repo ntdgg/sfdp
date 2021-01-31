@@ -33,11 +33,23 @@ class Functions{
     {
 		return (new Functions())->mode->findWhere($map);
     }
-	public static function functionSave($data){
-		$map[] = ['fun_name','=',$data['name']];
+	static function update($data)
+    {
+		return (new Functions())->mode->update($data);
+    }
+	public static function save($data){
+		if(!isset($data['id'])){
+			$map[] = ['fun_name','=',$data['name']];
+		}else{
+			$map[] = [['fun_name','=',$data['name']],['id','<>',$data['id']]];
+		}
 		$hasname = self::findWhere($map);
 		if($hasname){
 			return json(['code'=>1,'msg'=>'禁止函数名称重复！']);
+		}
+		$retFun = Common::query($data['fun']);
+		if($retFun['code']==-1){
+			return json($retFun);
 		}
 		if(!isset($data['id'])){
 			$ver = [

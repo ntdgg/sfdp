@@ -34,16 +34,17 @@ class lib{
 		
 		foreach($data as $k=>$v){
 		   $status = ['未锁定','已锁定'];
-		   $btn = '<a onClick=commonfun.openfullpage("设计——'.$k['s_bill'].'","'.$urls['api'].'?act=desc&sid='.$v['id'].'") class="button">设计</a><a onClick=commonfun.openfullpage("元素管理——'.$k['s_bill'].'","'.$urls['api'].'?act=ui&sid='.$v['id'].'") class="button">元素</a>';
+		   $status_zt = [1=>'未部署',2=>'已部署'];
+		   $btn = '<a onClick=commonfun.openfullpage("设计——'.$v['s_bill'].'","'.$urls['api'].'?act=desc&sid='.$v['id'].'") class="button">设计</a><a onClick=commonfun.openfullpage("元素管理——'.$v['s_bill'].'","'.$urls['api'].'?act=ui&sid='.$v['id'].'") class="button">元素</a>';
 		   if($v['s_field'] <> 1){
 			   $fix = $urls['api'].'?act=fix&sid='.$v['id'];
-			   $btn .= '<a onClick=commonfun.Askshow("'.$fix.'","部署后将生成最新版本,确定是否执行?") class="button">部署</a><a onClick=commonfun.openfullpage("脚本管理——'.$k['s_bill'].'","'.$urls['api'].'?act=script&sid='.$v['id'].'") class="button">脚本</a>';
+			   $btn .= '<a onClick=commonfun.Askshow("'.$fix.'","部署后将生成最新版本,确定是否执行?") class="button">部署</a><a onClick=commonfun.openfullpage("脚本管理——'.$v['s_bill'].'","'.$urls['api'].'?act=script&sid='.$v['id'].'") class="button">脚本</a><a onClick=commonfun.openfullpage("定义管理——'.$v['s_bill'].'","'.$urls['api'].'?act=custom&sid='.$v['id'].'") class="button">定义</a>';
 		   }
 		   if($v['s_db_bak']==1){
 			   $btn .='<a onClick=commonfun.Askshow("'.$urls['api'].'?act=deldb&sid='.$v['id'].'","删除备份数据库,是否执行?")  class="button">DelDb</a>';
 			   $btn .='<a onClick=add_fun('.$v['id'].')  class="button">Menu</a>';
 		   }
-		   $tr .='<tr class="text-c"><td>'.$v['s_bill'].'</td><td>'.$v['s_title'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$k['s_design'].'</td><td>'.$status[$v['s_look']].'（'.$k['s_db'].'）</td><td>'.$btn.'</td></tr>';	
+		   $tr .='<tr class="text-c"><td>'.$v['s_bill'].'</td><td>'.$v['s_title'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$status_zt[$v['s_design']].'</td><td>'.$status[$v['s_look']].'（'.$v['s_db'].'）</td><td>'.$btn.'</td></tr>';	
 		}
 		return <<<php
 		{$tmp['css']}{$tmp['head']}{$tmp['js']}
@@ -95,7 +96,12 @@ php;
 		$fun_save = $urls['api'].'?act=fun_save&sid=';
 		foreach($data as $k=>$v){
 		   $status = ['编辑中','已启用'];
-		   $tr .='<tr class="text-c"><td>'.$v['bill'].'</td><td>'.$v['title'].'</td><td>'.$k['fun_name'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$k['add_user'].'</td><td>'.$status[$v['status']].'</td><td><a onClick=add_fun("'.$v['title'].'","'.$v['fun_name'].'","'.$v['function'].'","'.$v['id'].'")	class="button">编辑</a></td></tr>';	
+		   if($v['status']==0){
+			   $btn ='<a onClick=commonfun.Askshow("'.$urls['api'].'?act=fun_update&status=1&id='.$v['id'].'","是否启用,是否执行?")  class="button">启用</a>';
+			}else{
+			   $btn ='<a onClick=commonfun.Askshow("'.$urls['api'].'?act=fun_update&status=0&id='.$v['id'].'","是否禁用,是否执行?")  class="button" style="    background-color: indianred;">禁用</a>';
+		   }
+		   $tr .='<tr class="text-c"><td>'.$v['bill'].'</td><td>'.$v['title'].'</td><td>'.$v['fun_name'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$v['add_user'].'</td><td>'.$status[$v['status']].'</td><td><input id="fun_'.$v['fun_name'].'" value="'.$v['function'].'" type=hidden><a onClick=add_fun("'.$v['title'].'","'.$v['fun_name'].'","'.$v['id'].'")	class="button">编辑</a>'.$btn.'</td></tr>';	
 		}
 		return <<<php
 		{$tmp['css']}{$tmp['head']}{$tmp['js']}
@@ -113,14 +119,15 @@ php;
 </body>
 </html>
 <script>
-function add_fun(title='',name='',fun='',id=''){
+function add_fun(title='',name='',id=''){
+	var fun = $('#fun_'+name).val() ?? '';
 	var html ='<form action="" method="post" name="form" id="form">'+
 			  '<table class=table id="table_view"><tr><td>函数标题</td><td style="text-align:left"><input type="text" id="title" value="'+title+'"></td></tr>'+
 			  '<tr><td>函数名称</td><td style="text-align:left"><input type="text" id="name" value="'+name+'"></td></tr>'+
-			  '<tr><td>填写函数</td><td><textarea placeholder="请填写SQL代码！" id="fun" type="text/plain" style="width:100%;height:100px;">'+fun+'</textarea></td></tr><tr><td colspan=2><a class="button" onclick="save_fun('+id+')">提交</a></td></tr></table></form>';
+			  '<tr><td>填写函数</td><td><textarea placeholder="请填写SQL代码！" id="fun" type="text/plain" style="width:100%;height:280px;">'+fun+'</textarea></td></tr><tr><td colspan=2><a class="button" onclick="save_fun('+id+')">提交</a></td></tr></table></form>';
 		layer.open({
 		  type: 1,
-		  area: ['520px', '340px'], //宽高
+		  area: ['620px', '540px'], //宽高
 		  content: html
 		});
 }
@@ -156,6 +163,78 @@ public static function ui($data){
 	</html>
 php;
 }
+public static function custom($sid,$list,$listtrue){
+	$patch = unit::gconfig('static_url');
+	$urls= unit::gconfig('url');
+	$fun_save = $urls['api'].'?act=customSave&sid='.$sid;
+	return <<<php
+  <link rel="stylesheet" href="{$patch}css/sfdp.common.css" />
+  <style>
+  #sortable1, #sortable2 {
+    border: 1px solid #eee;
+    min-height: 20px;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    margin-right: 10px;
+	display:inline-block;
+  }
+  .ui-state-highlight{
+	 border: 1px solid #dad55e;
+    background: #fffa90;
+    color: #777620;
+  }
+  .ui-state-default{
+	  border: 1px solid #c5c5c5;
+    background: #f6f6f6;
+    font-weight: normal;
+    color: #454545;
+  }
+  #sortable1 li, #sortable2 li {
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    font-size: 1.2em;
+    width: 120px;
+	float:left;
+  }
+  </style>
+  <script src="{$patch}lib/jquery-1.12.4.js"></script>
+  <script src="{$patch}lib/jquery-ui.js"></script>
+	<script src="{$patch}lib/layer/2.4/layer.js"></script>
+	<script src="{$patch}sfdp.commonfun.js"></script>
+  <script>
+  $( function() {
+    $( "#sortable1, #sortable2" ).sortable({
+      connectWith: ".connectedSortable",
+	  cancel:".cancel_me"
+    }).disableSelection();
+  } );
+  	function abc(){
+		var sortid = [];
+		$( "#sortable2 li" ).each( function (i){
+			sortid. push($(this).attr("data-id"));
+		});
+		var url = "{$fun_save}";
+		commonfun.sAjax(url,{sid:{$sid},data:sortid});
+	}
+  </script>
+</head>
+<body>
+ <table>
+ <tr><td colspan=2><b>列表排序规则<b> <a onclick='abc()'  class='btn'>保存数据</a></td></tr>
+ <tr><td style="width: 80px;">规则设置</td><td>
+ <input name="" value='id desc'>
+ </td></tr>
+  <tr><td colspan=2><b>列表布局设置<b> <a onclick='abc()' class='btn'>保存数据</a></td></tr>
+ <tr><td style="width: 80px;">设计字段</td><td><ul id="sortable1" class="connectedSortable">{$listtrue}</ul></td></tr>
+  <tr><td>列表排序</td><td><ul id="sortable2" class="connectedSortable">{$list}</ul></td></tr>
+ </table>
+</body>
+</html>
+php;
+}
+
+
 public static function desc($json,$fid,$look){
 	$patch = unit::gconfig('static_url');
 	$urls= unit::gconfig('url');
@@ -251,11 +330,8 @@ var look_db = {$look};
 	<script src="{$patch}lib/jquery-1.12.4.js"></script>
 	<script src="{$patch}lib/jquery-ui.js"></script>
 	<script src="{$patch}lib/layer/2.4/layer.js"></script>
-	<script src="{$patch}js/sfdp.fun.js"></script>
-	<script src="{$patch}js/sfdp.unit.js"></script>
+	<script src="{$patch}sfdp.commonfun.js"></script>
 	<script src="{$patch}sfdp.5.0.js"></script>
-	<script src="{$patch}js/sfdp.view.js"></script>
-	<script src="{$patch}js/sfdp.field.js"></script>
    <script>
    
   $( function() {
@@ -336,8 +412,8 @@ php;
 		$css = '<link rel="stylesheet" href="'.$patch.'css/sfdp.common.css" /><link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.5.0.css" />';
 		$js = '<script src="'.$patch.'lib/jquery-1.12.4.js"></script>
 		<script src="'.$patch.'lib/layer/2.4/layer.js"></script>
-		<script src="'.$patch.'js/sfdp.fun.js"></script>';
-		$head ='<title>'.$title.'</title><head>'.$css.'</head><body>';
+		<script src="'.$patch.'sfdp.commonfun.js"></script><script type="text/javascript" src="'.$patch.'multiselect2side.js" ></script>';
+		$head ='<title>'.$title.'</title><head>'.$css.'</head><body style="    background-color: white;">';
 		return ['head'=>$head,'css'=>$css,'js'=>$js];
 	}
 	

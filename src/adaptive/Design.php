@@ -62,9 +62,13 @@ class Design{
     {
 		return (new Design())->mode->insertVer($data);
     }
-	static function updateVerWhere($data)
+	static function updateVer($data)
     {
-		return (new Design())->mode->updateVerWhere($data);
+		return (new Design())->mode->updateVer($data);
+    }
+	static function updateVerWhere($map,$data)
+    {
+		return (new Design())->mode->updateVerWhere($map,$data);
     }
 	static function findVerWhere($data)
     {
@@ -148,6 +152,10 @@ class Design{
 							}
 						}
 						$v2['tpfd_data'] = $tpfd_data;
+					}else{
+						if(isset($v2['tpfd_data'])){
+							$tpfd_data = $v2['tpfd_data'];
+						}
 					}
 					if(($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
 						$fieldArr[$v2['tpfd_db']]=$v2['tpfd_data'];

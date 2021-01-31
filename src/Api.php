@@ -57,7 +57,7 @@ class Api
 			$data = ['sid'=>$sid,'node'=>$node];
 			return Control::api($act,$data);
 		}
-		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb'){
+		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb' || $act=='custom' || $act=='customSave'){
 			if (unit::is_post()) {
 				$data = input('post.');
 				return Control::api($act,$data);
@@ -69,6 +69,13 @@ class Api
 			$data = input('post.');
 			return Control::api($act,$data);
 		}
+		if($act=='fun_update'){
+			$data = ['id'=>input('id'),'status'=>input('status')];;
+			return Control::api($act,$data);
+		}
+		
+		
+		
 	}
 	/**
 	  * Sfdp 5.0统一接口流程审批接口
@@ -93,7 +100,7 @@ class Api
 				$data = input('post.');
 				return Control::curd($act,$sid,$data,$this->topconfig);
 			 }else{
-               return Control::curd($act,$sid,'',$this->topconfig);
+               return Control::curd($act,$sid,'',$this->topconfig,$bid);
 			 }
 		}
 		if($act=='view'){

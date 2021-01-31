@@ -40,7 +40,6 @@ class Data{
 	}
 	static function getListData($sid,$map,$page=1,$limit=10){
 		$jsondata = Design::descVerTodata($sid);
-		
 		$list = (new Data())->mode->select($jsondata['db_name'],$map,$jsondata['field'],$page,$limit);
 		$json = $list['data'];
 		foreach ($json as $k => $v) {
@@ -50,12 +49,79 @@ class Data{
 		}
 		return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
 	}
+	static function getEditData($sid,$bid){
+		$data = Design::getAddData($sid);
+		$sfdp_ver_info = Design::findVer($sid);
+		$field = json_decode($sfdp_ver_info['s_field'],true);
+		$find = (new Data())->mode->find($field['name_db'],$bid);
+		foreach($field['list'] as $k=>$v){
+				foreach($v['data'] as $k2=>$v2){
+					if(isset($v2['xx_type']) && $v2['xx_type']==1){
+						//函数名转为数据信息
+						$map[] = ['fun_name','=',$v2['checkboxes_func']];
+						$getFun = Functions::findWhere($map);
+						if(!$getFun){
+							echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+						}
+						$getData = Common::query($getFun['function']);
+						if($getData['code']==-1){
+							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
+						}else{
+							$tpfd_data = [];
+							foreach($getData['msg'] as $k3=>$v3){
+								$tpfd_data[$v3['id']] = $v3['name'];
+							}
+						}
+						$v2['tpfd_data'] = $tpfd_data;
+					}else{
+						if(isset($v2['tpfd_data'])){
+							$tpfd_data = $v2['tpfd_data'];
+						}
+					}
+					if($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
+						$value_arr = explode(",",$find[$v2['tpfd_db']]);
+						$fiedsver = '';
+						foreach($value_arr as $v3){
+							$fiedsver .=$v2['tpfd_data'][$v3].',';
+						}
+						$field['list'][$k]['data'][$k2]['tpfd_data'] = $tpfd_data;
+						$field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
+					}else{
+						$field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
+					}
+					
+				}
+		}
+		return ['info'=>json_encode($field),'data'=>$data];
+	}
 	static function getViewData($sid,$bid){
 		$sfdp_ver_info = Design::findVer($sid);
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		$find = (new Data())->mode->find($field['name_db'],$bid);
 		foreach($field['list'] as $k=>$v){
 				foreach($v['data'] as $k2=>$v2){
+					if(isset($v2['xx_type']) && $v2['xx_type']==1){
+						//函数名转为数据信息
+						$map[] = ['fun_name','=',$v2['checkboxes_func']];
+						$getFun = Functions::findWhere($map);
+						if(!$getFun){
+							echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+						}
+						$getData = Common::query($getFun['function']);
+						if($getData['code']==-1){
+							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
+						}else{
+							$tpfd_data = [];
+							foreach($getData['msg'] as $k3=>$v3){
+								$tpfd_data[$v3['id']] = $v3['name'];
+							}
+						}
+						$v2['tpfd_data'] = $tpfd_data;
+					}else{
+						if(isset($v2['tpfd_data'])){
+							$tpfd_data = $v2['tpfd_data'];
+						}
+					}
 					if($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
 						$value_arr = explode(",",$find[$v2['tpfd_db']]);
 						$fiedsver = '';

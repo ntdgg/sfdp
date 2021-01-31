@@ -57,7 +57,6 @@ class Control{
 		if($act =='ui'){
 			$info = Design::find($sid);
 			if($info['s_design']<>2){
-				$action = $urls['api'].'?act=ui&sid='.$sid;
 				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); </script>";
 				exit;
 			}
@@ -98,8 +97,15 @@ class Control{
 			return json(['code'=>0]);
 		}
 		if($act=='fun_save'){
-			return Functions::functionSave($sid);
-			
+			return Functions::save($sid);
+		}
+		if($act=='fun_update'){
+			$ret =  Functions::update($sid);
+			if($ret){
+				return json(['code'=>0,'msg'=>'操作成功！']);
+			}else{
+				return json(['code'=>-1,'msg'=>'更新出错']);
+			}
 		}
 		if($act=='create'){
 			$id = Design::saveDesc('','create');
@@ -120,9 +126,44 @@ class Control{
 			}
 			
 		}
+		if($act =='customSave'){
+			$ret = View::SaveVer($sid['sid'],$sid['data']);
+			if($ret){
+				return json(['code'=>0,'msg'=>'保存成功']);
+			}else{
+				return json(['code'=>1,'msg'=>'保存失败']);
+			}
+		}
+		if($act =='custom'){
+			$info = Design::find($sid);
+			if($info['s_design']<>2){
+				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); </script>";
+				exit;
+			}
+			$json = View::ver($sid);
+			$listtrue ='';
+			$list = '';
+			  foreach($json['db'] as $k=>$v){
+				  if($v['tpfd_list']=='yes'){
+					  $list .=  '<li class="ui-state-default" data-id="'.$v['tpfd_id'].'">'.$v['tpfd_db'].'('.$v['tpfd_name'].')</li>'; 
+				  }else{
+					  $listtrue  .= ' <li class="ui-state-highlight " data-id="'.$v['tpfd_id'].'">'.$v['tpfd_db'].'('.$v['tpfd_name'].')</li>'; 
+				  }
+			  }
+			
+			
+			
+			
+			
+			
+		//	dump($json);
+			return lib::custom($sid,$list,$listtrue);
+		}
+		
+		
         return $act.'参数出错';
 	}
-	static function curd($act,$sid='',$data='',$g_js=''){
+	static function curd($act,$sid,$data='',$g_js='',$bid=''){
 		
 		if($act =='index'){
 			$map = SfdpUnit::Bsearch($data);
@@ -171,18 +212,17 @@ class Control{
 				return json(['code'=>0]);
 			}
 			
-			$data = Data::getViewData($sid,1);
-			dump($data);
-			
+			$data = Data::getEditData($sid,$bid);
+			$viewdata = $data['data'];
 			$config = [
 				'g_js'=>$g_js,
-				'fun' =>$data['fun'],
-				'load_file' =>$data['load_file'],
+				'fun' =>$viewdata['fun'],
+				'load_file' =>$viewdata['load_file'],
 			];
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
 				}else{
-				return ['config'=>$config,'data'=>$data['info']['s_field']];
+				return ['config'=>$config,'data'=>$data['info']];
 			}
 		}
 		if($act =='add'){

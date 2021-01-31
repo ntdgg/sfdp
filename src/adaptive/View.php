@@ -28,6 +28,27 @@ class View{
 		}
 		return ['db'=>$data_ver_db];
 	}
+	public static function SaveVer($sid,$data){
+		$json = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
+		$field = json_decode($json['s_field'],true);
+		$new_list =[];
+		foreach($field['list'] as $k=>$v){
+			foreach($v['data'] as $k2=>$v2){
+				if(in_array($v2['tpfd_id'],$data)){
+					$field['list'][$k]['data'][$k2]['tpfd_list'] ='yes';
+					$new_list[] = $v2;
+				}else{
+					$field['list'][$k]['data'][$k2]['tpfd_list'] ='no';
+				}
+			}
+		}
+		$s_field = json_encode($field);//排序后的新列表字段数据
+		$s_list =json_encode($new_list);
+		return Design::updateVer(['id'=>$json['id'],'s_field'=>$s_field,'s_list'=>$s_list]);
+	}
+	
+	
+	
 	public static function verAdd($sid){
 		$info = Design::find($sid);
 		$json = Design::getDesignJson($sid);
