@@ -210,6 +210,7 @@ class Control{
 				'g_js'=>$g_js,
 				'fun' =>$viewdata['fun'],
 				'load_file' =>$viewdata['load_file'],
+				'upload_file'=>unit::gconfig('upload_file')
 			];
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
@@ -227,6 +228,7 @@ class Control{
 				'g_js'=>$g_js,
 				'fun' =>$data['fun'],
 				'load_file' =>$data['load_file'],
+				'upload_file'=>unit::gconfig('upload_file')
 			];
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
