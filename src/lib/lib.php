@@ -31,14 +31,13 @@ class lib{
 		}
 		$node_url =$urls['api'].'?act=node';
 		$create_url =$urls['api'].'?act=create';
-		
 		foreach($data as $k=>$v){
 		   $status = ['未锁定','已锁定'];
-		   $status_zt = [1=>'未部署',2=>'已部署'];
-		   $btn = '<a onClick=commonfun.openfullpage("设计——'.$v['s_bill'].'","'.$urls['api'].'?act=desc&sid='.$v['id'].'") class="button">设计</a><a onClick=commonfun.openfullpage("元素管理——'.$v['s_bill'].'","'.$urls['api'].'?act=ui&sid='.$v['id'].'") class="button">元素</a>';
+		   $status_zt = [0=>'未部署',1=>'未部署',2=>'已部署'];
+		   $btn = '<a onClick=commonfun.openfullpage("设计——'.$v['s_bill'].'","'.$urls['api'].'?act=desc&sid='.$v['id'].'") class="button">设计</a>';
 		   if($v['s_field'] <> 1){
 			   $fix = $urls['api'].'?act=fix&sid='.$v['id'];
-			   $btn .= '<a onClick=commonfun.Askshow("'.$fix.'","部署后将生成最新版本,确定是否执行?") class="button">部署</a><a onClick=commonfun.openfullpage("脚本管理——'.$v['s_bill'].'","'.$urls['api'].'?act=script&sid='.$v['id'].'") class="button">脚本</a><a onClick=commonfun.openfullpage("定义管理——'.$v['s_bill'].'","'.$urls['api'].'?act=custom&sid='.$v['id'].'") class="button">定义</a>';
+			   $btn .= '<a onClick=commonfun.openfullpage("元素管理——'.$v['s_bill'].'","'.$urls['api'].'?act=ui&sid='.$v['id'].'") class="button">元素</a> <a onClick=commonfun.Askshow("'.$fix.'","部署后将生成最新版本,确定是否执行?") class="button">部署</a><a onClick=commonfun.openfullpage("脚本管理——'.$v['s_bill'].'","'.$urls['api'].'?act=script&sid='.$v['id'].'") class="button">脚本</a><a onClick=commonfun.openfullpage("定义管理——'.$v['s_bill'].'","'.$urls['api'].'?act=custom&sid='.$v['id'].'") class="button">定义</a>';
 		   }
 		   if($v['s_db_bak']==1){
 			   $btn .='<a onClick=commonfun.Askshow("'.$urls['api'].'?act=deldb&sid='.$v['id'].'","删除备份数据库,是否执行?")  class="button">DelDb</a>';
@@ -47,14 +46,14 @@ class lib{
 		   $tr .='<tr class="text-c"><td>'.$v['s_bill'].'</td><td>'.$v['s_title'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$status_zt[$v['s_design']].'</td><td>'.$status[$v['s_look']].'（'.$v['s_db'].'）</td><td>'.$btn.'</td></tr>';	
 		}
 		return <<<php
-		{$tmp['css']}{$tmp['head']}{$tmp['js']}
+		{$tmp['head']}{$tmp['js']}
 			</head>
 		<body>
 		<div class="page-container">
-			<div style='float: left;width:8%'>
+			<div style='float: left;width:5%'>
 				<a onClick='commonfun.Askshow("{$create_url}","是否创建新表单？")' class="button">创建</a><hr/><a onclick="location.reload();" class="button ">刷新</a>
 			</div>
-			<div style='float: left;width:92%'>
+			<div style='float: left;width:95%'>
 				<table class="table" >
 					<tr class="text-c"><th >编码</th><th>标题</th><th>发布时间</th><th>启用状态</th><th>锁定状态</th><th>操作</th></tr>
 					{$tr}
@@ -82,7 +81,6 @@ class lib{
 			}
 			var url = "{$node_url}&sid="+sid+"&node="+node;
 			commonfun.Askshow(url,"再次确认是否创建目录，,是否执行?");
-			
 		}
 		</script>
 		</body>
@@ -168,7 +166,7 @@ public static function custom($sid,$list,$listtrue){
 	$urls= unit::gconfig('url');
 	$fun_save = $urls['api'].'?act=customSave&sid='.$sid;
 	return <<<php
-  <link rel="stylesheet" href="{$patch}css/sfdp.common.css" />
+  <link rel="stylesheet" href="{$patch}sfdp.5.0.css" />
   <style>
   #sortable1, #sortable2 {
     border: 1px solid #eee;
@@ -221,11 +219,11 @@ public static function custom($sid,$list,$listtrue){
 </head>
 <body>
  <table>
- <tr><td colspan=2><b>列表排序规则<b> <a onclick='abc()'  class='btn'>保存数据</a></td></tr>
+ <tr><td colspan=2><b>列表排序规则<b> <a onclick='abc()'  class='button'>保存数据</a></td></tr>
  <tr><td style="width: 80px;">规则设置</td><td>
  <input name="" value='id desc'>
  </td></tr>
-  <tr><td colspan=2><b>列表布局设置<b> <a onclick='abc()' class='btn'>保存数据</a></td></tr>
+  <tr><td colspan=2><b>列表布局设置<b> <a onclick='abc()' class='button'>保存数据</a></td></tr>
  <tr><td style="width: 80px;">设计字段</td><td><ul id="sortable1" class="connectedSortable">{$listtrue}</ul></td></tr>
   <tr><td>列表排序</td><td><ul id="sortable2" class="connectedSortable">{$list}</ul></td></tr>
  </table>
@@ -241,9 +239,8 @@ public static function desc($json,$fid,$look){
 	$save = $urls['api'].'?act=save';
 	return <<<php
 
- <body> 
-  <link rel="stylesheet" href="{$patch}css/sfdp.desc.css" /> 
-  <link rel="stylesheet" href="{$patch}css/sfdp.common.css" /> 
+ <body style="background-color: #d6d3d3"> 
+  <link rel="stylesheet" href="{$patch}sfdp.5.0.css" /> 
    <div class="fb-main"> 
     <ul style="list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;display: block;">
      <li><h3>SFDP 超级表单开发平台—V5.0</h3></li>
@@ -409,11 +406,11 @@ php;
 	  **/
 	static function commontmp($title){
 		$patch = unit::gconfig('static_url');
-		$css = '<link rel="stylesheet" href="'.$patch.'css/sfdp.common.css" /><link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.5.0.css" />';
+		$css = '<link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.5.0.css" />';
 		$js = '<script src="'.$patch.'lib/jquery-1.12.4.js"></script>
 		<script src="'.$patch.'lib/layer/2.4/layer.js"></script>
-		<script src="'.$patch.'sfdp.commonfun.js"></script><script type="text/javascript" src="'.$patch.'multiselect2side.js" ></script>';
-		$head ='<title>'.$title.'</title><head>'.$css.'</head><body style="    background-color: white;">';
+		<script src="'.$patch.'sfdp.commonfun.js"></script>';
+		$head ='<title>'.$title.'</title><head>'.$css.'</head><body style="background-color: white;">';
 		return ['head'=>$head,'css'=>$css,'js'=>$js];
 	}
 	

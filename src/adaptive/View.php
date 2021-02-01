@@ -26,7 +26,7 @@ class View{
 				}
 			}
 		}
-		return ['db'=>$data_ver_db];
+		return ['db'=>$data_ver_db,'all'=>$json['s_field']];
 	}
 	public static function SaveVer($sid,$data){
 		$json = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);

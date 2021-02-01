@@ -22,10 +22,10 @@ class BuildTable{
 	/**
      * 创建数据表
      */
-    static function Btable($table,$data)
+    static function Btable($table,$data,$btn)
     {
 		if (in_array($table, unit::gconfig('black_table'))) {
-			return ['info'=>'该数据表不允许创建','code'=>1];
+			return ['msg'=>'该数据表不允许创建','code'=>1];
         }
         $tableName = unit::gconfig('int_db_prefix') . $table;
         $tableExist = false;// 判断表是否存在
@@ -55,12 +55,21 @@ class BuildTable{
 		$fieldAttr[] = unit::tab(1) . "`status` int(10)  DEFAULT '0' COMMENT '审核状态'";
 		$fieldAttr[] = unit::tab(1) . "`create_time` int(10)  DEFAULT '0' COMMENT '新增时间'";
 		$fieldAttr[] = unit::tab(1) . "`update_time` int(10)  DEFAULT '0' COMMENT '更新时间'";
+		if((in_array('WorkFlow',$btn)) || (in_array('Status',$btn))){
+			$fieldAttr[] = unit::tab(1) . "`uptime` int(10)  DEFAULT '0' COMMENT '工作流调用更新时间'";
+		}
 		$fieldAttr[] = unit::tab(1) . "PRIMARY KEY (`id`)";
         $sql_drop = "DROP TABLE IF EXISTS `{$tableName}`";//删除数据表
-        $sql_create = "CREATE TABLE `{$tableName}` (\n"
-            . implode(",\n", array_merge($fieldAttr, $key))
-            . "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$table}'";
-        
+		if((in_array('WorkFlow',$btn)) || (in_array('Status',$btn))){
+			$sql_create = "CREATE TABLE `{$tableName}` (\n"
+				. implode(",\n", array_merge($fieldAttr, $key))
+				. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '[work]{$table}'";
+        }else{
+			$sql_create = "CREATE TABLE `{$tableName}` (\n"
+				. implode(",\n", array_merge($fieldAttr, $key))
+				. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$table}'";
+			
+		}
         $ret = Common::execute($sql_drop);
 		if($ret['code']==-1){
 			return ['msg'=>'<h2>系统级错误：'.$ret['msg'].'</h2>','code'=>-1];
@@ -69,7 +78,7 @@ class BuildTable{
        if($ret2['code']==-1){
 			return ['msg'=>'<h2>系统级错误：'.$ret2['msg'].'</h2>','code'=>-1];
 		}
-		return ['info'=>'创建成功！','code'=>0];
+		return ['msg'=>'创建成功！','code'=>0];
     }
 	static function hasDbbak($table){
         $tableName = unit::gconfig('int_db_prefix') . $table;

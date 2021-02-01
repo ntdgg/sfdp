@@ -87,7 +87,8 @@ class Control{
 			 }
 			//添加并返回
 			$tablefield = View::verAdd($sid);
-			$ret2 = BuildTable::Btable($json['name_db'],$tablefield['db']);
+			$all = json_decode($tablefield['all'],true);
+			$ret2 = BuildTable::Btable($json['name_db'],$tablefield['db'],$all['tpfd_btn']);
 			if($ret2['code']==-1){
 				return json($ret2);
 			}
@@ -150,17 +151,8 @@ class Control{
 					  $listtrue  .= ' <li class="ui-state-highlight " data-id="'.$v['tpfd_id'].'">'.$v['tpfd_db'].'('.$v['tpfd_name'].')</li>'; 
 				  }
 			  }
-			
-			
-			
-			
-			
-			
-		//	dump($json);
 			return lib::custom($sid,$list,$listtrue);
 		}
-		
-		
         return $act.'参数出错';
 	}
 	static function curd($act,$sid,$data='',$g_js='',$bid=''){
@@ -179,7 +171,7 @@ class Control{
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/index.html',['config'=>$config,'list'=>$list['list']]);
 				}else{
-				return ['config'=>$config,'list'=>$list['list']];
+				return ['config'=>$config,'list'=>$list['list'],'btn'=>$list['field']['btn']];
 			}
 			
 		}
