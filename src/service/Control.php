@@ -88,7 +88,7 @@ class Control{
 			//添加并返回
 			$tablefield = View::verAdd($sid);
 			$all = json_decode($tablefield['all'],true);
-			$ret2 = BuildTable::Btable($json['name_db'],$tablefield['db'],$all['tpfd_btn']);
+			$ret2 = BuildTable::Btable($json['name_db'],$tablefield['db'],$all['tpfd_btn'],$all['name']);
 			if($ret2['code']==-1){
 				return json($ret2);
 			}

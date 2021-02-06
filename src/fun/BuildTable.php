@@ -22,7 +22,7 @@ class BuildTable{
 	/**
      * 创建数据表
      */
-    static function Btable($table,$data,$btn)
+    static function Btable($table,$data,$btn,$name)
     {
 		if (in_array($table, unit::gconfig('black_table'))) {
 			return ['msg'=>'该数据表不允许创建','code'=>1];
@@ -60,10 +60,11 @@ class BuildTable{
 		}
 		$fieldAttr[] = unit::tab(1) . "PRIMARY KEY (`id`)";
         $sql_drop = "DROP TABLE IF EXISTS `{$tableName}`";//删除数据表
-		if((in_array('WorkFlow',$btn)) || (in_array('Status',$btn))){
+		
+		if((in_array('WorkFlow',$btn))){
 			$sql_create = "CREATE TABLE `{$tableName}` (\n"
 				. implode(",\n", array_merge($fieldAttr, $key))
-				. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '[work]{$table}'";
+				. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '[work]{$name}'";
         }else{
 			$sql_create = "CREATE TABLE `{$tableName}` (\n"
 				. implode(",\n", array_merge($fieldAttr, $key))
