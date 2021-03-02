@@ -18,9 +18,8 @@
 <script type="text/javascript" src="__LIB__/layer/2.4/layer.js"></script>
 <script type="text/javascript" src="__HUI__/js/H-ui.min.js"></script>
 <script type="text/javascript" src="__HUIADMIN__/js/H-ui.admin.js"></script>
-<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
-<script type="text/javascript" src="__HUIADMIN__/common.js"></script>
-<script type="text/javascript" src="__LIB__/laydate5.0.9/laydate.js"></script>
+<script type="text/javascript" src="__SFDP__/lib/Validform/5.3.2/Validform.min.js"></script>
+<script type="text/javascript" src="__SFDP__/lib/laydate5.0.9/laydate.js"></script>
 <script type="text/javascript" src="__SFDP__/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
 
 {$config.load_file.css|raw}
@@ -38,46 +37,122 @@ input,select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;borde
  <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
 <div class="text-l">
-	<span class="l">
-		<a href="javascript:;" onclick="layer_show('新增','{:url('index/sfdp/sfdpCurd',['act'=>'add','sid'=>$config.sid])}','850','500')" class="btn btn-primary radius">新增</a>
-	</span>
+	
 	<form action="" method="post" name="form" id="form">
 	<input type="hidden" readonly name="search" value="{$config['search']}">
 	<span class=" ml-5">
 	<span id='search'></span>
-	
+	<a  class="btn btn-success radius"   id='searchsubmit'><i class="Hui-iconfont">&#xe665;</i> 查询</a>
 	</span>
 	</form>
+	<div class="cl pd-5 bg-1 bk-gray"> 
+				<span class="l">
+					{$btn|raw}
+				</span>  
+			</div>
+			<table id='table_id' class="table table-border table-bordered table-bg">
+			<thead>
+			<tr class="text-c">
+				<th width="25"><input type="checkbox"></th>
+				{volist name='config.field' id='k'}
+				<th>{$k}</th>
+				{/volist}
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+			</thead>
+			</table>
 </div>
 
 </div>
 
-<table id='table_id' class='table table-border table-bordered table-bg table-hover table-sort'>
-<thead>
-<tr class="text-c">
-	<th width="25"><input type="checkbox"></th>
-	{volist name='config.field' id='k'}
-	<th>{$k}</th>
-	{/volist}
-	<th>操作</th>
-</tr>
-</thead>
-</table>
 </body>
 </html>
-	<script src="__SFDP__/js/sfdp.view.js"></script>
-	<script src="__SFDP__/js/sfdp.field.js"></script>
-	<script src="__SFDP__/js/sfdp.fun.js"></script> 
+<script src="__SFDP__/sfdp.commonfun.js"></script>
 <script>
   $( function() {
-		showlist({$config['search']|raw});
-	
-$("#table_id").dataTable({
-			deferRender: true,
-			bFilter: false,    //去掉搜索框方法三：这种方法可以
+	commonfun.showlist({$config['search']|raw});
+	var dataTable = $('#table_id').DataTable( {
+		deferRender: true,
+		bFilter: false,    //去掉搜索框方法三：这种方法可以
         bLengthChange: false,   //去掉每页显示多少条数据方法
-			ajax : "{:url('index/sfdp/sfdpCurd',['act'=>'GetData','sid'=>$config.sid])}",	
-            paging: true,//开启分页
- 　　});
+        processing: true,
+		order: [],
+        serverSide: true,
+		ordering: false,
+		ajax: function (data, callback, settings) {
+                //封装请求参数
+                var param = {};
+                param.limit = data.length;
+                param.start = data.start;
+				param.page = (data.start / data.length)+1;
+                param.draw = data.draw;			
+				var searchdata = {};
+				var search = $('#searchform').serializeArray();
+				$.each(search, function() {
+					searchdata[this.name] = this.value;
+				});
+				if(searchdata != {}){
+					param.search = searchdata;
+				}
+                $.ajax({
+                    type: "post",
+                    url: "{:url('index/sfdp/sfdpCurd',['act'=>'GetData','sid'=>$config.sid])}",
+                    cache: false,  //禁用缓存
+                    data: param,  //传入组装的参数
+                    dataType: "json",
+                    success: function (result) {
+						callback(result);
+                    }
+                });
+		},
+    });
+    $("#searchsubmit").bind("click", function () { //按钮 点击事件触发table重新请求服务器
+	  $("#table_id").dataTable().fnDraw(false);
+	});
  });
 </script>
+<script type="text/javascript">
+/*修改功能*/
+function edit(sid){
+	var Param =  getParam();
+	if(!Param){
+		return  false;
+	}
+	var id = Param[0];
+	var status = Param[1];
+	var table = Param[2];
+	if(status==1 || status==2 ){
+		layer.msg('流程审批中，或者已被审批通过~~');
+		return  false;
+	}
+	layer_show("修改","{:url('index/sfdp/sfdpCurd',['act'=>'edit','sid'=>$config.sid])}&bid="+id,"850","500");
+}
+
+function del(sid){
+	var Param =  getParam();
+	if(!Param){
+		return  false;
+	}
+	var id = Param[0];
+	var status = Param[1];
+	var table = Param[2];
+	if(status==1 || status==2 ){
+		layer.msg('流程审批中，或者已被审批通过~~');
+		return  false;
+	}
+	commonfun.Askshow("{:url('index/sfdp/sfdpCurd',['act'=>'del','sid'=>$config.sid])}&bid="+id,"删除须谨慎，确认要删除吗?")
+}
+/*参数获取*/
+function getParam(){
+	if ($("input[name='ids']:checked").length > 1) {
+		 layer.msg('只能选择一个哟~~');
+		return  false;
+   }
+	var val=$("input:checkbox:checked").val();
+	if(val==''||val==undefined){
+		layer.msg('请选择您要操作的单据~~');return  false;
+	}
+	return val.split('/');
+}
+</script> 

@@ -46,9 +46,6 @@ class View{
 		$s_list =json_encode($new_list);
 		return Design::updateVer(['id'=>$json['id'],'s_field'=>$s_field,'s_list'=>$s_list]);
 	}
-	
-	
-	
 	public static function verAdd($sid){
 		$info = Design::find($sid);
 		$json = Design::getDesignJson($sid);

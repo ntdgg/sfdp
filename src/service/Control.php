@@ -30,7 +30,6 @@ class Control{
 	
 	static function api($act,$sid=''){
 		$urls= unit::gconfig('url');
-		//获取流程信息
 		if($act =='list'){
 			$list = Design::select();
 			return lib::index($list);
@@ -51,7 +50,6 @@ class Control{
 				$action = $urls['api'].'?act=script&sid='.$sid['sid'];
 				echo "<script language='javascript'>alert('Success,脚本生成成功！'); location.assign('".$action."');</script>";exit;
 			}
-			
 			return lib::script(Script::script($sid),$sid);
 		}
 		if($act =='ui'){
@@ -85,16 +83,13 @@ class Control{
 				Design::saveDesc(['s_db_bak'=>1,'id'=>$sid],'update');
 				 return json($ret);
 			 }
-			//添加并返回
 			$tablefield = View::verAdd($sid);
 			$all = json_decode($tablefield['all'],true);
 			$ret2 = BuildTable::Btable($json['name_db'],$tablefield['db'],$all['tpfd_btn'],$all['name']);
 			if($ret2['code']==-1){
 				return json($ret2);
 			}
-			
 			$ret = Design::saveDesc(['s_db_bak'=>1,'s_design'=>2,'id'=>$sid],'update');
-			
 			return json(['code'=>0]);
 		}
 		if($act=='fun_save'){
@@ -113,7 +108,6 @@ class Control{
 			return json(['code'=>0]);
 		}
 		if($act=='node'){
-			
 			$className = unit::gconfig('node_action');
 			if(!class_exists($className)){
 				return 'Sorry,未找到node_action类，请先配置~';
@@ -125,7 +119,6 @@ class Control{
 			}else{
 				return json(['code'=>1,'msg'=>$Node['msg']]);
 			}
-			
 		}
 		if($act =='customSave'){
 			$ret = View::SaveVer($sid['sid'],$sid['data']);
@@ -155,6 +148,23 @@ class Control{
 		}
         return $act.'参数出错';
 	}
+	/**
+	 *获取按钮数据
+	 */
+	static function btnArray($btnArray,$sid){
+       $btns ='';
+	    if((in_array('add',$btnArray))){
+			$url = url('index/sfdp/sfdpCurd',['act'=>'add','sid'=>$sid]);
+			$btns .= '<a class="btn btn-primary radius" onclick=layer_show("新增","'.$url.'","850","500") ><i class="Hui-iconfont-add Hui-iconfont"></i> 新增</a> ';
+		}
+	   if((in_array('Edit',$btnArray))){
+			$btns .= '<a onClick="edit('.$sid.')" class="btn btn-success radius"><i class="Hui-iconfont Hui-iconfont-edit"></i>修改</a> ';
+		}
+	   if(in_array('Del',$btnArray)){
+			$btns .= ' <a onClick="del('.$sid.')"	class="btn btn-danger radius"><i class="Hui-iconfont Hui-iconfont-del3"></i>删除</a> ';
+		}
+	   return $btns;
+    }
 	static function curd($act,$sid,$data='',$g_js='',$bid=''){
 		
 		if($act =='index'){
@@ -168,23 +178,34 @@ class Control{
 				'title' =>$list['title'],
 				'load_file' =>$list['field']['load_file'],
 			];
+			$btns = self::btnArray($list['field']['btn'],$sid);
 			if(unit::gconfig('return_mode')==1){
-				return view(ROOT_PATH.'/index.html',['config'=>$config,'list'=>$list['list']]);
+				return view(ROOT_PATH.'/index.html',['btn'=>$btns,'config'=>$config,'list'=>$list['list']]);
 				}else{
 				return ['config'=>$config,'list'=>$list['list'],'btn'=>$list['field']['btn']];
 			}
-			
 		}
+		
 		if($act =='GetData'){
 			$map = SfdpUnit::Bsearch($data);
 			$list = Data::getListData($sid,$map,$data['page'],$data['limit']);
 			$jsondata = [];
+			$btnArray = $list['field']['btn'];
+			$tablename = $list['field']['db_name'];
+			$stv = [
+				-1=>'<span class="label label-danger radius" >退回修改</span>',0=>'<span class="label radius">保存中</span>',1=>'<span class="label radius" >流程中</span>',2=>'<span class="label label-success radius" >审核通过</span>'
+			];
 			foreach($list['list'] as $k=>$v){
+				
+				$list['list'][$k]['id'] = '<input type="checkbox" value="'.$v['id'].'/'.$v['status'].'/'.$tablename.'" name="ids">';
+				
+				$list['list'][$k]['status'] =   $stv[$v['status']] ?? 'ERR';
 				$list['list'][$k]['url'] = '<a onClick=commonfun.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
 				$jsondata[$k] = array_values($list['list'][$k]);
 			}
 			if(unit::gconfig('return_mode')==1){
-				return json(['data'=>$jsondata,'count'=>$list['count']]);
+				
+				return json(['data'=>$jsondata,'recordsFiltered'=>$list['count'],'recordsTotal'=>$list['count']]);
 				}else{
 				return ['data'=>$jsondata,'list'=>$list,'count'=>$list['count']];
 			}
@@ -200,7 +221,7 @@ class Control{
 		}
 		if($act =='edit'){
 			if($data !=''){
-				Data::add($sid,$data);
+				Data::edit($sid,$data,$bid);
 				return json(['code'=>0]);
 			}
 			
@@ -213,10 +234,14 @@ class Control{
 				'upload_file'=>unit::gconfig('upload_file')
 			];
 			if(unit::gconfig('return_mode')==1){
-				return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
+				return view(ROOT_PATH.'/edit.html',['showtype'=>'edit','config'=>$config,'data'=>$data['info']]);
 				}else{
 				return ['config'=>$config,'data'=>$data['info']];
 			}
+		}
+		if($act =='del'){	
+			Data::del($sid,$bid);
+			return json(['code'=>0]);	
 		}
 		if($act =='add'){
 			if($data !=''){
@@ -231,7 +256,7 @@ class Control{
 				'upload_file'=>unit::gconfig('upload_file')
 			];
 			if(unit::gconfig('return_mode')==1){
-				return view(ROOT_PATH.'/edit.html',['config'=>$config,'data'=>$data['info']['s_field']]);
+				return view(ROOT_PATH.'/edit.html',['showtype'=>'add','config'=>$config,'data'=>$data['info']['s_field']]);
 				}else{
 				return ['config'=>$config,'data'=>$data['info']['s_field']];
 			}

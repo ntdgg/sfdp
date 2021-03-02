@@ -24,6 +24,22 @@ class AdapteeData{
 			return  false;
 		}
 	}
+	function edit($table,$data,$id){
+		$info = Db::name($table)->where('id',$id)->update($data);
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
+	function del($table,$id){
+		$info = Db::name($table)->delete($id);
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
 	function find($table,$id){
 		$info = Db::name($table)->find($id);
 		if($info){

@@ -38,6 +38,22 @@ class Data{
 		unset($data['tpfd_check']);
 		return (new Data())->mode->add($table,$data);		
 	}
+	static function del($sid,$id){
+		$sfdp_ver_info = Design::findVer($sid);
+		$table = $sfdp_ver_info['s_db'];
+		return (new Data())->mode->del($table,$id);		
+	}
+	static function edit($sid,$data,$id){
+		foreach($data as $k=>$v){
+			if(is_array($v)){
+				$data[$k] = implode(",", $v);
+			}
+		}
+		$table = $data['name_db'];
+		unset($data['name_db']);
+		unset($data['tpfd_check']);
+		return (new Data())->mode->edit($table,$data,$id);		
+	}
 	static function getListData($sid,$map,$page=1,$limit=10){
 		$jsondata = Design::descVerTodata($sid);
 		$list = (new Data())->mode->select($jsondata['db_name'],$map,$jsondata['field'],$page,$limit);

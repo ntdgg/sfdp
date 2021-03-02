@@ -73,9 +73,6 @@ class Api
 			$data = ['id'=>input('id'),'status'=>input('status')];;
 			return Control::api($act,$data);
 		}
-		
-		
-		
 	}
 	/**
 	  * Sfdp 5.0统一接口流程审批接口
@@ -98,13 +95,16 @@ class Api
 		if($act=='edit'){
 			if (unit::is_post()) {
 				$data = input('post.');
-				return Control::curd($act,$sid,$data,$this->topconfig);
+				return Control::curd($act,$sid,$data,$this->topconfig,$bid);
 			 }else{
                return Control::curd($act,$sid,'',$this->topconfig,$bid);
 			 }
 		}
 		if($act=='view'){
 			return Control::curd($act,$sid,$bid);
+		}
+		if($act=='del'){		
+             return Control::curd($act,$sid,'',$this->topconfig,$bid);
 		}
 		if($act=='GetData'){
 			$data = input('post.');
