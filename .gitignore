@@ -1,0 +1,5 @@
+/.idea
+/.vscode
+/runtime
+*.log
+/vendor/guoguo/sfdp/.git
