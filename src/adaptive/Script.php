@@ -25,9 +25,15 @@ class Script{
 		}
 		$this->mode = new $className();
     }
+	/**
+	 * 脚本查询
+	 */
 	public static function script($sid){
 		return (new Script())->mode->findWhere([['sid','=',$sid]]);
 	}
+	/**
+	 * 脚本保存
+	 */
 	public static function scriptSave($data){
 		$info = self::script($data['sid']);
 		if(!$info){

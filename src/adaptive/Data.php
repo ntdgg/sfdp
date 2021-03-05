@@ -27,6 +27,9 @@ class Data{
 		}
 		$this->mode = new $className();
     }
+	/**
+	 * 添加
+	 */
 	static function add($sid,$data){
 		foreach($data as $k=>$v){
 			if(is_array($v)){
@@ -38,11 +41,17 @@ class Data{
 		unset($data['tpfd_check']);
 		return (new Data())->mode->add($table,$data);		
 	}
+	/**
+	 * 删除
+	 */
 	static function del($sid,$id){
 		$sfdp_ver_info = Design::findVer($sid);
 		$table = $sfdp_ver_info['s_db'];
 		return (new Data())->mode->del($table,$id);		
 	}
+	/**
+	 * 编辑修改
+	 */
 	static function edit($sid,$data,$id){
 		foreach($data as $k=>$v){
 			if(is_array($v)){
@@ -54,6 +63,9 @@ class Data{
 		unset($data['tpfd_check']);
 		return (new Data())->mode->edit($table,$data,$id);		
 	}
+	/**
+	 * 获取列表数据
+	 */
 	static function getListData($sid,$map,$page=1,$limit=10){
 		$jsondata = Design::descVerTodata($sid);
 		$list = (new Data())->mode->select($jsondata['db_name'],$map,$jsondata['field'],$page,$limit);
@@ -65,6 +77,9 @@ class Data{
 		}
 		return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
 	}
+	/**
+	 * 修改编辑
+	 */
 	static function getEditData($sid,$bid){
 		$data = Design::getAddData($sid);
 		$sfdp_ver_info = Design::findVer($sid);
@@ -110,6 +125,9 @@ class Data{
 		}
 		return ['info'=>json_encode($field),'data'=>$data];
 	}
+	/**
+	 * 获取数据方法
+	 */
 	static function getViewData($sid,$bid){
 		$sfdp_ver_info = Design::findVer($sid);
 		$field = json_decode($sfdp_ver_info['s_field'],true);

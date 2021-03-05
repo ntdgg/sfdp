@@ -58,18 +58,30 @@ class Design{
 			return  false;
 		}
 	}
+	/**
+	 * 插入版本
+	 */
 	static function insertVer($data)
     {
 		return (new Design())->mode->insertVer($data);
     }
+	/**
+	 * 更新版本
+	 */
 	static function updateVer($data)
     {
 		return (new Design())->mode->updateVer($data);
     }
+	/**
+	 * 更新版本
+	 */
 	static function updateVerWhere($map,$data)
     {
 		return (new Design())->mode->updateVerWhere($map,$data);
     }
+	/**
+	 * 查询方法
+	 */
 	static function findVerWhere($data)
     {
 		return (new Design())->mode->findVerWhere($data);
@@ -168,6 +180,9 @@ class Design{
 		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
 		return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
 	}
+	/**
+	 * 获取数据
+	 */
 	static function getAddData($sid){
 		$sfdp_ver_info = (new Design())->mode->findVer($sid);
 		
@@ -203,7 +218,9 @@ class Design{
 		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
 		return ['info'=>$sfdp_ver_info,'fun'=>$fun,'load_file'=>$load_file];
 	}
-	
+	/**
+	 * 设计保存
+	 */
 	static function saveDesc($data,$type='save'){
 		if($type=='save'){
 			$search = [];

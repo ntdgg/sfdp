@@ -1,7 +1,7 @@
 <?php
 /**
  *+------------------
- * SFDP-超级表单开发平台V3.0
+ * SFDP-超级表单开发平台V5.0
  *+------------------
  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
  *+------------------
@@ -23,7 +23,7 @@ return [
 		'api'=>"/index/sfdp/sfdpApi.html",
 	],
 	'return_mode' => 1,//1、系统模式  2、二次开发模式
-	'node_mode' => 2,//模式
+	'node_mode' => 1,//模式
 	'node_data'=>[
 		'html'=>'<option value="1">首页</option><option value="2">后台</option>',
 	],//黑名单表，防止重复

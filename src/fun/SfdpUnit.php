@@ -29,6 +29,9 @@ class SfdpUnit{
 		}
 		return $menu_html;
     }
+	/**
+	 * 构件查询条件
+	 */
 	public static function Bsearch($search){
 		$map =[];
 		if(isset($search['search']) && count($search)<>0){
@@ -42,7 +45,9 @@ class SfdpUnit{
 		}
 		return $map;
 	}
-	
+	/**
+	 * 加载文件
+	 */
 	public static function Loadfile($db_name,$css,$js){
 		$js_str = '';
 		if($js!=''){

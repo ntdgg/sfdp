@@ -72,9 +72,16 @@ class unit{
 	 * @param string $key 键值
 	 */
 	public static function gconfig($key) {
-		$ret =require ( dirname(dirname(__DIR__) . DIRECTORY_SEPARATOR, 4) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'sfdp.php');
+		$file = dirname(dirname(__DIR__) . DIRECTORY_SEPARATOR, 4) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'sfdp.php';
+		if(!file_exists($file)){
+			echo 'sorry,config no find!';exit;
+		}
+		$ret =require($file);
 		return $ret[$key] ?? '';
 	}
+	
+	
+	
 	static function tab($step = 1, $string = ' ', $size = 4)
 	{
 		return str_repeat($string, $size * $step);

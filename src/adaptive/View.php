@@ -16,6 +16,9 @@ use sfdp\lib\unit;
 
 class View{
 	
+	/**
+	 * 版本号
+	 */
 	public static function ver($sid){
 		$json = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
 		$field = json_decode($json['s_field'],true);
@@ -28,6 +31,9 @@ class View{
 		}
 		return ['db'=>$data_ver_db,'all'=>$json['s_field']];
 	}
+	/**
+	 * 保存版本
+	 */
 	public static function SaveVer($sid,$data){
 		$json = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
 		$field = json_decode($json['s_field'],true);
@@ -46,6 +52,9 @@ class View{
 		$s_list =json_encode($new_list);
 		return Design::updateVer(['id'=>$json['id'],'s_field'=>$s_field,'s_list'=>$s_list]);
 	}
+	/**
+	 * 添加版本
+	 */
 	public static function verAdd($sid){
 		$info = Design::find($sid);
 		$json = Design::getDesignJson($sid);

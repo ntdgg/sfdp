@@ -26,10 +26,18 @@ class Common{
 		}
 		$this->mode = new $className();
     }
+	/**
+	 * 查询语句
+	 * @param query $sql sql语句
+	 */
 	static function query($sql)
     {
 		return (new Common())->mode->query($sql);
     }
+	/**
+	 * 查询语句
+	 * @param query $sql sql语句
+	 */
 	static function execute($sql)
     {
 		return (new Common())->mode->execute($sql);

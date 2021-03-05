@@ -81,6 +81,9 @@ class BuildTable{
 		}
 		return ['msg'=>'创建成功！','code'=>0];
     }
+	/**
+	 * 检查是否备份
+	 */
 	static function hasDbbak($table){
         $tableName = unit::gconfig('int_db_prefix') . $table;
 		$ret_bak = Common::query("SHOW TABLES LIKE '{$tableName}_bak'");
@@ -88,6 +91,9 @@ class BuildTable{
 			return ['code'=>1,'msg'=>'备份数据表已经存在，请先删除！'];
 		}
 	}
+	/**
+	 * 删除备份
+	 */
 	static function delDbbak($table){
         $tableName = unit::gconfig('int_db_prefix') . $table;
 		$ret_bak = Common::query("SHOW TABLES LIKE '{$tableName}_bak'");

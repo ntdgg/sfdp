@@ -25,18 +25,30 @@ class Functions{
 		}
 		$this->mode = new $className();
     }
+	/**
+	 * 选择
+	 */
 	static function select($map=[],$order='id desc')
     {
 		return (new Functions())->mode->select($map,$order);
     }
+	/**
+	 * 查询
+	 */
 	static function findWhere($map)
     {
 		return (new Functions())->mode->findWhere($map);
     }
+	/**
+	 * 更新
+	 */
 	static function update($data)
     {
 		return (new Functions())->mode->update($data);
     }
+	/**
+	 * 函数方法
+	 */
 	public static function save($data){
 		if(!isset($data['id'])){
 			$map[] = ['fun_name','=',$data['name']];
