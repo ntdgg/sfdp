@@ -1,14 +1,28 @@
-# 欢迎使用SFDP5.0超级表单开发平台
+# Sfdp V5.0正式版
 
-**SFDP5.0是一个快速构建表单的插件平台**
+**欢迎使用 Sfdp 超级表单开发平台**
+
+*   Sfdp通过可视化的业务单据设计，可以完整的构建一套业务逻辑系统。 
+*   Sfdp通过脚本、函数的支持，在逻辑实现更加简洁、可用。 
 
 
-![SFDP Logo](http://sfdp.cojz8.com/logo.png "SFDP Logo")
+### 交流群
 
+交流群①：532797225  （已满）
 
-SFDP5.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个版本的迭代更新，发布全新重构的表单设计开发一体的平台。
+交流群②：778657302
 
-在线交流QQ群：855626871
+Vip交流群：1062040103  加群条件：[申请加群](https://www.cojz8.com/article/148 "加群条件") 
+
+### 演示及产品推荐
+
+Gadmin企业级开发平台：  [传送门](https://gadmin8.com "Demo") 包含在线演示模块 测试账号：test 123456
+
+* Gadmin V3.0.0 企业级极速开发平台，
+* 深耕OA、ERP的开发经验，整合TPFLOW、SFDP，
+* 企业级授权机制，
+* 企业级的日志管理平台，
+* 企业级的BI自定义开发系统
 
 ----
 ### 作者相关开源软件
@@ -50,13 +64,12 @@ SFDP5.0 前身是TPFD基于Thinkphp开发的可视化表单插件，经过三个
 
 ### 相关链接
 ---
-> QQ交流群：855626871
 
 > 官方博客：https://www.cojz8.com/
 
 > 演示站点：http://sfdp.cojz8.com/   
 
-> 开发手册：https://www.kancloud.cn/guowenbin/sfdp `付费文档` 
+> 开发手册：https://gadmin8.com/index/product.html `付费文档` 
 
 
 ---
