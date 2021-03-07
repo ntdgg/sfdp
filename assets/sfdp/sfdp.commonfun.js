@@ -448,9 +448,9 @@ var commonfun = {
 					data.value ='';
 				}
 				if(data.tpfd_upload_type == 1){
-					var html = '<input type="text" name="'+data.tpfd_db+'" readonly id="'+data.tpfd_id+'" value='+data.value+'><span id="drag" style="width:80px;margin-left:5px">'+ '<label id="label_'+data.tpfd_id+'" onclick=commonfun.openpage("多文件上传","'+data.tpfd_upload_action+'?id='+data.tpfd_id+'&value="'+data.value+',{w:"50%",h:"60%"})>附件</label></span>';
+					var html = '<input type="text" name="'+data.tpfd_db+'" readonly id="'+data.tpfd_id+'" value='+data.value+'><span id="drag" style="width:80px;margin-left:5px">'+ '<label id="label_'+data.tpfd_id+'" onclick=commonfun.openpage("多文件上传","'+data.tpfd_upload_action+'?id='+data.tpfd_id+'&value='+data.value+'",{w:"50%",h:"60%"})>附件</label></span>';
 				}else{
-					var html = '<input type="text" name="'+data.tpfd_db+'" readonly id="'+data.tpfd_id+'" value='+data.value+'><span id="drag" style="width:80px;margin-left:5px">'+ '<label id="label_'+data.tpfd_id+'" onclick=commonfun.openpage("文件上传","'+data.tpfd_upload_action+'?id='+data.tpfd_id+'&value="'+data.value+',{w:"18%",h:"25%"})>附件</label></span>';
+					var html = '<input type="text" name="'+data.tpfd_db+'" readonly id="'+data.tpfd_id+'" value='+data.value+'><span id="drag" style="width:80px;margin-left:5px">'+ '<label id="label_'+data.tpfd_id+'" onclick=commonfun.openpage("文件上传","'+data.tpfd_upload_action+'?id='+data.tpfd_id+'&value='+data.value+'",{w:"18%",h:"25%"})>附件</label></span>';
 				}
 			}
 			return html;
@@ -511,20 +511,13 @@ var commonfun = {
 						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
 					break;
 					case 'upload':
-						if(data.tpfd_upload_api==0){
-							/*自带模式*/
-							var html = '<label>下载：</label><span id="drag" style="width:80px;margin-left:5px">'+
-									'<label onclick=commonfun.H5uploadhtml("'+data.tpfd_id+'")><img src="'+commonfun.Ico(2)+'"></label></span>';
-							
-						}else{
-							/*自定义开发模式*/
-							if(data.tpfd_upload_type == 1){
+						/*自定义开发模式*/
+							if(data.tpfd_upload_api == 1){
 								var html = '<label>下载：</label><span id="drag" style="width:80px;margin-left:5px">'+
-							'<label id="label_'+data.tpfd_id+'" onclick=commonfun.openpage("多文件上传","'+data.tpfd_upload_action+'?act=view&id='+data.tpfd_id+'&value="'+data.value+',{w:"50%",h:"60%"})>附件</label></span>';
+							'<label id="label_'+data.tpfd_id+'" onclick=commonfun.openpage("多文件上传","'+data.tpfd_upload_action+'?act=view&id='+data.tpfd_id+'&value='+data.value+'",{w:"50%",h:"60%"})>附件</label></span>';
 							}else{
 								var html = '<label>下载：</label><a target="_blank" href="/'+data.value+'" download="filename"><img src="'+commonfun.Ico(1)+'"></a>';
 							}
-						}
 					break;
 					case 'date':
 						html ='<label>'+data.tpfd_name+'：</label>'+data.value;
@@ -559,11 +552,11 @@ var commonfun = {
 			return html;
 	},
 	 tpfd_xianshi:function(data){
-			return '<tr><td><div>显示类型：</td><td><textarea name="tpfd_moren">'+data.tpfd_moren +'</textarea></td></tr>';
+			return '<br>显示类型：<br><textarea name="tpfd_moren">'+data.tpfd_moren +'</textarea><br>';
         },
     tpfd_date:function(data){
 			var default_data =[{cid:0,clab:'yyyy'},{cid:1,clab:'MM-dd'},{cid:2,clab:'yyyy-MM-dd'},{cid:3,clab:'yyyyMMdd'},{cid:4,clab:'yyyy-MM'}];
-			return '<tr><td>显示类型：</td><td>'+commonfun.tpfd_select(default_data,'xx_type','2') +'</td></tr>';
+			return '<br>显示类型：<br>'+commonfun.tpfd_select(default_data,'xx_type','2') +'<br>';
         },
 	tpfd_checkboxes:function(data,type='checkbox'){
 			if(data.tpfd_data==undefined){
@@ -580,8 +573,8 @@ var commonfun = {
 				}
 				var default_data =JSON.parse(JSON.stringify(datas));
 			}
-            return '<tr><td><div><input '+((data.xx_type) == '0' ? 'checked' : '') +'  name="xx_type" value=0 type="radio">静态：</div></td><td>'+commonfun.tpfd_checkboxes_clss(default_data,type)+
-			'<div></td></tr><tr><td><input '+((data.xx_type) == '1' ? 'checked' : '') +' name="xx_type" value=1 type="radio">动态：</td><td><input name="checkboxes_func" type="text" value="'+((data.checkboxes_func) == '' ? '' : data.checkboxes_func)+'">*方法函数名</div></td></tr>';
+            return '<br><input '+((data.xx_type) == '0' ? 'checked' : '') +'  name="xx_type" value=0 type="radio">静态方法'+commonfun.tpfd_checkboxes_clss(default_data,type)+
+			'<input '+((data.xx_type) == '1' ? 'checked' : '') +' name="xx_type" value=1 type="radio">动态方法<br><input name="checkboxes_func" type="text" value="'+((data.checkboxes_func) == '' ? data.checkboxes_func : '')+'">*函数';
         },
 		tpfd_gaoji:function(data){
 			var default_data =[{cid:0,clab:'是'},{cid:1,clab:'否'}];
@@ -592,24 +585,24 @@ var commonfun = {
 				var tpfd_read = data.tpfd_read;
 				var tpfd_must = data.tpfd_must;
 			}
-			return '<tr><td><div>高级设置</div><div></td><td>只读：'+commonfun.tpfd_select(default_data,'tpfd_read','1')+'必填：'+commonfun.tpfd_select(default_data,'tpfd_must',tpfd_must)+'</div></td></tr>'; 
+			return '<br>字段只读：<br>'+commonfun.tpfd_select(default_data,'tpfd_read','1')+'<br>字段必填：<br>'+commonfun.tpfd_select(default_data,'tpfd_must',tpfd_must)+'<br>'; 
 		},
 		tpfd_moren:function(data){
-			return '<tr><td><div>占位内容：</td><td><input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  </td></tr><tr><td>设置默认：</td><td><input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'"></div></td></tr>';
+			return '<br>占位内容<br><input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'">  <br>默认内容<br><input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'">';
         },
 		tpfd_list:function(data){
-			return '<tr><td>列表组件：</td><td>列表：'+commonfun.tpfd_select('','tpfd_list',data.tpfd_list)+' 查询：'+commonfun.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'</td></tr>';
+			return '<br>列表组件：<br>'+commonfun.tpfd_select('','tpfd_list',data.tpfd_list)+' <br>查询组件：<br>'+commonfun.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'';
         },
 		tpfd_select:function(data,field,value){
 			if(data==''){
-				return '<select name="'+field+'" style="width: 80px"><option value="yes" '+((value) == 'yes' ? 'selected' : '') +'>是</option><option value="no" '+((value) == 'no' ? 'selected' : '') +'>否</option></select>';
+				return '<select name="'+field+'"><option value="yes" '+((value) == 'yes' ? 'selected' : '') +'>是</option><option value="no" '+((value) == 'no' ? 'selected' : '') +'>否</option></select>';
 			}else{
 					var on ='';
 				if(field=='tpfd_dblx'){
 					var on ='onchange=select_type()';
 				}
 				
-				var html ='<select name="'+field+'" style="width: 120px" '+on+'>';
+				var html ='<select name="'+field+'"  '+on+'>';
 				for (x in data){
 					html += '<option value="'+data[x]['cid']+'" '+((data[x]['cid']) == value ? 'selected' : '') +'>'+data[x]['clab']+'</option>';
 				}
@@ -630,7 +623,7 @@ var commonfun = {
 		},
 	tpfd_common:function(data){
 			var default_field = [{cid:'int',clab:'int',checked:''},{cid:'time',clab:'time',checked:''},{cid:'varchar',clab:'varchar',checked:'checked'},{cid:'datetime',clab:'datetime',checked:''},{cid:'longtext',clab:'longtext',checked:''}];
-			return '<div><input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div><tr><td>字段标题：</td><td><input  name="tpfd_name" type="text"  value="'+data.tpfd_name +'"></td></tr><tr><td>数据表段:</td><td><input name="tpfd_db" style="width:160px" type="text" value="'+data.tpfd_db +'"> 类型:'+commonfun.tpfd_select(default_field,'tpfd_dblx','varchar')+' 长度<input style="width:80px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'"></td></tr>'+commonfun.tpfd_list(data) +'</div>';
+			return '<input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'">字段标题:<br/> <input  name="tpfd_name" type="text"  value="'+data.tpfd_name +'"> <br/>字段名称:<br/><input name="tpfd_db" type="text" value="'+data.tpfd_db +'"> <br/>字段类型:<br/>'+commonfun.tpfd_select(default_field,'tpfd_dblx','varchar')+' <br/>字段长度:<br/><input style="width:80px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'">'+commonfun.tpfd_list(data);
         },
 	tpfd_upload:function(data){
 			if(data.tpfd_upload_type=='undefined'){
@@ -656,7 +649,7 @@ var commonfun = {
 	tpfd_return:function(type,data){
 			switch(type) {
 				case 'text':
-					var html = '<table>'+commonfun.tpfd_common(data)+commonfun.tpfd_moren(data)+commonfun.tpfd_gaoji(data)+'</table>';
+					var html = '<div>'+commonfun.tpfd_common(data)+commonfun.tpfd_moren(data)+commonfun.tpfd_gaoji(data)+'</div>';
 					break;
 				case 'checkboxes':
 					var html = '<table>'+commonfun.tpfd_common(data)+commonfun.tpfd_checkboxes(data)+commonfun.tpfd_gaoji(data)+'</table>';

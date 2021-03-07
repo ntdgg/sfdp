@@ -52,15 +52,6 @@ class Control{
 			}
 			return lib::script(Script::script($sid),$sid);
 		}
-		if($act =='ui'){
-			$info = Design::find($sid);
-			if($info['s_design']<>2){
-				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); </script>";
-				exit;
-			}
-			$json = View::ver($sid);
-			return lib::ui($json['db']);
-		}
 		if($act =='save'){
 			return json(Design::saveDesc($sid,'save'));
 		}

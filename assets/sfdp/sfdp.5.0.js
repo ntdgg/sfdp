@@ -18,8 +18,7 @@
 	var NumExp = /^[0-9]*[1-9][0-9]*$/;
 	//日志输出区
 	function logout(info){
-		var szInfo = "<div>[" + commonfun.dateFormat(new Date(), "mm:ss")+'] ' + info+"</div>";
-		$("#logout").html(szInfo + $("#logout").html());
+		console.log(commonfun.dateFormat(new Date(), "mm:ss")+'] ' + info);
 	}
 	//表单构建
 	function addtr(id,old_data='',showtype=''){ 
@@ -135,19 +134,27 @@
 					localStorage.setItem("json_data",JSON.stringify(json_data));
 					$('.tpfd-pop').fadeOut();
 					logout('初始化配置成功！');
-			}else{
-				if(!DbFieldExp.test(params.tpfd_db)){
-					commonfun.ShowTip('　数据表段有误　');
-					return;
-				}
-				if(params.tpfd_name==''){
-					commonfun.ShowTip('　标题不能为空　');
-					return;
-				}
-				fb_set_return(params);
-				commonfun.dataSave(params,params.tr_id,'td_data');
 			}
 		}
+	});
+	$('.data-ok').on('click', function() {
+		var params = commonfun.fromdata($("#dataform")); //将表单序列化为JSON对象 
+		console.log(params.tpfd_db);
+		if(params.tpfd_db==undefined){
+			commonfun.ShowTip('请选择要设置的字段信息~');
+			return;
+		}
+		if(!DbFieldExp.test(params.tpfd_db)){
+			commonfun.ShowTip('　数据表段有误　');
+			return;
+		}
+		if(params.tpfd_name==''){
+			commonfun.ShowTip('　标题不能为空　');
+			return;
+		}
+		fb_set_return(params);
+		commonfun.dataSave(params,params.tr_id,'td_data');
+		commonfun.ShowTip('保存成功！');
 	});
 	//配置项判断
 	function has_item(Item){
@@ -174,14 +181,12 @@
 			if(isInArray(btnArray,'Del')){
 				xDel ='checked';
 			}
-			
 			if(isInArray(btnArray,'Status')){
 				xStatus ='checked';
 			}
 			if(isInArray(btnArray,'WorkFlow')){
 				xWorkFlow ='checked';
 			}
-			
 			var html = '<table><tr><td><div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div></td></tr>'+
 			'<tr><td><div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+' '+((look_db) == '1' ? 'readonly' : '') +' ></div></td></tr>'+
 			'<tr><td><div>设置列表控件：<input  name="tpfd_btn" value=add type="checkbox" checked  onclick="return false;">Add <input  name="tpfd_btn" value=Edit type="checkbox" '+xEdit+' >Edit <input  name="tpfd_btn" value=Del type="checkbox" '+xDel+' >Del <input  name="tpfd_btn" value=View type="checkbox" checked  onclick="return false;">View <input  name="tpfd_btn" value=Status '+xStatus+' type="checkbox">Status <input  name="tpfd_btn" value=WorkFlow type="checkbox" '+xWorkFlow+'>WorkFlow <br/>控件说明：status Workflow同时选中优先使用workflow</td></tr>'+
@@ -196,7 +201,8 @@
 			commonfun.showadd(desc_data,'add',true);
 		}else{
 			$('#showtype').val('other');
-			$('#table').html(fb_set(type,id,parent_code));
+			$('#att').html(fb_set(type,id,parent_code));
+			return;
 		}
 		var layer = $('#pop'),
 			layerwrap = layer.find('.tpfd-wrap');
@@ -256,7 +262,6 @@
 	}
 	//用于初始化设计
 	function int_data(int_data){
-		//var int_data = ;
 		if(int_data==1){
 			var local_data = localStorage.getItem("json_data");
 			if(local_data!=null){

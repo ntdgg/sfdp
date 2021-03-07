@@ -37,7 +37,7 @@ class lib{
 		   $btn = '<a onClick=commonfun.openfullpage("设计——'.$v['s_bill'].'","'.$urls['api'].'?act=desc&sid='.$v['id'].'") class="button">设计</a>';
 		   if($v['s_field'] <> 1){
 			   $fix = $urls['api'].'?act=fix&sid='.$v['id'];
-			   $btn .= '<a onClick=commonfun.openfullpage("元素管理——'.$v['s_bill'].'","'.$urls['api'].'?act=ui&sid='.$v['id'].'") class="button">元素</a> <a onClick=commonfun.Askshow("'.$fix.'","部署后将生成最新版本,确定是否执行?") class="button">部署</a><a onClick=commonfun.openfullpage("脚本管理——'.$v['s_bill'].'","'.$urls['api'].'?act=script&sid='.$v['id'].'") class="button">脚本</a><a onClick=commonfun.openfullpage("定义管理——'.$v['s_bill'].'","'.$urls['api'].'?act=custom&sid='.$v['id'].'") class="button">定义</a>';
+			   $btn .= ' <a onClick=commonfun.Askshow("'.$fix.'","部署后将生成最新版本,确定是否执行?") class="button">部署</a><a onClick=commonfun.openfullpage("脚本管理——'.$v['s_bill'].'","'.$urls['api'].'?act=script&sid='.$v['id'].'") class="button">脚本</a><a onClick=commonfun.openfullpage("定义管理——'.$v['s_bill'].'","'.$urls['api'].'?act=custom&sid='.$v['id'].'") class="button">定义</a>';
 		   }
 		   if($v['s_db_bak']==1){
 			   $btn .='<a onClick=commonfun.Askshow("'.$urls['api'].'?act=deldb&sid='.$v['id'].'","删除备份数据库,是否执行?")  class="button">DelDb</a>';
@@ -144,23 +144,6 @@ function save_fun(id){
 </script>
 php;
 }
-public static function ui($data){
-	$tr ='';
-	$tmp = self::commontmp('Sfdp超级表单设计器');
-	foreach($data as $k=>$v){
-		   $status = ['编辑中','已启用'];
-		   $tr .='<tr valign="top"><td style="width:35px;text-align:left">元素标识：'.$v['tpfd_id'].'<br/>元素名称：'.$v['tpfd_name'].'('.$v['td_type'].')</td><td style="width:330px" >字段名：'.$v['tpfd_db'].'('.$v['tpfd_dblx'].')('.$v['tpfd_dbcd'].') |列表：'.$v['tpfd_list'].' | 查询：'.$v['tpfd_chaxun'].' <br/></td></tr>';	
-		}	
-	return <<<php
-	{$tmp['css']}<div class="page-container"> 
-			<table><tr><td colspan='2' style='width:330px'><pre>元素说明：<br>特别说明：显示设计的所有UI元素</pre></td></tr>
-				{$tr}
-			</table>
-			</div>
-	</body>
-	</html>
-php;
-}
 public static function custom($sid,$list,$listtrue){
 	$patch = unit::gconfig('static_url');
 	$urls= unit::gconfig('url');
@@ -240,10 +223,20 @@ public static function desc($json,$fid,$look){
 	return <<<php
 
  <body style="background-color: #d6d3d3"> 
-  <link rel="stylesheet" href="{$patch}sfdp.5.0.css" /> 
+  <link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=4444" /> 
+  <style>
+  #att input[type=text]{
+    width: auto;
+	padding: 6px 12px;
+}
+select{
+    width: auto;
+	padding: 6px 2px;
+}
+  </style>
    <div class="fb-main"> 
     <ul style="list-style: none;padding: 0 0 0 20px;border-bottom: 1px solid #ccc;display: block;">
-     <li><h3>SFDP 超级表单开发平台—V5.0</h3></li>
+     <li><h3>Sfdp 超级表单开发平台 V5.0</h3></li>
     </ul> 
     <div class="fb-left"> 
      <ul class="fb-ul">
@@ -296,9 +289,12 @@ public static function desc($json,$fid,$look){
     </div> 
     <div class="fb-right"> 
      <ul class="fb-ul">
-      <li class="active">日志输出区 Logs Out</li>
+      <li class="active">字段属性 Field Att <button class="data-ok">保 存</button></li>
      </ul> 
-     <div id="logout" class="logout"></div> 
+		<form id="dataform"> 
+		<div id="att" class="logout active" style='overflow-y:scroll;height:90%'>
+	 </div> 
+	 </form>  
     </div> 
    </div> 
   </div>
@@ -327,8 +323,8 @@ var look_db = {$look};
 	<script src="{$patch}lib/jquery-1.12.4.js"></script>
 	<script src="{$patch}lib/jquery-ui.js"></script>
 	<script src="{$patch}lib/layer/2.4/layer.js"></script>
-	<script src="{$patch}sfdp.commonfun.js"></script>
-	<script src="{$patch}sfdp.5.0.js"></script>
+	<script src="{$patch}sfdp.commonfun.js?v=3333333"></script>
+	<script src="{$patch}sfdp.5.0.js?v=333333"></script>
    <script>
    
   $( function() {
