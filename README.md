@@ -1,4 +1,4 @@
-# Sfdp V5.0正式版
+# Sfdp V5.0.1正式版
 
 **欢迎使用 Sfdp 超级表单开发平台**
 
@@ -33,7 +33,6 @@ Gadmin企业级开发平台：  [传送门](https://gadmin8.com "Demo") 包含�
 > 下载地址：https://gitee.com/ntdgg/tpflow
 
 
-
 ----
 ### 5.0版本主要特性 Characteristic
 
@@ -42,6 +41,15 @@ Gadmin企业级开发平台：  [传送门](https://gadmin8.com "Demo") 包含�
 - 基于JQ UI的元素拖拽  `Draggable`   `Sortable`
 - 元素可移动拖拽设计
 - 界面布局自定义化
+
+#### &hearts; 多权限构建
+
+- 支持多种权限判断过滤
+- 列表权限支持过滤
+
+#### &hearts; 子表关联开发功能
+
+- 全新子表功能
 
 #### &hearts; 动态表单构建器
 
