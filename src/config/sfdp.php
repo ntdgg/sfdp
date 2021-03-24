@@ -1,7 +1,7 @@
 <?php
 /**
  *+------------------
- * SFDP-超级表单开发平台V5.0
+ * SFDP-超级表单开发平台V3.0
  *+------------------
  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
  *+------------------
@@ -9,7 +9,7 @@
  *+------------------
  */
 return [
-	'int_db_prefix'=> 'xadmin_',//定义数据表前缀
+	'int_db_prefix'=> 'wf_',//定义数据表前缀
 	'int_user_name'=> 'username',//定义用户名称
 	'int_user_id'=> 'uid',//定义用户id
 	'int_user_role'=> 'role',//定义用户角色

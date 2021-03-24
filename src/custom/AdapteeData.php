@@ -48,9 +48,25 @@ class AdapteeData{
 			return  false;
 		}
 	}
+	function delSub($table,$id){
+		$info = Db::name($table)->where('d_id',$id)->delete();
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
+	function selectAll($table,$map=[]){
+		return Db::name($table)->where($map)->withoutField('id,d_id,uid,status,create_time,update_time')->select()->toarray();
+	}
 	function select($table,$map=[],$field='',$page=1,$limit=10){
-		$offset = ($page-1)*$limit;  
-		$list = Db::name($table)->where($map)->limit($offset,$limit)->field('id,'.$field.',status,"url",uid,create_time')->order('id desc')->select()->toarray();
+		$offset = ($page-1)*$limit;
+		if($field!=''){
+			$field =','.$field.',';
+		}else{
+			$field =',';
+		}
+		$list = Db::name($table)->where($map)->limit($offset,$limit)->field('id'.$field.'status,"url",uid,create_time')->order('id desc')->select()->toarray();
 		$count = Db::name($table)->where($map)->count();
 		return ['data'=>$list,'count'=>$count];
 	}

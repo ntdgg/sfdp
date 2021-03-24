@@ -28,20 +28,18 @@ class BuildTable{
 			return ['msg'=>'该数据表不允许创建','code'=>1];
         }
         $tableName = unit::gconfig('int_db_prefix') . $table;
-        $tableExist = false;// 判断表是否存在
+        $tableExist = false;
+		// 判断表是否存在,如果存在，就创建个备份数据表
         $ret = Common::query("SHOW TABLES LIKE '{$tableName}'");
-		self::hasDbbak($table);
         if ($ret && isset($ret['msg'][0])) {
             Common::execute("RENAME TABLE {$tableName} to {$tableName}_bak");
             $tableExist = true;
         }
-        $auto_create_field = ['id', 'status', 'create_time', 'update_time'];
-        // 强制建表和不存在原表执行建表操作
+		//内置字段
+        $auto_create_field = ['id','uid','status', 'create_time', 'update_time'];
         $fieldAttr = [];
+		$fieldAttr[] = unit::tab(1) . "`id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键'";
         $key = [];
-        if (in_array('id', $auto_create_field)) {
-            $fieldAttr[] = unit::tab(1) . "`id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键'";
-        }
         foreach ($data as $field) {
             if (!in_array($field['tpfd_db'], $auto_create_field)) {
 				if($field['tpfd_dblx']=='datetime'||$field['tpfd_dblx']=='longtext'){
@@ -68,8 +66,7 @@ class BuildTable{
         }else{
 			$sql_create = "CREATE TABLE `{$tableName}` (\n"
 				. implode(",\n", array_merge($fieldAttr, $key))
-				. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$table}'";
-			
+				. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$name}'";
 		}
         $ret = Common::execute($sql_drop);
 		if($ret['code']==-1){
@@ -86,6 +83,8 @@ class BuildTable{
 		$ret_bak = Common::query("SHOW TABLES LIKE '{$tableName}_bak'");
 		if ($ret_bak && isset($ret_bak['msg'][0])) { 
 			return ['code'=>1,'msg'=>'备份数据表已经存在，请先删除！'];
+		}else{
+			return ['code'=>0,'msg'=>'未找到备份数据表！'];
 		}
 	}
 	static function delDbbak($table){

@@ -79,17 +79,24 @@ class unit{
 		$ret =require($file);
 		return $ret[$key] ?? '';
 	}
-	
-	
-	
+	/**
+	 * 缩进设置
+	 *
+	 * @param string $step 步骤
+	 * @param string $string 字符串
+	 * @param string $size 长度
+	 */
 	static function tab($step = 1, $string = ' ', $size = 4)
 	{
 		return str_repeat($string, $size * $step);
 	}
+	/**
+	 * 根据日期编码生成
+	 *
+	 */
 	static function OrderNumber()
 	{
-		$code = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'H', 'I');
-		return $code[intval(date('Y')) - 2011] . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5);
+		return "D" . date("Ymd").rand(1000,9999);;
 	}
 }
 

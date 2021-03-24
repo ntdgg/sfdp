@@ -93,6 +93,14 @@ class AdapteeDesign{
 	function getDesignVer($status=1){
 		return Db::name('sfdp_design_ver')->where('status',$status)->select();
 	}
+	function insertBtable($data){
+		$info = Db::name('sfdp_btable')->insertGetId($data);
+		if($info){
+			return  $info;
+		}else{
+			return  false;
+		}
+	}
 
 	
 	

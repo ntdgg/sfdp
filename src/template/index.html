@@ -21,7 +21,7 @@
 <script type="text/javascript" src="__SFDP__/lib/Validform/5.3.2/Validform.min.js"></script>
 <script type="text/javascript" src="__SFDP__/lib/laydate5.0.9/laydate.js"></script>
 <script type="text/javascript" src="__SFDP__/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
-
+<link rel="stylesheet" href="__SFDP__/sfdp.5.0.css?v=5.0.1" />
 {$config.load_file.css|raw}
 <style>
 input[type=text], select,textarea {width: 150px;padding: 12px 20px;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}
@@ -38,14 +38,13 @@ input,select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;borde
 <div class="page-container">
 <div class="text-l">
 	
-	<form action="" method="post" name="form" id="form">
-	<input type="hidden" readonly name="search" value="{$config['search']}">
+	<form action="" method="post" name="form" id="searchform">
 	<span class=" ml-5">
 	<span id='search'></span>
 	<a  class="btn btn-success radius"   id='searchsubmit'><i class="Hui-iconfont">&#xe665;</i> 查询</a>
 	</span>
 	</form>
-	<div class="cl pd-5 bg-1 bk-gray"> 
+	<div class="cl pd-5 bg-1 bk-gray mt-5"> 
 				<span class="l">
 					{$btn|raw}
 				</span>  
@@ -68,10 +67,10 @@ input,select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;borde
 
 </body>
 </html>
-<script src="__SFDP__/sfdp.commonfun.js"></script>
+<script src="__SFDP__/sfdp.5.0.js?v=5.0.1"></script>
 <script>
   $( function() {
-	commonfun.showlist({$config['search']|raw});
+	sfdp.showlist2({$config['search']|raw})
 	var dataTable = $('#table_id').DataTable( {
 		deferRender: true,
 		bFilter: false,    //去掉搜索框方法三：这种方法可以
@@ -90,7 +89,17 @@ input,select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;borde
 				var searchdata = {};
 				var search = $('#searchform').serializeArray();
 				$.each(search, function() {
-					searchdata[this.name] = this.value;
+					var dbname = this.name;
+					if(dbname.indexOf("[]") >= 0 ) {
+						var rdbname = dbname.replace("[", "").replace("]", "");
+						if(searchdata[rdbname] == undefined){
+							searchdata[rdbname] = this.value;
+						}else{
+							searchdata[rdbname] = searchdata[rdbname] +',' + this.value;
+						}
+					}else{
+						searchdata[dbname] = this.value;
+					}
 				});
 				if(searchdata != {}){
 					param.search = searchdata;
@@ -141,7 +150,7 @@ function del(sid){
 		layer.msg('流程审批中，或者已被审批通过~~');
 		return  false;
 	}
-	commonfun.Askshow("{:url('index/sfdp/sfdpCurd',['act'=>'del','sid'=>$config.sid])}&bid="+id,"删除须谨慎，确认要删除吗?")
+	sfdp.Askshow("{:url('index/sfdp/sfdpCurd',['act'=>'del','sid'=>$config.sid])}&bid="+id,"删除须谨慎，确认要删除吗?")
 }
 /*参数获取*/
 function getParam(){

@@ -14,7 +14,7 @@
 namespace sfdp\fun;
 
 use sfdp\adaptive\Design;
-
+use sfdp\adaptive\Field;
 
 class SfdpUnit{
 	/**
@@ -32,14 +32,19 @@ class SfdpUnit{
 	/**
 	 * 构件查询条件
 	 */
-	public static function Bsearch($search){
+	public static function Bsearch($search,$sid){
 		$map =[];
-		if(isset($search['search']) && count($search)<>0){
-			
+		if(isset($search['search']) && count($search)<>0){	
 			$search_field = $search['search'];
 			foreach($search_field as $k=>$v){
 				if($v <>''){
-					$map[$k] = ['=',$v];
+					$info = Field::findWhere([['field','=',$k],['sid','=',$sid]]);
+					if($info['search_type']=='like' || $info['search_type']=='not like'){
+						$map[] = [$k,$info['search_type'],'%'.$v.'%'];
+						}else{
+						$map[] = [$k,$info['search_type'],$v];
+					}
+					
 				}
 			}
 		}

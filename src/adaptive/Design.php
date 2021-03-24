@@ -237,9 +237,6 @@ class Design{
 					}
 				}
 			}
-			if(empty($list)){
-				return ['code'=>1,'msg'=>'Sorry,未能找到列表参数'];
-			}
 			$ver = [
 				'id'=>$data['id'],
 				's_title'=>$field['name'],
@@ -267,4 +264,11 @@ class Design{
 			return (new Design())->mode->insert($ver);
 		}
 	}
+	/**
+	 * 插入版本
+	 */
+	static function insertBtable($data)
+    {
+		return (new Design())->mode->insertBtable($data);
+    }
 }

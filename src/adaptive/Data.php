@@ -36,18 +36,76 @@ class Data{
 				$data[$k] = implode(",", $v);
 			}
 		}
+		$data['uid']=unit::getuserinfo('uid');
+		$data['create_time']=time();
 		$table = $data['name_db'];
 		unset($data['name_db']);
 		unset($data['tpfd_check']);
-		return (new Data())->mode->add($table,$data);		
+		$subdata  = json_decode($data['@subdata'],true);
+		unset($data['@subdata']);
+		$did = (new Data())->mode->add($table,$data);
+		if(!$did){
+			return $did;
+		}
+		if(is_array($subdata) && count($subdata)>0 ){
+			$subDatas = [];
+			foreach($subdata as $k=>$v){
+				$keys = array_keys($v);//取出所有
+				$num = count($v[$keys[0]]);//计算下有几列数据
+				//数组转换，将值合并
+				for ($x=0; $x<$num; $x++) {
+					$new[$x] = [];
+				    foreach($keys as $key){
+						//相同顺序的值Push到同个数组
+						array_push($new[$x],[$key=>$v[$key][$x]]);
+					}
+				}
+				//将值对应转成二维数组
+				foreach($new as $kk=>$vv){
+					//二维数组转一维数组，并赋值给对应的数据表
+					$subDatas[$k][] = array_reduce($vv, 'array_merge', array());
+				}
+			}
+			foreach($subDatas as $k=>$v){
+				$subTable = $k;
+				foreach($v as $kk=>$vv){
+					$vv['uid']=unit::getuserinfo('uid');
+					$vv['create_time']=time();
+					$vv['d_id']=$did;
+					$ret = (new Data())->mode->add($subTable,$vv);
+					if(!$ret){
+						return $ret;
+					}
+				}
+			}
+		}
+		return 	true;
 	}
 	/**
 	 * 删除
 	 */
 	static function del($sid,$id){
 		$sfdp_ver_info = Design::findVer($sid);
+		$field = json_decode($sfdp_ver_info['s_field'],true);
+		$sublist =[];
+		if($field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
+			$Stable = self::getSubData($field['name_db'],$field['sublist']);
+			foreach($Stable as $k=>$v){	
+				$ret = self::delSub($v[0],$id);
+				if(!$ret){
+					return $ret;
+				}
+			}
+		}
+		
 		$table = $sfdp_ver_info['s_db'];
 		return (new Data())->mode->del($table,$id);		
+	}
+	/**
+	 * 删除
+	 */
+	static function delSub($table,$id){
+		return (new Data())->mode->delSub($table,$id);		
 	}
 	/**
 	 * 编辑修改
@@ -59,23 +117,98 @@ class Data{
 			}
 		}
 		$table = $data['name_db'];
+		$data['update_time'] = time();
 		unset($data['name_db']);
 		unset($data['tpfd_check']);
-		return (new Data())->mode->edit($table,$data,$id);		
+		$subdata  = json_decode($data['@subdata'],true);
+		unset($data['@subdata']);
+		//修改主表数据
+		$ret = (new Data())->mode->edit($table,$data,$id);
+		if(!$ret){
+			return $ret;
+		}
+		if(is_array($subdata) && count($subdata)>0 ){
+			$subDatas = [];
+			foreach($subdata as $k=>$v){
+				$keys = array_keys($v);//取出所有
+				$num = count($v[$keys[0]]);//计算下有几列数据
+				//数组转换，将值合并
+				for ($x=0; $x<$num; $x++) {
+					$new[$x] = [];
+				    foreach($keys as $key){
+						//相同顺序的值Push到同个数组
+						array_push($new[$x],[$key=>$v[$key][$x]]);
+					}
+				}
+				//将值对应转成二维数组
+				foreach($new as $kk=>$vv){
+					//二维数组转一维数组，并赋值给对应的数据表
+					$subDatas[$k][] = array_reduce($vv, 'array_merge', array());
+				}
+			}
+			foreach($subDatas as $k=>$v){
+				$subTable = $k;
+				self::delSub($subTable,$id);
+				foreach($v as $kk=>$vv){
+					$vv['uid']=unit::getuserinfo('uid');
+					$vv['create_time']=time();
+					$vv['d_id']=$id;
+					$ret = (new Data())->mode->add($subTable,$vv);
+					if(!$ret){
+						return $ret;
+					}
+				}
+			}
+		}
+		return 	true;	
 	}
 	/**
 	 * 获取列表数据
 	 */
 	static function getListData($sid,$map,$page=1,$limit=10){
 		$jsondata = Design::descVerTodata($sid);
-		$list = (new Data())->mode->select($jsondata['db_name'],$map,$jsondata['field'],$page,$limit);
+		$Modue = Modue::find($jsondata['sid']);
+		/*权限系统组合过滤*/
+		$access = json_decode($Modue['access'],true);
+		foreach((array)$access as $kk=>$vv){
+			$field = Field::find($vv[0]);
+			$value =unit::getuserinfo($vv[2]);
+			if($vv[1]=='in'){
+				$eq ='find in set';
+			}else if($vv[1]=='no in'){
+				$eq ='NOT REGEXP';
+				$value ='(^|,)('.$value.')(,|$)';
+			}else{
+				$eq =$vv[1];
+			}
+			$map[] = [$field['field'],$eq,$value];
+		}
+		
+		/*权限系统组合过滤*/
+		$list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit);
 		$json = $list['data'];
 		foreach ($json as $k => $v) {
-			foreach($jsondata['fieldArr'] as $k2=>$v2){
-				$json[$k][$k2] = $jsondata['fieldArr'][$k2][$v[$k2]] ?? '<font color="red">索引出错</font>';
+			foreach($jsondata['fieldArrAll'] as $k2=>$v2){
+				if(in_array($k2,explode(',',$Modue['field']))){
+					if(strpos($v[$k2],',') !== false){
+						$vk2 = explode(',',$v[$k2]);
+						$vk2value ='';
+						foreach($vk2 as $vvv){
+							$vk2value .=$jsondata['fieldArrAll'][$k2][$vvv].',';
+						}
+						$json[$k][$k2] = rtrim($vk2value, ",");
+						
+					}else{
+						$json[$k][$k2] = $jsondata['fieldArrAll'][$k2][$v[$k2]] ?? '<font color="red">索引出错</font>';
+					}
+				}
 			}
 		}
+		
 		return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
+	}
+	static function selectAll($table,$where=[]){
+		return  (new Data())->mode->selectAll($table,$where);
 	}
 	/**
 	 * 修改编辑
@@ -123,7 +256,39 @@ class Data{
 					
 				}
 		}
-		return ['info'=>json_encode($field),'data'=>$data];
+		//字表数据
+		$sublist =[];
+		if($field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
+			$Stable = self::getSubData($field['name_db'],$field['sublist']);
+			foreach($Stable as $k=>$v){	
+				
+				$sublist[$k]= self::selectAll($v[0],['d_id'=>$bid]);
+				$datas = self::selectAll($v[0],['d_id'=>$bid]);
+				
+				foreach($datas as $kk=>$vv){
+					$mkey = array_keys($v[1]);
+					$mkey2 = array_keys($vv);
+					foreach($mkey as $kkk=>$vvv){
+						$v[1][$vvv]['value'] =$vv[$mkey2[$kkk]];
+					}
+					$sublist[$k][$kk] = $v[1];
+				}
+			}
+		}
+		$field['sublists'] = $sublist;
+		return ['info'=>json_encode($field),'sublist'=>json_encode($sublist),'data'=>$data];
+	}
+	static function getSubData($table,$data){
+		$buile_table =[];
+		$i = 1;
+		foreach($data as $k=>$v){
+			if($v['data']!='' && is_array($v['data']) && count($v['data'])>0){
+				$buile_table[$i-1][] = $table.'_d'.$i;
+				$buile_table[$i-1][] = $v['data'];
+				$i++;
+			}
+		}
+		return $buile_table;
 	}
 	/**
 	 * 获取数据方法
@@ -168,6 +333,26 @@ class Data{
 					}
 				}
 		}
+		//字表数据
+		$sublist =[];
+		if($field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
+			$Stable = self::getSubData($field['name_db'],$field['sublist']);
+			foreach($Stable as $k=>$v){	
+				
+				$sublist[$k]= self::selectAll($v[0],['d_id'=>$bid]);
+				$datas = self::selectAll($v[0],['d_id'=>$bid]);
+				
+				foreach($datas as $kk=>$vv){
+					$mkey = array_keys($v[1]);
+					$mkey2 = array_keys($vv);
+					foreach($mkey as $kkk=>$vvv){
+						$v[1][$vvv]['value'] =$vv[$mkey2[$kkk]];
+					}
+					$sublist[$k][$kk] = $v[1];
+				}
+			}
+		}
+		$field['sublists'] = $sublist;
 		return ['info'=>json_encode($field)];
 	}
 

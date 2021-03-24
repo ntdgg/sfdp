@@ -22,14 +22,14 @@ class View{
 	public static function ver($sid){
 		$json = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
 		$field = json_decode($json['s_field'],true);
-		foreach($field['list'] as $k=>$v){
+		foreach((array)$field['list'] as $k=>$v){
 			foreach($v['data'] as $v2){
 				if(isset($v2['tpfd_db'])){
 					$data_ver_db[] = $v2;
 				}
 			}
 		}
-		return ['db'=>$data_ver_db,'all'=>$json['s_field']];
+		return ['db'=>$data_ver_db,'all'=>$json['s_field'],'ver'=>$json];
 	}
 	/**
 	 * 保存版本
@@ -55,9 +55,7 @@ class View{
 	/**
 	 * 添加版本
 	 */
-	public static function verAdd($sid){
-		$info = Design::find($sid);
-		$json = Design::getDesignJson($sid);
+	public static function verAdd($sid,$info,$json){
 		$ver = [
 			'sid'=>$sid,
 			's_bill'=>unit::OrderNumber(),
@@ -72,9 +70,8 @@ class View{
 			'add_time'=>time()
 		];
 		$id  = Design::insertVer($ver);
-		$map[] = ['id','<>',$id];
-		$map[] = ['sid','=',$sid];
-		Design::updateVerWhere($map,['status'=>0]);
+		//将历史版本库禁用
+		Design::updateVerWhere([['id','<>',$id],['sid','=',$sid]],['status'=>0]);
 		return self::ver($sid);
 		
 	}

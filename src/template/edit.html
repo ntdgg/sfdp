@@ -18,9 +18,9 @@
 	<script src="__SFDP__/lib/Validform/5.3.2/Validform.min.js"></script>
 	<script src="__SFDP__/lib/H5upload.js"></script>
 	<script src="__SFDP__/lib/laydate5.0.9/laydate.js"></script>
-	<script src="__SFDP__/sfdp.commonfun.js"></script>
+	<script src="__SFDP__/sfdp.5.0.js?v=5.0.1"></script>
 	{$config.load_file.js|raw}
-<link rel="stylesheet" href="__SFDP__/sfdp.5.0.css" />
+<link rel="stylesheet" href="__SFDP__/sfdp.5.0.css?v=5.0.1" />
 <div class="page-container"><div class="tpfd-content" id='table'></div></div>
 	<!--动态加载用户自定义脚本-->
 	{$config.fun|raw}
@@ -30,11 +30,12 @@
 			try{
 			  load_satr_fun();//后置函数
 			}catch(e){
-			  console.log('page no load star fun ~');
+				if(Debug){
+				 console.log('page no load star fun ~');
+				}
 			}
 		  $( function() {
-				
-				commonfun.showadd({$data|raw},'{$showtype}');
+				sfdp.showadd({$data|raw},'{$showtype}');
 				$("#form").Validform({
 					tiptype:function(msg,o,cssctl){
 					if (o.type == 3){
@@ -44,18 +45,52 @@
 					ajaxPost:true,
 					showAllError:true,
 					callback:function(ret){
-						commonfun.common_return(ret);
+						sfdp.common_return(ret);
 					}
 				});
-				$(".btn").click(function(){
-					 $("#form").submit();
+				$(".savedata").click(function(){
+					/*构建子表json*/
+					var searchdata = [];
+					var stable = [];
+					var allSdata = {};
+					/*遍历找出所有子表*/
+					$(".sub_list").each(function(index, el) {
+						var id = $(this).attr("data");
+						if(typeof(id)!=='undefined'){
+							stable.push(id)
+						}
+					});
+					//遍历子表，找出子表的表单数据
+					$.each(stable, function(index,table) {
+						var search = $('#'+table).serializeArray();
+						//表单数据拼接成数组
+						var i = 0;
+						$.each(search, function(index,vars) {
+							var dbname = this.name;
+							if(searchdata[dbname] == undefined){
+								 searchdata[dbname] = [];
+								 searchdata[dbname].push(vars.value || '');
+							}else{
+								 searchdata[dbname].push(vars.value);
+							}
+							;
+							
+						});
+						allSdata[table] = {};
+						allSdata[table] = Object.assign({},searchdata);
+						searchdata = [];
+					});
+					$('#subdata_subdata').val(JSON.stringify(allSdata));
+					$("#form").submit();
 				});
 			});
 		$(document).ready(function(){
 			try{
 			  load_end_fun();//后置函数
 			}catch(e){
-			  console.log('page no load end fun ~');
+			  if(Debug){
+				 console.log('page no load end fun ~');
+			  }
 			}
 		});
 </script>

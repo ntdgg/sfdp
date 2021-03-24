@@ -13,6 +13,7 @@
 namespace sfdp\custom;
 
 use think\facade\Db;
+use think\Exception;
 
 class AdapteeCommon{
 

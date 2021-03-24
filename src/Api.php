@@ -57,7 +57,7 @@ class Api
 			$data = ['sid'=>$sid,'node'=>$node];
 			return Control::api($act,$data);
 		}
-		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb' || $act=='custom' || $act=='customSave'){
+		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb' || $act=='custom' || $act=='customSave' || $act=='customSearch'|| $act=='customAccess'|| $act=='customOrder'){
 			if (unit::is_post()) {
 				$data = input('post.');
 				return Control::api($act,$data);
@@ -73,6 +73,11 @@ class Api
 			$data = ['id'=>input('id'),'status'=>input('status')];;
 			return Control::api($act,$data);
 		}
+		if($act=='btable'){
+			$data = input('post.');
+			return Control::api($act,$data);
+		}
+		
 	}
 	/**
 	  * Sfdp 5.0统一接口流程审批接口
@@ -80,11 +85,16 @@ class Api
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
 	public function sfdpCurd($act='index',$sid='',$bid=''){
+		if($act=='index2'){
+			$data = input('post.');
+			return Control::curd($act,$sid,$data,$this->topconfig);
+		}
 		if($act=='index'){
 			$data = input('post.');
 			return Control::curd($act,$sid,$data,$this->topconfig);
 		}
 		if($act=='add'){
+			
 			if (unit::is_post()) {
 				$data = input('post.');
 				return Control::curd($act,$sid,$data,$this->topconfig);
@@ -110,6 +120,7 @@ class Api
 			$data = input('post.');
 			return Control::curd($act,$sid,$data,$this->topconfig);
 		}
+		
 	}
 	/**
 	  * Sfdp 5.0 内部目录调用方法

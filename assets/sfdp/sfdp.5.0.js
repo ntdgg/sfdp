@@ -1,180 +1,911 @@
-	//Tpfd表单控件
-	var fb_config_data = {
-		name:'',//表单名称
-		name_db:'',//数据表名称
-		tpfd_id:'SFDP'+ commonfun.dateFormat(new Date(), "mmssS"),//表单ID
-		tpfd_btn:{},
-		tpfd_script:'',//数据表脚本
-		tpfd_class :'',//数据表脚本
-		list:{
-			//设计数据
-		},
-		tpfd_time:commonfun.dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),//表单设计时间
-		tpfd_ver:'v5.0'//表单设计器版本
-	};
-	var NameExp = /^[\u4e00-\u9fa5]{0,}$/;
-	var DbNameExp = /^(?!_)(?!.*?_$)[a-z0-9_]+$/;
-	var DbFieldExp = /^(?!_)(?!.*?_$)[a-z_]+$/;
-	var NumExp = /^[0-9]*[1-9][0-9]*$/;
-	//日志输出区
-	function logout(info){
-		console.log(commonfun.dateFormat(new Date(), "mm:ss")+'] ' + info);
-	}
-	//表单构建
-	function addtr(id,old_data='',showtype=''){ 
-		if(!has_item('name')){
-			return;
-		}
-		var $targetTbody= $("#table_center tbody");
-		var $tr = $targetTbody.children("tr[class='table_tr']:last");
-		if(old_data==''){
-			var code = 'Tr'+commonfun.dateFormat(new Date(), "hhmmssS");
-		}else{
-			var code = old_data['tr'];
-		}
-		var html = commonfun.tpfd_tableui(code,id);
+/*!
+ * SFDP 表单设计器---公用方法库
+ * http://cojz8.com
+ *
+ * 
+ * Released under the MIT license
+ * http://cojz8.com
+ *
+ * Date: 2020年3月4日23:34:39
+ */
+var Debug = false;//是否开启打印模式
+var NameExp = /^[\u4e00-\u9fa5]{0,}$/; //中文名称正则运算
+var DbNameExp = /^(?!_)(?!.*?_$)[a-z0-9_]+$/; //数据库名称校验
+var DbFieldExp = /^(?!_)(?!.*?_$)[a-z_]+$/; //数据库字段校验
+var NumExp = /^[0-9]*[1-9][0-9]*$/; //数字正则运算
 
-		var logs ='新增1*'+id+'单元行';
-		if(old_data==''){
-			commonfun.dataSave({tr:code,data:{},type:id},code,'tr');
-			logout(logs);
+var sfdp = {
+	sfdp_int_data : function(){
+		return	{
+			name:'',//表单名称
+			name_db:'',//数据表名称
+			tpfd_id:'SFDP'+ sfdp.dateFormat(new Date(), "mmssS"),//表单ID
+			tpfd_btn:{},
+			tpfd_script:'',//数据表脚本
+			tpfd_class :'',//数据表脚本
+			list:{
+				//设计数据
+			},
+			sublist:{
+				//子表数据
+			},
+			tpfd_time:sfdp.dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),//表单设计时间
+			tpfd_ver:'v5.0'//表单设计器版本
+		};
+	},
+	showview : function(int_data) {
+		if(int_data==null){
+			layer.msg('对不起，没有任何数据~');
 		}else{
-			logout('[恢复]'+logs);
+			$('#table').html('<div id="table_view" style="margin:10px"></div>');
+			 for (x in int_data.list){
+				var table = sfdp.table_build(int_data.list[x]['type'],int_data.list[x],'show');//恢复表单布局设计
+				$("#table_view").append(table);
+			 } 
+			 var xh = 1;
+			 //恢复子表布局
+			  for (x in int_data.sublist){
+				 var table = sfdp.sublist_build(int_data.sublist[x]['type'],int_data.sublist[x],'show',int_data.name_db+'_d'+xh,true);
+				 $("#table_view").append(table);
+				 xh++
+			 }
+			
+			 for (x in int_data.sublists){
+				  for (y in int_data.sublists[x]){
+					var table = sfdp.sublist_r(int_data.sublists[x][y],true);						
+					$("#"+int_data.name_db+"_d"+(Number(x)+1)+" .table .title").after(table);						
+				  }					  
+			 }
+			 
+			 
+			$(document).attr("title",int_data.name);//修改页面标题
 		}
-		if(showtype==''){
-			$tr.after(html);
-			commonfun.delTr();
-			$( ".fb-fz" ).sortable({
-					opacity: 0.5,
-					revert: true,
-					stop: function( event, ui ) {
-						var type = $(this).children('a').attr("data");
-						var parent_code = $(this).parent().attr("id"); //获取Tr的ID值 
-						if($(this).html().indexOf("code") >= 0 ) { 
-							var code = '<span class="code">'+parent_code+'</span><span class="code2">x</span>';
-						}else{
-							var code = '';
-						}
-						var html =fb_tpl(type,code,parent_code,$(this).attr("id"));
-						//禁止本单元格再放置其他控件
-						$(this).removeClass("fb-fz");
-						$(this).removeClass("ui-sortable");
-						$(this).addClass("fb-disabled");
-						$( ".fb-disabled" ).sortable( "disable" );
-						$(this).html(html);
-					}
-			});
+	},
+	showlist2 : function(int_data) {
+		var  td_data= int_data;
+			var html ='';
+			for (x in td_data){
+				var type = td_data[x].type || 'text';
+				 html += sfdp.search_build(type,td_data[x]);
+			}
+		$('#search').html(html);
+		sfdp.setDate();//初始化日期选择器
+	},
+	search_build:function(type,data){
+			var field_att = '';
+			var lab ='<div style="float: left;"><label class="sfdp-label">'+data.name+'：</label><div class="sfdp-input-block">';
+			switch(type) {
+				case 'text':
+					var html =lab+'<input type="text"  value="'+data.zanwei+'" name="'+data.field+'"   class="sfdp-input">';
+				break;
+				case 'number':
+					var html =lab+'<input type="text" value="'+data.zanwei+'" name="'+data.field+'"   class="sfdp-input">';
+				break;
+				case 'radio':
+					data.tpfd_db = data.field;
+					data.tpfd_data = eval('(' + data.type_data + ')');
+					var html =lab+view_checkboxes_clss(data,'radio',field_att);
+				break;
+				case 'checkboxes':
+					data.tpfd_db = data.field;
+					data.tpfd_data = eval('(' + data.type_data + ')');
+					var html =lab+view_checkboxes_clss(data,'checkbox',field_att);
+				break;
+				case 'dropdown':
+					data.tpfd_db = data.field;
+					data.tpfd_data = data.type_data;
+					var html =lab+sfdp.view_select(data.tpfd_data,data.tpfd_db,0,field_att,data.id);
+				break;
+				case 'textarea':
+					var html =lab+'<input type="text"  value="'+data.zanwei+'" name="'+data.field+'"   class="sfdp-input">';
+				break;
+				case 'date':
+					var rqtype =['yyyy','MM-dd','yyyy-MM-dd','yyyyMMdd','yyyy-MM'];
+					var html =lab+'<input '+field_att+' data-type="'+rqtype[data.data]+'" class="datetime sfdp-input" autocomplete="off"  type="text" id="date'+data.field+data.id+'" name="'+data.field+'" >';
+				break;
+				default:
+				var html ='';
+			}
+			return html + '</div></div>';
+        },
+	showlist : function(int_data,Debug=false) {
+		var td_data = int_data;
+			var html ='';
+			for (x in td_data){
+				var type = td_data[x]['td_type'];
+				 html += '   '+sfdp.view_field_return(type,td_data[x]);
+			}
+		$('#search').html(html);
+	},
+	showadd : function(int_data,showtype='add',Debug=false) {
+		if(int_data==null){
+			layer.msg('对不起，没有任何数据~');
 		}else{
-			return html;
+			if(Debug==true){
+				var btn ='';
+				}else{
+				var btn = '<div class="sfdp-rows-view" style="text-align: center;margin-top: 15px;"><a  class="button savedata" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</a><a class="button" onclick=sfdp.layer_close()>&nbsp;&nbsp;取消&nbsp;&nbsp;</a></div>';
+			}
+			$('#table').html('<form action="" method="post" name="form" id="form"><input type="hidden" readonly name="name_db" value="'+int_data.name_db+'"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"></div></form>');
+			//恢复主表单设计
+			 for (x in int_data.list){
+				var table = sfdp.table_build(int_data.list[x]['type'],int_data.list[x],showtype);//恢复表单布局设计
+				$("#table_view").append(table);
+			 }
+			 var xh = 1;
+			 //恢复子表布局
+			  for (x in int_data.sublist){
+				var table = sfdp.sublist_build(int_data.sublist[x]['type'],int_data.sublist[x],showtype,int_data.name_db+'_d'+xh);
+				 $("#table_view").append(table);
+				 xh++
+			 }
+			 if(showtype=='edit'){ 
+				var tr ='';
+				  for (x in int_data.sublists){
+					  for (y in int_data.sublists[x]){
+						var table = sfdp.sublist_r(int_data.sublists[x][y]);						
+						$("#"+int_data.name_db+"_d"+(Number(x)+1)+" .table .title").after(table);						
+					  }					  
+				 }
+			 }
+			$("#table_view").append(btn);
+			$(document).attr("title",int_data.name);
 		}
-	}
-	
-	//文本转换
-	function fb_tpl(type,code,parent_code,td_xh,old_data=0){
-		if(old_data==0){
-			var td_id = type+'_'+ commonfun.dateFormat(new Date(), "mmssS");
-		}else{
-			var td_id =old_data;
-		}
-		var labid = 'onclick=showLayer("'+type+'","'+td_id+'","'+parent_code+'") id="label'+td_id+'"';
-		var html =commonfun.tpfd_change(labid,type);
-		if(old_data==0){
-			commonfun.dataSave({td:td_xh,td_type:type,tpfd_id:td_id},parent_code,'tr_data');
-		}
-		return html+code;
-	}
-	//
-	function fb_set(type,id,parent_code){
-		$('#zd_id').html(id);
-		var all_data = JSON.parse(localStorage.getItem("json_data"));
-		var default_data = all_data['list'][parent_code]['data'][id];
-		if(default_data.tpfd_db==undefined){
-			var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_dbcd: "",tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "no",tpfd_list: "no"};
-		}else{
-			var tpfd_db =default_data;
-		}
-		return commonfun.tpfd_return(type,tpfd_db);
-	}
-	function fb_set_return(data){
-		$('#label'+data.tpfd_id).html(data.tpfd_name+'：');
-		$('.tpfd-pop').fadeOut();
-	}
-	$(".code2").unbind('click').click(function(){
-		var tr_id = $(this).parent().parent().attr("id");
-		commonfun.dataSave('',tr_id,'tr_del');
-		logout('删除了单元行'+tr_id);
-		$(this).parent().parent().remove();
-	});
-	//点击保存按钮
-	$('.tpfd-ok').on('click', function() {
-		var params = commonfun.fromdata($("#myform")); //将表单序列化为JSON对象  
-		if($('#showtype').val()=='view'){
-			$('.tpfd-pop').fadeOut();
-			commonfun.ShowTip(' 界面预览成功 ');
-			logout('界面预览成功！');
-		}else{
-			if(params.name!=undefined){
-				if(!NameExp.test(params.name)){
-					commonfun.ShowTip(' Name格式不正确 ');
-					return;
+		sfdp.setDate();//初始化日期选择器
+	},
+	sublist_r : function (td_data,show_type=false){
+		
+		var json = {1:'',2:'',3:'',4:'',5:'',6:'',7:'',8:'',9:'',10:'',11:'',12:''};
+		var lend = 0;
+		for (z in td_data){
+				var type = td_data[z]['td_type'];
+				if(show_type){
+					var html =sfdp.show_field_return(type,td_data[z],true);	
+					}else{
+					var html =sfdp.edit_field_return(type,td_data[z],true);	
 				}
-				if(!DbNameExp.test(params.name_db)){
-					commonfun.ShowTip(' Dbname格式不正确 ！');
-					logout('仅允许使用小写字母和数字和下划线~');
-					return;
+				json[td_data[z]['td']] = html;
+				lend ++;
+		}
+		var htmls ='<tr class="text-c">';
+		for (var i=1;i<=lend;i++){
+			htmls +='<td>'+json[i]+'</td>';
+		}
+		if(show_type){
+			return htmls+'</tr>';
+			}else{
+			return htmls+'<td><a onclick="sfdp.fz(this)">增</a> <a onclick="sfdp.dl(this)">删</a></td></tr>';
+		}
+		
+	},
+	sublist_build : function(id,data='',types,stable,show_type=false){
+		var code = data['id'];
+		var td_data = data.data;
+		var json = {1:'',2:'',3:'',4:'',5:'',6:'',7:'',8:'',9:'',10:'',11:'',12:''};
+		var heads = {};
+		for (x in td_data){
+				var type = td_data[x]['td_type'];
+				heads[x] = td_data[x]['tpfd_name'];
+				if(types=='add'){
+					var html =sfdp.view_field_return(type,td_data[x],true);
+				}else if(types=='edit'){
+					var html =sfdp.view_field_return(type,td_data[x],true);
+				}else{
+					var html =sfdp.show_field_return(type,td_data[x],true);
 				}
-				$('#fb_name').html(params.name+'(DbTable:'+params.name_db+')');
-				var json_data = JSON.parse(localStorage.getItem("json_data"));
-				console.log(params);
-					json_data['name']=params.name;
-					json_data['name_db']=params.name_db;
-					json_data['tpfd_btn']=params.tpfd_btn;
-					json_data['tpfd_class']=params.tpfd_class;
-					json_data['tpfd_script']=params.tpfd_script;
-					localStorage.setItem("json_data",JSON.stringify(json_data));
-					$('.tpfd-pop').fadeOut();
-					logout('初始化配置成功！');
+				json[td_data[x]['td']] = html;
+			}
+		var htmls ='<tr class="text-c">';
+		for (var i=1;i<=id;i++){
+			htmls +='<td>'+json[i]+'</td>';
+		}
+		var head_html ='';
+		$.each(heads, function() {
+			head_html +='<th>'+this+'</th>';
+		});
+		if(show_type){
+			html = '<div id="'+stable+'"><fieldset  id="'+data.id+'_field"  mode="field" > <legend id="'+code+'">'+data['title']+'</legend><table class="table table-border table-bordered table-bg"><thead><tr class="text-c title">'+head_html+'</tr></thead></table></fieldset></div>';	
+			}else{
+			html = '<form id="'+stable+'" class="sub_list" data="'+stable+'"><fieldset  id="'+data.id+'_field"  mode="field" > <legend id="'+code+'">'+data['title']+'</legend><table class="table table-border table-bordered table-bg"><thead><tr class="text-c title">'+head_html+'<th>操作</th></tr>'+htmls+'<td><a onclick="sfdp.fz(this)">增</a> <a onclick="sfdp.dl(this)">删</a></td></tr></thead></table></fieldset></form>';	
+		}
+		
+		return html;
+	},
+	fz : function (obj){
+		var tr = $(obj).parent().parent();
+		tr.after(tr.clone());
+	},
+	dl :function (obj){
+		$(obj).parent().parent().remove();  
+	},
+	table_build : function(id,old_data='',types){
+		var code = old_data['tr'];
+		var td_data = old_data.data;
+			var json = {1:'',2:'',3:'',4:'',5:'',6:'',7:'',8:'',9:'',10:'',11:'',12:''};
+			for (x in td_data){
+				var type = td_data[x]['td_type'];
+				if(types=='add'){
+					var html =sfdp.view_field_return(type,td_data[x]);
+				}else if(types=='edit'){
+					var html =sfdp.edit_field_return(type,td_data[x]);
+				}else{
+					var html =sfdp.show_field_return(type,td_data[x]);
+				}
+				json[td_data[x]['td']] = html;
+			}
+		var lan =parseInt(12 / id);
+		var htmls ='';
+		for (var i=1;i<=id;i++){ 
+			htmls +='<div class="col-'+lan+' sfdp-field-con-view">'+json[i]+'</div>';
+		}
+			html = '<div id="'+code+'" class="sfdp-rows-view">'+htmls+'</div>';	
+		return html;
+	},
+	ShowTip : function(tip) {
+		layer.msg(tip);
+	},
+	common_return : function(data) {
+		if (data.code == 0) {
+			layer.msg(data.msg,{icon:1,time: 1500},function(){
+					parent.location.reload(); // 父页面刷新
+			});          
+		} else {
+		   layer.alert(data.msg || data.responseJSON.message, {title: "错误信息", icon: 2});
+		}
+	},
+	insFgf : function(id){
+		$('#'+id).val($("#"+id).val()+'@@');
+	},
+	addoption : function(id,type='checkbox'){
+		$('#checkboxes'+id).children('span').attr("onclick","sfdp.editoption("+id+")");
+		$('#checkboxes'+id).children('span').html('Del');
+		var html ='<div id="checkboxes'+(id+1)+'"><input type="'+type+'" name="tpfd_check" value='+(id+1)+' ><input name="tpfd_data" type="text" value="选项'+(id+2)+'"><span onclick=sfdp.addoption('+(id+1)+',"'+type+'")>Add</span></div>';
+		$('#checkboxes'+id).after(html);
+	},
+	editoption : function(id){
+		$('#checkboxes'+id).remove();
+	},
+	dateFormat : function (oDate, fmt){
+		var o = {
+			"M+": oDate.getMonth() + 1, //月份
+			"d+": oDate.getDate(), //日
+			"h+": oDate.getHours(), //小时
+			"m+": oDate.getMinutes(), //分
+			"s+": oDate.getSeconds(), //秒
+			"q+": Math.floor((oDate.getMonth() + 3) / 3), //季度
+			"S": oDate.getMilliseconds()//毫秒
+		};
+		if (/(y+)/.test(fmt)) {
+			fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
+		}
+		for (var k in o) {
+			if (new RegExp("(" + k + ")").test(fmt)) {
+				fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
 			}
 		}
-	});
-	$('.data-ok').on('click', function() {
-		var params = commonfun.fromdata($("#dataform")); //将表单序列化为JSON对象 
-		console.log(params.tpfd_db);
-		if(params.tpfd_db==undefined){
-			commonfun.ShowTip('请选择要设置的字段信息~');
-			return;
-		}
-		if(!DbFieldExp.test(params.tpfd_db)){
-			commonfun.ShowTip('　数据表段有误　');
-			return;
-		}
-		if(params.tpfd_name==''){
-			commonfun.ShowTip('　标题不能为空　');
-			return;
-		}
-		fb_set_return(params);
-		commonfun.dataSave(params,params.tr_id,'td_data');
-		commonfun.ShowTip('保存成功！');
-	});
-	//配置项判断
-	function has_item(Item){
-		var json_data = JSON.parse(localStorage.getItem("json_data"));
-		if(json_data[Item]==''){
-			alert('参数' + Item + '未配置！');
-			return ; 
-		}
-		return true;
-	}
-	function showLayer(type,id,parent_code){
-		if(type=='config'){
-			var json_data = JSON.parse(localStorage.getItem("json_data"));
+		return fmt;
+	},
+	fromdata : function (froms){
+		var o = {};  
+        var arr = froms.serializeArray();  
+        $.each(arr,function(){
+            if (o[this.name]) {  //返回json中有该属性
+                if (!o[this.name].push) { //将已存在的属性值改成数组
+                    o[this.name] = [ o[this.name] ];
+                }
+                o[this.name].push(this.value || ''); //将值存放到数组中
+            } else {  //返回json中没有有该属性
+                o[this.name] = this.value || '';  //直接将属性和值放入返回json中
+            } 
 			
+        });  
+        return o; 
+	},
+	openpage : function(title, url, opt){
+		if (typeof opt === "undefined") opt = {nav: true};
+		w = opt.w || "80vw";
+		h = opt.h || "80vh";
+		return layer.open({
+			type: opt.type || 2,
+			area: [w, h],
+			fix: false, // 不固定
+			maxmin: true,
+			shade: 0.4,
+			title: title,
+			content: url,
+			success: function (layero, index) {
+				if (typeof opt.confirm !== "undefined" && opt.confirm === true) {
+					layero.find(".layui-layer-close").off("click").on("click", function () {
+						layer.alert('您确定要关闭当前窗口吗？', {
+							btn: ['确定', '取消'] //按钮
+						}, function (i) {
+							layer.close(i);
+							layer.close(index);
+						});
+					});
+				}
+				// 自动添加面包屑导航
+				if (true === opt.nav) {
+					layer.getChildFrame('#nav-title', index).html($('#nav-title').html() + ' <span class="c-gray en">&gt;</span> ' + $('.layui-layer-title').html());
+				}
+				if (typeof opt.fn === "function") {
+					opt.fn(layero, index);
+				}
+			}
+		});
+	},
+	openfullpage : function(title, url, opt){
+		return sfdp.openpage(title, url, $.extend({w: "100%", h: "100%"}, opt))
+	},
+	returnShow : function(data, callback, param){
+		 if (data.code == 0) {
+			layer.msg(data.msg,{icon:1,time: 1500},function(){
+					parent.location.reload(); // 父页面刷新
+			});          
+		} else {
+		   layer.alert(data.msg, {title: "错误信息", icon: 2});
+		}	
+	},
+	Askshow : function(url,msg){
+		layer.confirm(msg,function(index){
+			sfdp.sGet(url);
+		});
+	},
+	H5uploadhtml : function(ids){
+		var html = '<label for="file-input"><img  width="120px"src="'+sfdp.Ico(0)+'"></label></span>'+
+		'<input type="file" accept="*/*" name="file[]" data-attr="'+ids+'" id="file-input" multiple  style="display: none">';
+		layer.open({
+		  type: 1,
+		  title: false,
+		  area: ['125px', '85px'], //宽高
+		  content: html
+		});
+		sfdp.H5upload(ids);
+		
+	},
+	H5upload : function (){
+		$("#file-input").tpUpload({
+			url: uploadurl,
+			start: function () {
+				layer_msg = layer.msg('正在上传中…', {time: 100000000});
+			},
+			progress: function (loaded, total, file) {
+				$('.layui-layer-msg .layui-layer-content').html('已上传' + (loaded / total * 100).toFixed(2) + '%');
+			},
+			success: function (ret) {
+				$('#'+ret.attr_id).val(ret.msg);
+				layer.closeAll();
+			},
+			error: function (ret) {
+				layer.alert(ret);
+			},
+			end: function () {
+				layer.close(layer_msg);
+			}
+		});
+	},
+	setDate :function(){
+		$(".datetime").click(function(){
+			var format = $(this).attr('data-type');
+			var id = $(this).attr('id');
+			  laydate.render({
+				elem: '#'+id,
+				format:format,
+				show: true 
+				,closeStop: '.datetime' 
+			 });
+		});
+	},
+	sGet : function(url,msg='操作成功'){
+		$.get(url,function(data,status){
+			if(status=='success'){
+					 if (data.code == 0) {
+						layer.msg(msg,{icon:1,time: 1500},function(){
+							location.reload();
+						});          
+					}else{
+					   layer.alert(data.msg, {title: "错误信息", icon: 2});
+					}	
+			}else{
+				 layer.alert("状态: " + status, {title: "错误信息", icon: 2});
+			}
+			
+		});
+    },
+	sAjax : function(url,data){
+		$.ajax({  
+			 url:url,
+			 data:data,  
+			 type:'post',  
+			 cache:true,  
+			dataType:'json',			 
+			 success:function(ret) {  
+				 if (ret.code == 0) {
+						layer.msg(ret.msg,{icon:1,time: 1500},function(){
+							location.reload();
+						});          
+					}else{
+					   layer.alert(ret.msg, {title: "错误信息", icon: 2});
+					}
+			  },  
+			  error : function() {  
+						layer.alert('请求出错！', {title: "错误信息", icon: 2});
+			  }  
+		 }); 
+	},
+	sFun : function(url,data,setActive){
+		$.ajax({  
+			url:url,
+			data:data,  
+			type:'post', 
+			dataType:'json',			 
+			 success:function(ret) {  
+				 layer.msg('请求成功！');
+				 setActive(ret); 
+				 return ret;
+			  },  
+			  error : function() {  
+						layer.alert('请求出错！', {title: "错误信息", icon: 2});
+			  }  
+		 }); 
+	},
+	/*5.0.1 数据存储*/
+	dataSave : function(data,key,type){
+		var json_data = JSON.parse(localStorage.getItem("json_data"));
+		switch(type) {
+			case 'tr':
+				json_data.list[key]=data;
+				break;
+			case 'sublist':
+				json_data.sublist[key]=data;
+				break;
+			case 'sublist_title':
+				json_data['sublist'][key].title = data;
+				break;
+			case 'sublist_datasave':
+				data.td = json_data['sublist'][key]['data'][data.tpfd_id]['td'];
+				data.td_type = json_data['sublist'][key]['data'][data.tpfd_id]['td_type'];
+				json_data['sublist'][key]['data'][data.tpfd_id] = data;
+				break;
+			case 'sublist_data':
+				json_data['sublist'][key]['data'][data.tpfd_id] = data;
+				break;
+			case 'sublist_del':
+				delete json_data.sublist[key];
+				break;
+			case 'tr_del':
+				delete json_data.list[key];
+				break;
+			case 'tr_data':
+				json_data['list'][key]['data'][data.tpfd_id] = data;
+				break;
+			case 'td_data':
+				data.td = json_data['list'][key]['data'][data.tpfd_id]['td'];
+				data.td_type = json_data['list'][key]['data'][data.tpfd_id]['td_type'];
+				json_data['list'][key]['data'][data.tpfd_id] = data;
+				break;
+			default:
+		} 
+		localStorage.setItem("json_data",JSON.stringify(json_data));
+	},
+	layer_close : function(){
+		var index = parent.layer.getFrameIndex(window.name);
+		parent.layer.close(index);
+	},
+	/*编辑返回字段*/
+	edit_field_return:function(type,data,is_sub=false){
+		if(data.tpfd_must==0){
+			var maste = 'datatype="*"';
+		}else{
+			var maste = '';
+		}
+		if(data.tpfd_read==0){
+			var read = 'readonly';
+		}else{
+			var read = '';
+		}
+		var field_att = maste + read;
+		if (typeof(data['tpfd_name']) == 'undefined') {
+			return sfdp.view_default(type,data);
+		}else{
+				var lab ='<div><label class="sfdp-label">'+data.tpfd_name+'：</label><div class="sfdp-input-block">';
+				if(is_sub){
+						lab ='';
+					}
+			switch(type) {
+				case 'text':
+					var html =lab+'<input type="text" '+field_att+' value="'+(data.value || '')+'" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'">';
+					break;
+				case 'radio':
+					var html =lab+view_checkboxes_clss(data,'radio',field_att);
+					break;
+				case 'number':
+					var html =lab+'<input type="number" '+field_att+' value="'+(data.value || '')+'" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'" class="sfdp-input">';
+					break;
+				case 'checkboxes':
+				var html =lab+view_checkboxes_clss(data,'checkbox',field_att);
+				break;
+				case 'dropdown':
+				var html =lab+sfdp.view_select(data.tpfd_data,data.tpfd_db,data.value,field_att,data.tpfd_id);
+				break;
+				case 'textarea':
+				var html =lab+'<textarea  name="'+data.tpfd_db+'" '+field_att+' placeholder="" >'+(data.value || '')+'</textarea>';
+				break;
+				case 'upload':
+				var html =lab+sfdp.view_upload(data,data.tpfd_db,0);
+				break;
+				case 'date':
+				var rqtype =['yyyy','MM-dd','yyyy-MM-dd','yyyyMMdd','yyyy-MM'];
+				var html =lab+'<input value="'+(data.value || '')+'" '+field_att+' '+field_att+' data-type="'+rqtype[data.xx_type]+'" class="datetime" type="text" name="'+data.tpfd_db+'"  id="'+data.tpfd_id+'">';
+				break;
+				case 'html':
+				var html =lab+data.tpfd_moren;
+				break;
+				case 'wenzi':
+				var html =lab+data.tpfd_moren;
+				break;
+			}
+		}
+		return html + '</div></div>';
+	},
+	/*添加返回字段*/
+	view_field_return:function(type,data,is_sub=false){
+			if(data.tpfd_must==0){
+				var maste = 'datatype="*"';
+			}else{
+				var maste = '';
+			}
+			if(data.tpfd_read==0){
+				var read = 'readonly';
+			}else{
+				var read = '';
+			}
+			var field_att = maste + read;
+			if (typeof(data['tpfd_name']) == 'undefined') {
+				return sfdp.view_default(type,data);
+			}else{
+					var lab ='<div><label class="sfdp-label">'+data.tpfd_name+'：</label><div class="sfdp-input-block">';
+					if(is_sub){
+						lab ='';
+					}
+				switch(type) {
+					case 'text':
+					var html =lab+'<input type="text" '+field_att+' value="'+data.tpfd_zanwei+'" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'" class="sfdp-input">';
+					break;
+					case 'number':
+					var html =lab+'<input type="number" '+field_att+' value="'+data.tpfd_zanwei+'" name="'+data.tpfd_db+'"  placeholder="" id="'+data.tpfd_id+'" class="sfdp-input">';
+					break;
+					case 'radio':
+					var html =lab+view_checkboxes_clss(data,'radio',field_att);
+					break;
+					case 'checkboxes':
+					var html =lab+view_checkboxes_clss(data,'checkbox',field_att);
+					break;
+					case 'dropdown':
+					var html =lab+sfdp.view_select(data.tpfd_data,data.tpfd_db,0,field_att,data.tpfd_id);
+					break;
+					case 'textarea':
+					var html =lab+'<textarea  name="'+data.tpfd_db+'" '+field_att+' placeholder="" ></textarea>';
+					break;
+					case 'upload':
+					var html =lab+sfdp.view_upload(data,data.tpfd_db,0);
+					break;
+					case 'date':
+					var rqtype =['yyyy','MM-dd','yyyy-MM-dd','yyyyMMdd','yyyy-MM'];
+					var html =lab+'<input '+field_att+' '+field_att+' data-type="'+rqtype[data.xx_type]+'" class="datetime sfdp-input" type="text" name="'+data.tpfd_db+'"  id="'+data.tpfd_id+'">';
+					break;
+					case 'html':
+					var html =lab+data.tpfd_moren;
+					break;
+					case 'wenzi':
+					var html =lab+data.tpfd_moren;
+					break;
+				}
+			}
+			return html + '</div></div>';
+        },
+	view_select:function(data,field,value,att,selectid){
+				var html ='<select name="'+field+'" style="width: 80px" '+att+' id="'+selectid+'"><option value="">请选择</option>';
+				for (y in data){
+					html += '<option value="'+y+'" '+((value) == data[y] ? 'selected' : '') +'>'+data[y]+'</option>';
+					
+				}
+				return html+'</select>';
+    },
+	view_upload:function(data,field,value){
+		if(data.tpfd_upload_api==0){
+			var html = '<input type="text" name="'+data.tpfd_db+'" readonly id="'+data.tpfd_id+'" value='+(data.value || '')+'><span id="drag" style="width:80px;margin-left:5px">'+
+					'<label onclick=sfdp.H5uploadhtml("'+data.tpfd_id+'")><img src="'+sfdp.Ico(2)+'"></label></span>';
+			
+		}else{
+			if(data.value == undefined){
+				data.value ='';
+			}
+			if(data.tpfd_upload_type == 1){
+				var html = '<input type="text" name="'+data.tpfd_db+'" readonly id="'+data.tpfd_id+'" value='+data.value+'><span id="drag" style="width:80px;margin-left:5px">'+ '<label id="label_'+data.tpfd_id+'" onclick=sfdp.openpage("多文件上传","'+data.tpfd_upload_action+'?id='+data.tpfd_id+'&value='+data.value+'",{w:"50%",h:"60%"})>附件</label></span>';
+			}else{
+				var html = '<input type="text" name="'+data.tpfd_db+'" readonly id="'+data.tpfd_id+'" value='+data.value+'><span id="drag" style="width:80px;margin-left:5px">'+ '<label id="label_'+data.tpfd_id+'" onclick=sfdp.openpage("文件上传","'+data.tpfd_upload_action+'?id='+data.tpfd_id+'&value='+data.value+'",{w:"18%",h:"25%"})>附件</label></span>';
+			}
+		}
+		return html;
+    },
+	view_default:function(type,data){
+			switch(type) {
+				case 'text':
+					var html ='<label>文本控件：</label><input type="text"  placeholder="请输入信息~" >';
+					break;
+				case 'upload':    
+					var html ='<label>上传控件：</label>上传';
+					break;
+				case 'checkboxes':
+					var html ='<label>多选控件：</label>选项1<input type="checkbox"  placeholder="" > 选项2<input type="checkbox"  placeholder="" >';
+					break;
+				case 'radio':
+					var html ='<label>单选控件：</label>选项1<input type="radio"  placeholder="" > 选项2<input type="radio"  placeholder="" >';
+					break;
+				case 'date':
+					var html ='<label>时间日期：</label><input type="text"  placeholder=""  >';
+					break;
+				case 'dropdown':
+					var html ='<label>下拉选择：</label><select ><option value ="请选择">请选择</option></select>';
+					break;
+				case 'textarea':
+					var html ='<label>多行控件：</label><textarea   ></textarea>';
+					break;
+				case 'html':
+					var html ='<label>HTML控件：</label><b style="color: blue;">Look this is a HTML</b>';
+					break;
+				case 'wenzi':
+					var html ='<label>文字控件：</label>默认现实的文本';
+					break;
+				 default:
+					var html ='1';
+				}
+			return html;
+	},
+	show_field_return:function(type,data,is_sub=false){
+			var html ='';
+			if (typeof(data['tpfd_name']) == 'undefined') {
+				return sfdp.view_default(type,data);
+			}else{
+					var lab ='<div><label class="sfdp-label">'+data.tpfd_name+'：</label><div class="sfdp-input-block">';
+					if(is_sub){
+						lab ='';
+					}
+				switch(type) {
+					case 'text':
+						html =lab+data.value;
+					break;
+					case 'number':
+						var html =lab+data.value;
+						break;
+					case 'radio':
+						html =lab+data.value;
+					break;
+					case 'checkboxes':
+						html =lab+data.value;
+					break;
+					case 'dropdown':
+						html =lab+data.value;
+					break;
+					case 'textarea':
+						html =lab+data.value;
+					break;
+					case 'upload':
+						/*自定义开发模式*/
+							if(data.tpfd_upload_api == 1){
+								var html = lab+'<span id="drag" style="width:80px;margin-left:5px">'+
+							'<label id="label_'+data.tpfd_id+'" onclick=sfdp.openpage("多文件上传","'+data.tpfd_upload_action+'?act=view&id='+data.tpfd_id+'&value='+data.value+'",{w:"50%",h:"60%"})>附件</label></span>';
+							}else{
+								var html = lab+'<a target="_blank" href="/'+data.value+'" download="filename"><img src="'+sfdp.Ico(1)+'"></a>';
+							}
+					break;
+					case 'date':
+						html =lab+data.value;
+					break;
+					case 'html':
+						html =lab+data.value;
+					break;
+					case 'wenzi':
+						html =lab+data.value;
+					break;
+				}
+			}
+			return html + '</div></div>';
+	},
+	/*5.0.1 显示组件*/
+	tpfd_xianshi:function(data){
+		return '<div class="sfdp-form-item"><label class="sfdp-label">显示类型：</label><div class="sfdp-input-block"><textarea name="tpfd_moren" class="sfdp-input">'+data.tpfd_moren +'</textarea> </div></div>';
+    },
+	/*5.0.1 日期组件*/
+    tpfd_date:function(data){
+			var default_data =[{cid:0,clab:'yyyy'},{cid:1,clab:'MM-dd'},{cid:2,clab:'yyyy-MM-dd'},{cid:3,clab:'yyyyMMdd'},{cid:4,clab:'yyyy-MM'},{cid:5,clab:'yyyy-MM-dd HH:mm:ss'}];
+			return '<div class="sfdp-form-item"><label class="sfdp-label">日期格式</label><div class="sfdp-input-block">'+sfdp.tpfd_select(default_data,'xx_type','2') +'</div></div>';
+    },
+	/*5.0.1 多选组建*/
+	tpfd_checkboxes:function(data,type='checkbox'){
+			if(data.tpfd_data==undefined){
+				var default_data =[{cid:0,clab:'选项1',checked:''},{cid:1,clab:'选项2',checked:'checked'}];
+			}else{
+				var datas = [];
+				for (x in data.tpfd_data){
+					if(data.tpfd_check != undefined && isInArray(data.tpfd_check,x)){
+						var check='checked';
+					}else{
+						var check='';
+					}
+					datas[x] = { cid:x,clab:data.tpfd_data[x],checked:check};
+				}
+				var default_data =JSON.parse(JSON.stringify(datas));
+			}
+            return '<div class="sfdp-form-item"><label class="sfdp-label"><input '+((data.xx_type) == '0' ? 'checked' : '') +'  name="xx_type" value=0 type="radio">静态方法</label><div class="sfdp-input-block">'+sfdp.tpfd_checkboxes_clss(default_data,type)+
+			'</div></div><div class="sfdp-form-item"><label class="sfdp-label"><input '+((data.xx_type) == '1' ? 'checked' : '') +' name="xx_type" value=1 type="radio">动态方法</label><div class="sfdp-input-block"><input name="checkboxes_func" placeholder="函数" type="text" value="'+((data.checkboxes_func) == '' ? data.checkboxes_func : '')+'" class="sfdp-input" style="width:50%"></div></div>';
+    },
+	/*5.0.1 高级组件*/
+	tpfd_gaoji:function(data){
+		var default_data =[{cid:0,clab:'是'},{cid:1,clab:'否'}];
+		if(data.tpfd_read=='undefined'){
+			var tpfd_read = 0;
+			var tpfd_must = 0;
+		}else{
+			var tpfd_read = data.tpfd_read;
+			var tpfd_must = data.tpfd_must;
+		}
+		return '<div class="sfdp-form-item"><label class="sfdp-label">字段只读</label><div class="sfdp-input-block">'+sfdp.tpfd_select(default_data,'tpfd_read','1')+'</div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段必填</label><div class="sfdp-input-block">'+sfdp.tpfd_select(default_data,'tpfd_must',tpfd_must)+'</div></div>'; 
+	},
+	/*5.0.1 默认组件*/
+	tpfd_moren:function(data){
+		return '<div class="sfdp-form-item"><label class="sfdp-label">占位内容</label><div class="sfdp-input-block"><input type="text" name="tpfd_zanwei" value="'+data.tpfd_zanwei +'" class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">默认内容</label><div class="sfdp-input-block"><input name="tpfd_moren" type="text" value="'+data.tpfd_moren+'" class="sfdp-input"></div></div>';
+	},
+	/*5.0.1 列表组件*/
+	tpfd_list:function(data){
+		return '<div class="sfdp-form-item"><label class="sfdp-label">列表组件</label><div class="sfdp-input-block">'+sfdp.tpfd_select('','tpfd_list',data.tpfd_list)+' </div></div><div class="sfdp-form-item"><label class="sfdp-label">查询组件</label><div class="sfdp-input-block">'+sfdp.tpfd_select('','tpfd_chaxun',data.tpfd_chaxun)+'</div></div>';
+	},
+	/*5.0.1 选择组件*/
+	tpfd_select:function(data,field,value){
+		if(data==''){
+			return '<select name="'+field+'"><option value="yes" '+((value) == 'yes' ? 'selected' : '') +'>是</option><option value="no" '+((value) == 'no' ? 'selected' : '') +'>否</option></select>';
+		}else{
+				var on ='';
+			if(field=='tpfd_dblx'){
+				var on ='onchange=sfdp.select_type()';
+			}
+			
+			var html ='<select name="'+field+'"  '+on+' style="width:35%">';
+			for (x in data){
+				html += '<option value="'+data[x]['cid']+'" '+((data[x]['cid']) == value ? 'selected' : '') +'>'+data[x]['clab']+'</option>';
+			}
+			return html+'</select>';
+		}
+	},
+	/*5.0.1 通用多选框*/
+	tpfd_checkboxes_clss:function(data,type='checkbox'){
+			var html ='';
+			for (x in data){
+				if(x == data.length-1){
+					var btn ='<span onclick=sfdp.addoption('+x+',"'+type+'")>Add</span>';
+				}else{
+					var btn ='<span onclick=sfdp.editoption('+x+')>Del</span>';
+				}
+				html += '<div id="checkboxes'+x+'"><input '+data[x]['checked']+' name="tpfd_check" value='+x+' type="'+type+'"><input name="tpfd_data" type="text" value="'+data[x]['clab']+'">'+btn+'</div>';
+			}
+			return html;
+		},
+	/*5.0.1 通用设置组件*/
+	tpfd_common:function(data){
+			var default_field = [{cid:'int',clab:'int',checked:''},{cid:'time',clab:'time',checked:''},{cid:'varchar',clab:'varchar',checked:'checked'},{cid:'datetime',clab:'datetime',checked:''},{cid:'longtext',clab:'longtext',checked:''}];
+			return '<input name="tpfd_id" type="hidden" value="'+data.tpfd_id +'"><input name="tr_id" type="hidden" value="'+data.tr_id +'"><div  style="margin: 5px;"><div class="sfdp-title">字段设置</div></div><div class="sfdp-form-item"><label class="sfdp-label">唯一标识</label><div class="sfdp-input-block"><input type="text"  autocomplete="off" value="'+data.tpfd_id +'" readonly class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">字段标题</label><div class="sfdp-input-block"> <input  name="tpfd_name" type="text"  value="'+data.tpfd_name +'"  class="sfdp-input"> </div></div><div class="sfdp-form-item"><label class="sfdp-label">字段名称</label><div class="sfdp-input-block"> <input name="tpfd_db" type="text" value="'+data.tpfd_db +'"  class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段类型</label><div class="sfdp-input-block">'+sfdp.tpfd_select(default_field,'tpfd_dblx','varchar')+' </div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段长度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_dbcd" type="text" value="'+data.tpfd_dbcd +'" class="sfdp-input"></div></div>'+sfdp.tpfd_list(data);
+        },
+	/*5.0.1 上传控制组件*/
+	tpfd_upload:function(data){
+			if(data.tpfd_upload_type=='undefined'){
+				var tpfd_upload_type = 0;
+				var tpfd_upload_xz = 0;
+				var tpfd_upload_api = 0;
+				var tpfd_upload_action = 0;
+			}else{
+				var tpfd_upload_type = data.tpfd_upload_type;
+				var tpfd_upload_xz = data.tpfd_upload_xz;
+				var tpfd_upload_api = data.tpfd_upload_api;
+				var tpfd_upload_action = data.tpfd_upload_action;
+			}
+			var default_data =[{cid:0,clab:'单文件上传'},{cid:1,clab:'多文件上传'}];
+			var action_data =[{cid:0,clab:'内置接口'},{cid:1,clab:'自定义API'}];
+			var word_type =[{cid:0,clab:'不限制'},{cid:1,clab:'*.jpg/*.png/*.gif'},{cid:1,clab:'*.doc/*.txt/*.xlx/*.xlxs/*.docx'}];
+			
+			return '<div class="sfdp-form-item"><label class="sfdp-label">上传配置</label>'+sfdp.tpfd_select(default_data,'tpfd_upload_type',tpfd_upload_type)+''+
+				   ' '+sfdp.tpfd_select(word_type,'tpfd_upload_xz',tpfd_upload_xz)+'</div><div class="sfdp-form-item"><label class="sfdp-label">上传接口</label>'+sfdp.tpfd_select(action_data,'tpfd_upload_api',tpfd_upload_api)+''+
+				   ' API:<input style="width:80px;display: inline;" name="tpfd_upload_action" type="text" value="'+(tpfd_upload_action || '') +'"  class="sfdp-input"></div>'; 
+			
+		},
+	/*5.0.1 返回基础数据*/
+	tpfd_return:function(type,data){
+			switch(type) {
+				case 'text':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_moren(data)+sfdp.tpfd_gaoji(data)+'</div>';
+					break;
+				case 'number':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_moren(data)+sfdp.tpfd_gaoji(data)+'</div>';
+					break;
+				case 'checkboxes':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_checkboxes(data)+sfdp.tpfd_gaoji(data)+'</div>';
+					break;
+				case 'radio':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_checkboxes(data,'radio')+sfdp.tpfd_gaoji(data)+'</div>';
+					break;
+				case 'date':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_date(data)+sfdp.tpfd_gaoji(data)+'</div>';
+					break;
+				case 'dropdown':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_checkboxes(data,'radio')+sfdp.tpfd_gaoji(data)+'</div>';
+					break;
+				case 'textarea':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_moren(data)+sfdp.tpfd_gaoji(data)+'</div>';
+					break;
+				case 'html':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_xianshi(data)+'</div>';
+					break;
+				case 'wenzi':
+					var html = '<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_xianshi(data)+'</div>';
+					break;
+				case 'upload':    
+					data.tpfd_list = 'no';
+					data.tpfd_chaxun = 'no';
+					data.tpfd_show = 'no';
+					var html ='<form id="fieldform"><div>'+sfdp.tpfd_common(data)+sfdp.tpfd_upload(data)+sfdp.tpfd_gaoji(data)+'</div>';
+					break;
+				 default:
+					var html ='';
+			}
+			return html + '<div style="margin-left: 5%;" class="button" onclick="sfdp.save_field()">保存</div></form>';;
+        },
+	/*5.0.1 拖拽进去设计容器的时候改变为响应的控件样式*/
+	btn_to_input:function(labid,type){
+			
+			switch(type) {
+			case 'text':
+				var html ='<label '+labid+' class="sfdp-label">文本控件</label><div class="sfdp-input-block"><input  type="text"  placeholder="请输入信息~" disabled class="sfdp-input"></div>';
+				break;
+			case 'number':
+				var html ='<label '+labid+' class="sfdp-label">数字控件</label><div class="sfdp-input-block"><input  type="number"  placeholder="" disabled class="sfdp-input"></div>';
+				break;
+			case 'upload':    
+				var html ='<label '+labid+' class="sfdp-label">上传控件</label>上传';
+				break;
+			case 'checkboxes':
+				var html ='<label '+labid+' class="sfdp-label">多选控件</label><div class="sfdp-input-block">选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled></div>';
+				break;
+			case 'radio':
+				var html ='<label '+labid+' class="sfdp-label">单选控件</label>选项1<input type="radio"  placeholder="" disabled> 选项2<input type="radio"  placeholder="" disabled>';
+				break;
+			case 'date':
+				var html ='<label '+labid+' class="sfdp-label">时间日期</label><div class="sfdp-input-block"><input type="text"  placeholder="" disabled class="sfdp-input"></div>';
+				break;
+			case 'dropdown':
+				var html ='<label '+labid+' class="sfdp-label">下拉选择</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div>';
+				break;
+			case 'textarea':
+				var html ='<label '+labid+' class="sfdp-label">多行控件</label><div class="sfdp-input-block"><textarea  disabled class="sfdp-input"></textarea></div>';
+				break;
+			case 'html':
+				var html ='<label '+labid+' class="sfdp-label">HTML控件</label><b style="color: blue;">Look this is a HTML</b>';
+				break;
+			case 'wenzi':
+				var html ='<label '+labid+' class="sfdp-label">文字控件</label>默认现实的文本';
+				break;
+			 default:
+				var html ='';
+			}
+			return html;
+		},
+		/*5.0.1 数据库设计自动带数据*/
+		sys_config : function(){
+			var json_data = JSON.parse(localStorage.getItem("json_data"));
 			var xEdit='',xDel='',xStatus='',xWorkFlow='';
 			if(json_data.tpfd_btn == 'undefined'){
 				json_data.tpfd_btn = {};
 			}
 			var btnArray = json_data.tpfd_btn;
-			
 			if(isInArray(btnArray,'Edit')){
 				xEdit ='checked';
 			}
@@ -187,98 +918,428 @@
 			if(isInArray(btnArray,'WorkFlow')){
 				xWorkFlow ='checked';
 			}
-			var html = '<table><tr><td><div>设置表单标题：<input name="name" type="text" value='+json_data.name+'></div></td></tr>'+
-			'<tr><td><div>数据库表名称：<input name="name_db" type="text" value='+json_data.name_db+' '+((look_db) == '1' ? 'readonly' : '') +' ></div></td></tr>'+
-			'<tr><td><div>设置列表控件：<input  name="tpfd_btn" value=add type="checkbox" checked  onclick="return false;">Add <input  name="tpfd_btn" value=Edit type="checkbox" '+xEdit+' >Edit <input  name="tpfd_btn" value=Del type="checkbox" '+xDel+' >Del <input  name="tpfd_btn" value=View type="checkbox" checked  onclick="return false;">View <input  name="tpfd_btn" value=Status '+xStatus+' type="checkbox">Status <input  name="tpfd_btn" value=WorkFlow type="checkbox" '+xWorkFlow+'>WorkFlow <br/>控件说明：status Workflow同时选中优先使用workflow</td></tr>'+
-			'<tr><td><div>设置表单样式：<textarea id="tpfd_class" name="tpfd_class">'+json_data.tpfd_class +'</textarea><a onclick=commonfun.insFgf("tpfd_class")>分割</a></td></tr>'+
-			'<tr><td><div>加载脚本控件：<textarea id="tpfd_script" name="tpfd_script">'+json_data.tpfd_script +'</textarea><a onclick=commonfun.insFgf("tpfd_script")>分割</a><br/>(一个脚本文件，后面需要加一个分隔符@@)</div></td></tr></table>';
-		$('#showtype').val('config');
-		$('#table').html(html);
-		}else if(type=='view'){
-			$('#showtype').val('view');
-			var int_data = localStorage.getItem("json_data");
-			var desc_data = JSON.parse(int_data);
-			commonfun.showadd(desc_data,'add',true);
-		}else{
-			$('#showtype').val('other');
-			$('#att').html(fb_set(type,id,parent_code));
-			return;
-		}
-		var layer = $('#pop'),
-			layerwrap = layer.find('.tpfd-wrap');
-			layer.fadeIn();
-		if(type=='view'){
-			layerwrap.removeAttr("style");
-			layerwrap.css({
-				'width':'90%',
-				'margin-left': '-10px',
-				'top': '5%',
-				'left': '5%',
-				'height': '450px'
+			var html = '<form id="configform"> <div class="sfdp-form-item"><label class="sfdp-label">表单标题</label><div class="sfdp-input-block"><input name="name" type="text" value="'+json_data.name+'" class="sfdp-input"></div></div>'+
+			'<div class="sfdp-form-item"><label class="sfdp-label">数据表名</label><div class="sfdp-input-block"><input name="name_db" type="text" value="'+(json_data.name_db)+'"'+((look_db) == '1' ? 'readonly' : '') +' class="sfdp-input"></div></div>'+
+			'<div class="sfdp-form-item"><label class="sfdp-label">列表控件</label><div class="sfdp-input-block"><input  name="tpfd_btn" value=add type="checkbox" checked  onclick="return false;">Add <input  name="tpfd_btn" value=Edit type="checkbox" '+xEdit+' >Edit <input  name="tpfd_btn" value=Del type="checkbox" '+xDel+' >Del <input  name="tpfd_btn" value=View type="checkbox" checked  onclick="return false;">View <input  name="tpfd_btn" value=Status '+xStatus+' type="checkbox">Status <input  name="tpfd_btn" value=WorkFlow type="checkbox" '+xWorkFlow+'>WorkFlow <br/>控件说明：status Workflow同时选中优先使用workflow</div></div>'+
+			'<div class="sfdp-form-item"><label class="sfdp-label">表单样式</label><div class="sfdp-input-block"><textarea id="tpfd_class" name="tpfd_class">'+json_data.tpfd_class +'</textarea><a onclick=sfdp.insFgf("tpfd_class")>分割</a></div></div>'+
+			'<div class="sfdp-form-item"><label class="sfdp-label">脚本控件</label><div class="sfdp-input-block"><tr><td><div><textarea id="tpfd_script" name="tpfd_script">'+json_data.tpfd_script +'</textarea><a onclick=sfdp.insFgf("tpfd_script")>分割</a></div></div>(一个脚本文件，后面需要加一个分隔符@@)</div></td></tr><tr><td><div style="margin-left: 15%;" class="button" onclick="sfdp.save_data()">保存</div></td></tr></table></form> ';
+			layer.open({
+			  type: 1,
+			  title:'基础配置 Base Set',
+			  area: ['620px', '365px'], //宽高
+			  content: html
 			});
-		}else{
-			layerwrap.removeAttr("style");
-			layerwrap.css({'margin-top': -layerwrap.outerHeight() / 2});
-		}
-	}
-	$('.tpfd-close').on('click', function() {
-		$('.tpfd-pop').fadeOut();
-	});
-	function select_type(){
-		var mycars = new Array()
-			mycars['int'] = 11
-			mycars['varchar'] = 255
-			mycars['time'] = 0
-			mycars['datetime'] = 0
-			mycars['longtext'] = 0
-		var tpfd_dblx = $("select[name='tpfd_dblx']").val();
-		$("input[name='tpfd_dbcd']").val(mycars[tpfd_dblx]);
-	}
-	
-	function recovery_input(old_data){
-		var td_data = old_data.data;
-		//如果有设计数据，则开始恢复表单数据
-		if(!$.isEmptyObject(old_data.data)){
-			for (x in td_data){
-				var type = td_data[x]['td_type'];
-				var parent_code = old_data['tr'];
-				if($('#'+old_data['tr']).children('td').eq(td_data[x]['td']-1).html().indexOf("code") >= 0 ) { 
-					var class_code = '<span class="code">'+parent_code+'</span><span class="code2">x</span>';
-				}else{
-					var class_code = '';
+		},
+		/*5.0.1 数据库设计自动带数据*/
+		select_type : function(){
+			var mycars = new Array()
+				mycars['int'] = 11
+				mycars['varchar'] = 255
+				mycars['time'] = 0
+				mycars['datetime'] = 0
+				mycars['longtext'] = 0
+			var tpfd_dblx = $("select[name='tpfd_dblx']").val();
+			$("input[name='tpfd_dbcd']").val(mycars[tpfd_dblx]);
+		},
+		/*5.0.1 初始化系统配置*/
+		int_data : function(int_data){
+			if(int_data==1){
+				var local_data = localStorage.getItem("json_data");
+				if(local_data!=null){
+					var desc_data = local_data;
 				}
-				var html =fb_tpl(type,class_code,parent_code,td_data[x]['td'],td_data[x]['tpfd_id']);
-				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).removeClass("fb-fz");
-				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).removeClass("ui-sortable");
-				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).addClass("fb-disabled");
-				$('#'+parent_code).children('td').eq(td_data[x]['td']-1).html(html);
-				$( ".fb-disabled" ).sortable( "disable" );//阻止排序
-				commonfun.delTr();
-				if(td_data[x]['tpfd_name']!=undefined){
-					fb_set_return(td_data[x]);
-				} 
+			}else{
+				var desc_data = int_data;
 			}
-		}
-	}
-	//用于初始化设计
-	function int_data(int_data){
-		if(int_data==1){
-			var local_data = localStorage.getItem("json_data");
-			if(local_data!=null){
-				var desc_data = local_data;
-			}
-		}else{
-			var desc_data = int_data;
-		}
-		if(int_data==null||int_data==1){
-			localStorage.setItem("json_data",JSON.stringify(fb_config_data));
-		}else{
+			if(int_data==null||int_data==1){
+				localStorage.setItem("json_data",JSON.stringify(sfdp.sfdp_int_data()));
+			}else{
 				localStorage.setItem("json_data",JSON.stringify(int_data));
 				$('#fb_name').html(desc_data.name+'(DbTable:'+desc_data.name_db+')');
 				 for (x in desc_data.list){
-					addtr(desc_data.list[x]['type'],desc_data.list[x]);//恢复表单布局设计
-					recovery_input(desc_data.list[x]);//用于恢复表单字段内容
+					sfdp.build_view(desc_data.list[x]['type'],desc_data.list[x]);//恢复表单布局设计
+					sfdp.recovery_input(desc_data.list[x]);//用于恢复表单字段内容
 				 }
+				 for (y in desc_data.sublist){
+					sfdp.recovery_ui(desc_data.sublist[y]['type'],desc_data.sublist[y]);//恢复表单布局设计
+					sfdp.recovery_sub(desc_data.sublist[y]);
+				 }
+				 
+			}
+		},
+		/*5.0.1 恢复UI布局*/
+		recovery_ui : function(id,data){
+			var lan =parseInt(12 / id);
+			var html ='';
+			for (var i=1;i<=id;i++){ 
+				 html +='<div class="col-'+lan+' sfdp-field-con fb-fz" id='+i+'></div>';
+			}
+			html = '<fieldset  id="'+data.id+'_field"  mode="field" > <legend id="'+data.id+'_title">'+(data.title || '请设置子表单标题')+'</legend><div class="sfdp-rows " id="'+data.id+'" mode="zibiao"><div class="view-action"><b class="ico" id="del" data="'+data.id+'" >㊀</b></div>'+html+'</div></fieldset>';	
+			$('#sfdp-main').append(html);
+			$( ".fb-fz" ).sortable({
+					opacity: 0.5,
+					revert: true,
+					animation: 150,
+					stop: function( event, ui ) {
+						var type =$(this).children('div').children('a').attr("data");
+						var parent_code = $(this).parent().attr("id");
+						$(this).removeClass("fb-fz");
+						$(this).removeClass("ui-sortable");
+						$(this).addClass("fb-disabled");
+						$( ".fb-disabled" ).sortable( "disable" );
+						$(this).html(sfdp.bulid_tpl(type,parent_code,$(this).attr("id")));
+					}
+			});
+		},
+		/*5.0.1 恢复子表数据*/
+		recovery_sub : function(old_data){
+			var td_data = old_data.data;
+			
+			if(!$.isEmptyObject(old_data.data)){
+				for (x in td_data){
+					var type = td_data[x]['td_type'];
+					var parent_code = old_data['id'];
+					var html =sfdp.bulid_tpl(type,parent_code,td_data[x]['td'],td_data[x]['tpfd_id']);
+					$('#'+parent_code).children('div').eq(td_data[x]['td']).removeClass("fb-fz");
+					$('#'+parent_code).children('div').eq(td_data[x]['td']).removeClass("ui-sortable");
+					$('#'+parent_code).children('div').eq(td_data[x]['td']).addClass("fb-disabled");
+					$('#'+parent_code).children('div').eq(td_data[x]['td']).html(html);
+					$( ".fb-disabled" ).sortable( "disable" );//阻止排序
+					if(td_data[x]['tpfd_name']!=undefined){
+						sfdp.fb_set_return(td_data[x]);
+					} 
+			}
 		}
+		},
+		/*5.0.1 字段信息设置*/
+		field_config : function(type,id,parent_code){
+			var all_data = JSON.parse(localStorage.getItem("json_data"));
+			var mode = $('#'+parent_code).attr('mode') || 'zhubiao';
+		
+			if(mode=='zhubiao'){
+				var default_data = all_data['list'][parent_code]['data'][id];
+				}else{
+				var default_data = all_data['sublist'][parent_code]['data'][id];
+			}
+			if(default_data.tpfd_db==undefined){
+				var tpfd_db = {tpfd_id: id,tr_id:parent_code, tpfd_db:'',tpfd_name: "", tpfd_dbcd: "",tpfd_zanwei: "", tpfd_moren: "", tpfd_chaxun: "no",tpfd_list: "no"};
+			}else{
+				var tpfd_db =default_data;
+			}
+			return sfdp.tpfd_return(type,tpfd_db);
+		},
+		/*5.0.1 字段信息保存*/
+		save_field : function(){
+			var params = sfdp.fromdata($("#fieldform")); //将表单序列化为JSON对象 
+			if(params.tpfd_db==undefined){
+				sfdp.ShowTip('请选择要设置的字段信息~');
+				return;
+			}
+			if(!DbFieldExp.test(params.tpfd_db)){
+				sfdp.ShowTip('　数据表段有误　');
+				return;
+			}
+			if(params.tpfd_name==''){
+				sfdp.ShowTip('　标题不能为空　');
+				return;
+			}
+			if(params.tpfd_dbcd==''){
+				sfdp.ShowTip('　数据字段长度不能为空　');
+				return;
+			}
+			sfdp.fb_set_return(params);
+			var mode = $('#'+params.tr_id).attr('mode') || 'zhubiao';
+		
+			if(mode=='zhubiao'){
+					sfdp.dataSave(params,params.tr_id,'td_data');
+				}else{
+					sfdp.dataSave(params,params.tr_id,'sublist_datasave');
+			}
+			sfdp.ShowTip('保存成功！');
+		},
+		/*5.0.1 配置信息保存功能*/
+		save_data : function(){
+			var params = sfdp.fromdata($("#configform")); //将表单序列化为JSON对象  
+			if(params.name!=undefined){
+					if(!NameExp.test(params.name)){
+						sfdp.ShowTip(' Name格式不正确 ');
+						return;
+					}
+					if(!DbNameExp.test(params.name_db)){
+						sfdp.ShowTip(' Dbname格式不正确 ！');
+						logout('仅允许使用小写字母和数字和下划线~');
+						return;
+					}
+					var json_data = JSON.parse(localStorage.getItem("json_data"));
+						json_data['name']=params.name;
+						json_data['name_db']=params.name_db;
+						json_data['tpfd_btn']=params.tpfd_btn;
+						json_data['tpfd_class']=params.tpfd_class;
+						json_data['tpfd_script']=params.tpfd_script;
+						localStorage.setItem("json_data",JSON.stringify(json_data));
+						sfdp.ShowTip(' 设置成功 ！');
+						setTimeout(function () {
+							layer.closeAll();
+						}, 2000);
+						logout('初始化配置成功！');
+			}
+		},
+		/*5.0.1 排序组件*/
+		setSortable : function(){
+			$( ".fb-fz" ).sortable({
+					opacity: 0.5,
+					revert: true,
+					animation: 150,
+					stop: function( event, ui ) {
+						var type =$(this).children('div').children('a').attr("data");
+						var parent_code = $(this).parent().attr("id"); //code id
+						var html =sfdp.bulid_tpl(type,parent_code,$(this).attr("id"));
+						$(this).removeClass("fb-fz");
+						$(this).removeClass("ui-sortable");
+						$(this).addClass("fb-disabled");
+						$( ".fb-disabled" ).sortable( "disable" );
+						$(this).html(html);
+					}
+			});
+		},
+		fb_set_return : function(data){
+			$('#label'+data.tpfd_id).html(data.tpfd_name+'：');
+		},
+		/*5.0.1 附表设计*/
+		build_fb : function(old_data=''){
+			var json_data = JSON.parse(localStorage.getItem("json_data"));
+			if(json_data.name==''){
+				sfdp.ShowTip(' 请先执行基础配置！');return;
+			}
+			var code = 'Id'+sfdp.dateFormat(new Date(), "hhmmssS");
+			$('#sfdp-main').append('<fieldset id="'+code+'_field" mode="field"> <legend id="'+code+'_title">子表设计</legend><div class="sfdp-rows " mode="zibiao" id="'+code+'"><div class="view-action"><b class="ico" id="del" data="'+code+'" >㊀</b></div><div class="col-6 sfdp-field-con fb-fz"  id="1"></div><div class="col-6 sfdp-field-con fb-fz" id="2"></div></div></fieldset>');
+			if(old_data==''){
+				sfdp.dataSave({id:code,title:'',data:{},type:2},code,'sublist');
+			}
+			sfdp.setSortable();
+		},
+		/*5.0.1 布局模式设计*/
+		build_bj : function(old_data=''){
+			var json_data = JSON.parse(localStorage.getItem("json_data"));
+			if(json_data.name==''){
+				sfdp.ShowTip(' 请先执行基础配置！');return;
+			}
+			var code = 'Id'+sfdp.dateFormat(new Date(), "hhmmssS");
+			$('#sfdp-main').append('<div class="sfdp-rows " id="'+code+'"><div class="view-action"><b class="ico" id="del" data="'+code+'" >㊀</b></div><div class="col-6 sfdp-field-con fb-fz"  id="1"></div><div class="col-6 sfdp-field-con fb-fz" id="2"></div></div>');
+			if(old_data==''){
+				sfdp.dataSave({tr:code,data:{},type:2},code,'tr');
+			}
+			sfdp.setSortable();
+		},
+		/*5.0.1 拖拽进去转换信息*/
+		bulid_tpl : function(type,parent_code,td_xh,old_data=0){
+			if(old_data==0){
+				var td_id = type+'_'+ sfdp.dateFormat(new Date(), "mmssS");
+			}else{
+				var td_id =old_data;
+			}
+			var labid = ' data-type="'+type+'" data-id="'+td_id+'" data-code="'+parent_code+'" id="label'+td_id+'"';	
+			var html =sfdp.btn_to_input(labid,type);	
+			var mode = $('#'+parent_code).attr('mode') || 'zhubiao';
+			if(mode=='zhubiao'){
+				if(old_data==0){
+					sfdp.dataSave({td:td_xh,td_type:type,tpfd_id:td_id},parent_code,'tr_data');
+				}
+				}else{
+				if(old_data==0){
+					
+					sfdp.dataSave({td:td_xh,td_type:type,tpfd_id:td_id},parent_code,'sublist_data');
+				}
+			}
+			return html;
+		},
+		/*5.0.1 构建样式布局*/
+		build_view : function(id,old_data='',showtype=''){
+			if(old_data==''){
+				var code = 'Tr'+sfdp.dateFormat(new Date(), "hhmmssS");
+			}else{
+				var code = old_data['tr'];
+			}
+			var lan =parseInt(12 / id);
+			var html ='';
+			for (var i=1;i<=id;i++){ 
+				 html +='<div class="col-'+lan+' sfdp-field-con fb-fz" id='+i+'></div>';
+			}
+			html = '<div class="sfdp-rows " id="'+code+'"><div class="view-action"><b class="ico" id="del" data="'+code+'" >㊀</b></div>'+html+'</div>';	
+			var logs ='新增1*'+id+'单元行';
+			if(old_data==''){
+				sfdp.dataSave({tr:code,data:{},type:id},code,'tr');
+				logout(logs);
+			}else{
+				logout('[恢复]'+logs);
+			}
+			if(showtype==''){
+				$('#sfdp-main').append(html);
+				$( ".fb-fz" ).sortable({
+						opacity: 0.5,
+						revert: true,
+						animation: 150,
+						stop: function( event, ui ) {
+							var type =$(this).children('div').children('a').attr("data");
+							var parent_code = $(this).parent().attr("id");
+							$(this).removeClass("fb-fz");
+							$(this).removeClass("ui-sortable");
+							$(this).addClass("fb-disabled");
+							$( ".fb-disabled" ).sortable( "disable" );
+							$(this).html(sfdp.bulid_tpl(type,parent_code,$(this).attr("id")));
+						}
+				});
+			}else{
+				return html;
+			}
+			
+		},
+		/*5.0.1 恢复表单布局中的样式并初始化*/
+		recovery_input : function(old_data){
+			var td_data = old_data.data;
+			if(!$.isEmptyObject(old_data.data)){
+				for (x in td_data){
+					var type = td_data[x]['td_type'];
+					var parent_code = old_data['tr'];
+					
+					var html =sfdp.bulid_tpl(type,parent_code,td_data[x]['td'],td_data[x]['tpfd_id']);
+					$('#'+parent_code).children('div').eq(td_data[x]['td']).removeClass("fb-fz");
+					$('#'+parent_code).children('div').eq(td_data[x]['td']).removeClass("ui-sortable");
+					$('#'+parent_code).children('div').eq(td_data[x]['td']).addClass("fb-disabled");
+					$('#'+parent_code).children('div').eq(td_data[x]['td']).html(html);
+					$( ".fb-disabled" ).sortable( "disable" );//阻止排序
+					if(td_data[x]['tpfd_name']!=undefined){
+						sfdp.fb_set_return(td_data[x]);
+					} 
+				}
+		}
+	},
+	/*5.0.1 判断存储的数据是否存在*/
+	has_item : function(Item){
+		var json_data = JSON.parse(localStorage.getItem("json_data"));
+		if(json_data[Item]==''){
+			alert('参数' + Item + '未配置！');
+			return ; 
+		}
+		return true;
+	},
+	Ico : function(id=0) {
+		var data = ['data:image/png;base64,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AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIwLTAyLTI2VDA5OjExOjEwKzAwOjAwmvYnqAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wNC0yNVQwMjoxMDoyMCswMDowMAG1iHYAAAAgdEVYdHNvZnR3YXJlAGh0dHBzOi8vaW1hZ2VtYWdpY2sub3JnvM8dnQAAABh0RVh0VGh1bWI6OkRvY3VtZW50OjpQYWdlcwAxp/+7LwAAABh0RVh0VGh1bWI6OkltYWdlOjpIZWlnaHQAMTkyQF1xVQAAABd0RVh0VGh1bWI6OkltYWdlOjpXaWR0aAAzMDjhP6cxAAAAGXRFWHRUaHVtYjo6TWltZXR5cGUAaW1hZ2UvcG5nP7JWTgAAABd0RVh0VGh1bWI6Ok1UaW1lADE1NTYxNTgyMjDnCLouAAAAEXRFWHRUaHVtYjo6U2l6ZQA0ODUxQoxAmPUAAABadEVYdFRodW1iOjpVUkkAZmlsZTovLy9kYXRhL3d3d3Jvb3Qvd3d3LmVhc3lpY29uLm5ldC9jZG4taW1nLmVhc3lpY29uLmNuL2ZpbGVzLzEyMy8xMjMyOTc5LnBuZ6ul+WcAAAAASUVORK5CYII=','data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAPCAMAAADJev/pAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABa1BMVEUAAAAAAP8jKdYiJ9gmJtkZHuEiKdYiJtkiKNckKtUlKtUjKNcjKtczM8wkJdojKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYkKdYjKdYjKdYjKdcjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdcjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYAAACRoT2eAAAAeHRSTlMAAAAAAAAAAAAAAAAAAAALNFVXOA4DT7LHubjGt1kGgMxrIQodY8mMDSwzeTEowHsFXLrIxdNEFznNMHzKXx8WIAS2AZ2HAUix71TZoAJ6mZcILo/EJhK/QBWGmhM9iEW+EKdwPiUcg58HkEYGZ887c7TCSh5LXUkCRTE5AAAAAWJLR0QAiAUdSAAAAAlwSFlzAADqYAAA6mABhMnedgAAAAd0SU1FB+QDEQMWFOoAZu0AAAEbSURBVBjTTU/5OwJRFH0OUraEIaIwYynMiEiWyWQrokY0SlKWGLJv/777ar4v55d73znn3nseYzU0AXD2uHr7+qlpZg0AwsCge2jYMzLqBVosspVcXt/Y+IQoSpNT0yJgmTHjD8x65lDDvKzYUOcXgotLoeUVIBwG2rAaWQPsJAjrG5tqdEuDFItJNLK9s7tHhWE/EqjtUOOJRFyFAweHST8JR8ljrtvalVQ6nVIcgH6SOT0DyxrnPIUNOTGfF3PoIJt2kelkBfmSC3Z6F4vgZ7uAq1KZadc3tJdxyefjaXjQW7nA4HLf1X+ASsVqcP8gMJiPxlNZN01Tr1Z5Mc3s88srxYXzLWS8/8dH6ZPOdtPk13fwp4Hgb5S4P2sdNjKhHYdUAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIwLTAyLTI2VDA5OjExOjEwKzAwOjAwmvYnqAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wNC0yNVQwMjoxMDoyMCswMDowMAG1iHYAAAAgdEVYdHNvZnR3YXJlAGh0dHBzOi8vaW1hZ2VtYWdpY2sub3JnvM8dnQAAABh0RVh0VGh1bWI6OkRvY3VtZW50OjpQYWdlcwAxp/+7LwAAABh0RVh0VGh1bWI6OkltYWdlOjpIZWlnaHQAMTkyQF1xVQAAABd0RVh0VGh1bWI6OkltYWdlOjpXaWR0aAAzMDjhP6cxAAAAGXRFWHRUaHVtYjo6TWltZXR5cGUAaW1hZ2UvcG5nP7JWTgAAABd0RVh0VGh1bWI6Ok1UaW1lADE1NTYxNTgyMjDnCLouAAAAEXRFWHRUaHVtYjo6U2l6ZQA0ODUxQoxAmPUAAABadEVYdFRodW1iOjpVUkkAZmlsZTovLy9kYXRhL3d3d3Jvb3Qvd3d3LmVhc3lpY29uLm5ldC9jZG4taW1nLmVhc3lpY29uLmNuL2ZpbGVzLzEyMy8xMjMyOTc5LnBuZ6ul+WcAAAAASUVORK5CYII=','data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAPCAMAAADJev/pAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABa1BMVEUAAAAAAP8jKdYiJ9gmJtkZHuEiKdYiJtkiKNckKtUlKtUjKNcjKtczM8wkJdojKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYkKdYjKdYjKdYjKdcjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdcjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYjKdYAAACRoT2eAAAAeHRSTlMAAAAAAAAAAAAAAAAAAAALNFVXOA4DT7LHubjGt1kGgMxrIQodY8mMDSwzeTEowHsFXLrIxdNEFznNMHzKXx8WIAS2AZ2HAUix71TZoAJ6mZcILo/EJhK/QBWGmhM9iEW+EKdwPiUcg58HkEYGZ887c7TCSh5LXUkCRTE5AAAAAWJLR0QAiAUdSAAAAAlwSFlzAADqYAAA6mABhMnedgAAAAd0SU1FB+QDEQMWFOoAZu0AAAEbSURBVBjTTU/5OwJRFH0OUraEIaIwYynMiEiWyWQrokY0SlKWGLJv/777ar4v55d73znn3nseYzU0AXD2uHr7+qlpZg0AwsCge2jYMzLqBVosspVcXt/Y+IQoSpNT0yJgmTHjD8x65lDDvKzYUOcXgotLoeUVIBwG2rAaWQPsJAjrG5tqdEuDFItJNLK9s7tHhWE/EqjtUOOJRFyFAweHST8JR8ljrtvalVQ6nVIcgH6SOT0DyxrnPIUNOTGfF3PoIJt2kelkBfmSC3Z6F4vgZ7uAq1KZadc3tJdxyefjaXjQW7nA4HLf1X+ASsVqcP8gMJiPxlNZN01Tr1Z5Mc3s88srxYXzLWS8/8dH6ZPOdtPk13fwp4Hgb5S4P2sdNjKhHYdUAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIwLTAyLTI2VDA5OjExOjEwKzAwOjAwmvYnqAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wNC0yNVQwMjoxMDoyMCswMDowMAG1iHYAAAAgdEVYdHNvZnR3YXJlAGh0dHBzOi8vaW1hZ2VtYWdpY2sub3JnvM8dnQAAABh0RVh0VGh1bWI6OkRvY3VtZW50OjpQYWdlcwAxp/+7LwAAABh0RVh0VGh1bWI6OkltYWdlOjpIZWlnaHQAMTkyQF1xVQAAABd0RVh0VGh1bWI6OkltYWdlOjpXaWR0aAAzMDjhP6cxAAAAGXRFWHRUaHVtYjo6TWltZXR5cGUAaW1hZ2UvcG5nP7JWTgAAABd0RVh0VGh1bWI6Ok1UaW1lADE1NTYxNTgyMjDnCLouAAAAEXRFWHRUaHVtYjo6U2l6ZQA0ODUxQoxAmPUAAABadEVYdFRodW1iOjpVUkkAZmlsZTovLy9kYXRhL3d3d3Jvb3Qvd3d3LmVhc3lpY29uLm5ldC9jZG4taW1nLmVhc3lpY29uLmNuL2ZpbGVzLzEyMy8xMjMyOTc5LnBuZ6ul+WcAAAAASUVORK5CYII='];
+		return data[id];
 	}
+}
+/*5.0.1 日志输出信息*/
+function logout(info){
+	if(Debug){
+		console.log(sfdp.dateFormat(new Date(), "mm:ss")+'] ' + info);
+	}
+}
+/*5.0.1 查看时选择框状态*/
+function view_checkboxes_clss(data,type='checkbox',att){
+			var datas = [];
+			var htmls ='';  
+			if(data.value != undefined){
+					var strs = [];
+					strs=(data.value).split(",");
+				}
+			for (y in data.tpfd_data){
+				if(data.tpfd_check != undefined && isInArray(data.tpfd_check,y)){
+					var check='checked';
+				}else{
+					var check='';
+				}
+				
+				if(data.value != undefined && isInArray(strs,data.tpfd_data[y])){
+					var check='checked';
+				}else{
+					var check='';
+				}
+				htmls += '<input '+att+' '+check+' name="'+data.tpfd_db+'[]" value='+y+' type="'+type+'">'+data.tpfd_data[y]+'';
+			}
+			
+			return htmls;
+}
+/*5.0.1 是否在数组里面判断*/
+function isInArray(arr,value){
+	for(var i = 0; i < arr.length; i++){
+	if(value === arr[i]){
+	return true;
+	}
+	}
+	return false;
+}
+/*5.0.1 监听单元格点击状态*/
+$("#sfdp-main").on("click",".sfdp-rows",function(e){
+	var activeDom = $(this).attr('id');
+	var mode = $(this).attr('mode') || 'zhubiao';
 	
+	var json_data = JSON.parse(localStorage.getItem("json_data"));
+	if(mode=='zibiao'){
+		var zbtitle = '<div class="sfdp-form-item"><label class="sfdp-label" >子表标题</label><div class="sfdp-input-block"><input id="row-title" type="text"  autocomplete="off"  class="sfdp-input" value="'+(json_data.sublist[activeDom].title || '请设置子表单标题')+'"></div></div>';
+		var rownum = json_data.sublist[activeDom].type;
+	}else{
+		var zbtitle = '';
+		var rownum =json_data.list[activeDom].type;
+	}
+	$('.sfdp-rows').removeClass('sfdp-ctrl-active');
+	$('#'+activeDom).addClass('sfdp-ctrl-active');
+	var html = '<div  style="margin: 5px;"><div class="sfdp-title">布局配置</div><div class="sfdp-form-item"><label class="sfdp-label">唯一标识</label><div class="sfdp-input-block"><input id="row-id" type="text" name="id" autocomplete="off" value='+activeDom+' class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">布局栅格</label><div class="sfdp-input-block"><input id="row-num" type="number" name="id" autocomplete="off" value='+rownum+' class="sfdp-input"></div></div>'+zbtitle+'</div>';
+	$('.sfdp-att').html(html);
+});
+/*5.0.1 监听删除点击事件*/
+$("#sfdp-main").on("click","#del",function(event){
+	var mode = $('#'+$(this).attr("data")).attr('mode') || 'zhubiao';
+	if(mode=='zhubiao'){
+		$('#'+$(this).attr("data")).remove();
+		sfdp.dataSave('',$(this).attr("data"),'tr_del');
+		}else{
+		$('#'+$(this).attr("data")+'_field').remove();
+		sfdp.dataSave('',$(this).attr("data"),'sublist_del');
+	}	
+	
+	
+	
+	event.stopPropagation();
+});
+/*5.0.1 监听设置属性*/
+$("#sfdp-main").on("click",".sfdp-label",function(event){
+	var dataId = $(this).attr("data-id");
+	var dataCode = $(this).attr("data-code");
+	var dataType = $(this).attr("data-type");
+	var html = sfdp.field_config(dataType,dataId,dataCode);
+	$('.sfdp-att').html(html);
+	event.stopPropagation();
+});
+/*5.0.1 监听栅格变化设计*/
+$(document).on("input propertychange", "#row-num", function (e) {
+		var p_id = $('#row-id').val();
+		var num = $(this).val();
+		if(num<0 || num >12){
+			$(this).val(12);
+			num = 12;
+			layer.msg('Tip:栅格布局只能在1~12区间。');return;
+		}
+		var sl = num;
+		var lan =parseInt(12 / num);
+		var html ='';
+		for (var i=1;i<=sl;i++){ 
+			 html +='<div class="col-'+lan+' sfdp-field-con fb-fz" id='+i+'></div>';
+		}
+		var mode = $('#'+p_id).attr('mode') || 'zhubiao';
+		
+		$('#'+p_id+' .sfdp-field-con').remove();
+		$('#'+p_id+' .view-action').after(html);
+		if(mode=='zhubiao'){
+			sfdp.dataSave({tr:p_id,data:{},type:sl},p_id,'tr');	
+			}else{
+			sfdp.dataSave({id:p_id,title:'',data:{},type:sl},p_id,'sublist');	
+		}	
+		sfdp.setSortable();
+});
+/*5.0.1 监听子表标题设置*/
+$(document).on("input propertychange", "#row-title", function (e) {
+		var title = $('#row-title').val();
+		var p_id = $('#row-id').val();
+		$('#'+p_id+'_title').html(title);
+		sfdp.dataSave(title,p_id,'sublist_title');
+});
