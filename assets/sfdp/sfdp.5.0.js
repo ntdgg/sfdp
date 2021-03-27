@@ -771,7 +771,7 @@ var sfdp = {
 				var on ='onchange=sfdp.select_type()';
 			}
 			
-			var html ='<select name="'+field+'"  '+on+' style="width:35%">';
+			var html ='<select name="'+field+'"  '+on+' >';
 			for (x in data){
 				html += '<option value="'+data[x]['cid']+'" '+((data[x]['cid']) == value ? 'selected' : '') +'>'+data[x]['clab']+'</option>';
 			}
