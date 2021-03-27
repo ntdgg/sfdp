@@ -353,7 +353,7 @@ var sfdp = {
 	},
 	H5uploadhtml : function(ids){
 		var html = '<label for="file-input"><img  width="120px"src="'+sfdp.Ico(0)+'"></label></span>'+
-		'<input type="file" accept="*/*" name="file[]" data-attr="'+ids+'" id="file-input" multiple  style="display: none">';
+		'<input type="file" accept="*/*" name="file" data-attr="'+ids+'" id="file-input" multiple  style="display: none">';
 		layer.open({
 		  type: 1,
 		  title: false,
@@ -373,7 +373,7 @@ var sfdp = {
 				$('.layui-layer-msg .layui-layer-content').html('已上传' + (loaded / total * 100).toFixed(2) + '%');
 			},
 			success: function (ret) {
-				$('#'+ret.attr_id).val(ret.msg);
+				$('#'+ret.attr_id).val(ret.data);
 				layer.closeAll();
 			},
 			error: function (ret) {
