@@ -295,7 +295,7 @@ php;
 	function addoption(id){
 		 $('#checkboxes'+id).children('span').attr("onclick","editoption("+id+")");
 		 $('#checkboxes'+id).children('span').html('Del');
-		 var html ='<div id="checkboxes'+(id+1)+'">查询字段：<select style="width:200px" name="search_ids">{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,LIKE     <span onclick=addoption('+(id+1)+') class="button">Add</span></div>';
+		 var html ='<div id="checkboxes'+(id+1)+'">查询字段：<select style="width:200px" name="search_ids"><option value="">请选择</option>{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,LIKE     <span onclick=addoption('+(id+1)+') class="button">Add</span></div>';
 		 $('#checkboxes'+id).after(html);
 	}
 	function editaccess(id){
