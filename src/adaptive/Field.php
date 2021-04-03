@@ -54,8 +54,8 @@ class Field{
 					'name_type'=>$v['tpfd_dblx'],
 					'zanwei'=>$v['tpfd_zanwei'] ?? '',//占位标识
 					'moren'=>$v['tpfd_moren'] ?? '',//默认标识
-					'is_request'=>$v['tpfd_must'],
-					'is_read'=>$v['tpfd_read'],
+					'is_request'=>$v['tpfd_must'] ?? '',
+					'is_read'=>$v['tpfd_read'] ?? '',
 					'length'=>$v['tpfd_dbcd'],
 					'type_data'=>json_encode($v['tpfd_data'] ?? '',true),
 					'type'=>$v['td_type'],//输入类型
