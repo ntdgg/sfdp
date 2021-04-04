@@ -200,7 +200,7 @@ class Control{
 			$ids = explode(",",$sid['ids_val']);
 			$value = explode(",",$sid['value_val']);
 			$json = View::ver($sid['sid']);
-			Field::saveWhere([['sid','=',$json['ver']['id']]],['is_search'=>0,'search_type'=>'','update_time'=>time()]);
+			$ret =Field::saveWhere([['sid','=',$json['ver']['id']]],['is_search'=>0,'search_type'=>'','update_time'=>time()]);
 			foreach($ids as $k=>$v){
 				if($v <> ''){
 					$ret =Field::saveWhere([['id','=',$v]],['is_search'=>1,'search_type'=>$value[$k],'update_time'=>time()]);

@@ -258,7 +258,7 @@ class Data{
 		}
 		//字表数据
 		$sublist =[];
-		if($field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
+		if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
 			$Stable = self::getSubData($field['name_db'],$field['sublist']);
 			foreach($Stable as $k=>$v){	
 				
