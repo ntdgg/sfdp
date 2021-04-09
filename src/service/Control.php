@@ -66,7 +66,7 @@ class Control{
 		if($act =='deldb'){
 			 $json = Design::getDesignJson($sid);
 			 //判断是否有附表
-			if($json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
+			if(isset($json['sublist']) && $json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
 				$Stable = BuildStable::delDbbak($json['name_db'],$json['sublist']);
 				if($Stable['code']==-1){
 					return json($Stable);
@@ -99,7 +99,7 @@ class Control{
 				return json($ret2);
 			}
 			//判断是否有附表
-			if($json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
+			if(isset($json['sublist']) && $json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
 				$Stable = BuildStable::Btable($json['name_db'],$json['sublist']);
 				if($Stable['code']==-1){
 					return json($Stable);
@@ -200,7 +200,7 @@ class Control{
 			$ids = explode(",",$sid['ids_val']);
 			$value = explode(",",$sid['value_val']);
 			$json = View::ver($sid['sid']);
-			$ret =Field::saveWhere([['sid','=',$json['ver']['id']]],['is_search'=>0,'search_type'=>'','update_time'=>time()]);
+			Field::saveWhere([['sid','=',$json['ver']['id']]],['is_search'=>0,'search_type'=>'','update_time'=>time()]);
 			foreach($ids as $k=>$v){
 				if($v <> ''){
 					$ret =Field::saveWhere([['id','=',$v]],['is_search'=>1,'search_type'=>$value[$k],'update_time'=>time()]);

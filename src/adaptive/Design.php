@@ -169,11 +169,13 @@ class Design{
 							$tpfd_data = $v2['tpfd_data'];
 						}
 					}
-					if(($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
-						$fieldArr[$v2['tpfd_db']]=$v2['tpfd_data'];
-					}
-					if($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
-						$fieldArrAll[$v2['tpfd_db']]=$v2['tpfd_data'];
+					if(isset($v2['tpfd_db']) and(isset($v2['tpfd_list']))){
+						if(($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
+							$fieldArr[$v2['tpfd_db']]=$v2['tpfd_data'];
+						}
+						if($v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
+							$fieldArrAll[$v2['tpfd_db']]=$v2['tpfd_data'];
+						}
 					}
 				}
 			}

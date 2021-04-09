@@ -53,7 +53,7 @@ class Script{
 		}	
 		$map[] = ['sid','=',$info['sid']];
 		$map[] = ['status','=',1];
-		$data = Design::updateVerWhere($map,['s_fun_id'=>$id,'s_fun_ver'=>$info['s_bill']]);
+		$data = Design::updateVerWhere($map,['s_fun_id'=>$id,'s_fun_ver'=>$bill]);
 		return $bill;
 	}
 }
