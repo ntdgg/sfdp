@@ -38,13 +38,18 @@ class SfdpUnit{
 			$search_field = $search['search'];
 			foreach($search_field as $k=>$v){
 				if($v <>''){
-					$info = Field::findWhere([['field','=',$k],['sid','=',$sid]]);
-					if($info['search_type']=='like' || $info['search_type']=='not like'){
-						$map[] = [$k,$info['search_type'],'%'.$v.'%'];
-						}else{
-						$map[] = [$k,$info['search_type'],$v];
+					$info = Field::findWhere([['field','=',$k],['sid','=',$sid],['is_search','=',1]]);
+					if($info){
+						if($info['search_type']=='like' || $info['search_type']=='not like'){
+							$map[] = [$k,$info['search_type'],'%'.$v.'%'];
+							}else{
+							$map[] = [$k,$info['search_type'],$v];
+						}
 					}
-					
+					//全局权限过滤
+					if($k=='uid'){
+						$map[] = ['uid','in',$v];
+					}
 				}
 			}
 		}
