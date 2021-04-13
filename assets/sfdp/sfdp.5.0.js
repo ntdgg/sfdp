@@ -529,7 +529,7 @@ var sfdp = {
 				var html =lab+sfdp.view_select(data.tpfd_data,data.tpfd_db,data.value,field_att,data.tpfd_id);
 				break;
 				case 'textarea':
-				var html =lab+'<textarea  name="'+data.tpfd_db+'" '+field_att+' placeholder="" >'+(data.value || '')+'</textarea>';
+				var html =lab+'<textarea  id="'+data.tpfd_id+'" name="'+data.tpfd_db+'" '+field_att+' placeholder="" >'+(data.value || '')+'</textarea>';
 				break;
 				case 'upload':
 				var html =lab+sfdp.view_upload(data,data.tpfd_db,0);
@@ -585,7 +585,7 @@ var sfdp = {
 					var html =lab+sfdp.view_select(data.tpfd_data,data.tpfd_db,0,field_att,data.tpfd_id);
 					break;
 					case 'textarea':
-					var html =lab+'<textarea  name="'+data.tpfd_db+'" '+field_att+' placeholder="" ></textarea>';
+					var html =lab+'<textarea id="'+data.tpfd_id+'" name="'+data.tpfd_db+'" '+field_att+' placeholder="" ></textarea>';
 					break;
 					case 'upload':
 					var html =lab+sfdp.view_upload(data,data.tpfd_db,0);
