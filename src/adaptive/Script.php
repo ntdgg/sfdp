@@ -50,8 +50,8 @@ class Script{
 			$id = $info['id'];
 			(new Script())->mode->update(['id'=>$info['id'],'s_fun'=>$data['function']]);
 			$bill=$info['s_bill'];
-		}	
-		$map[] = ['sid','=',$info['sid']];
+		}
+		$map[] = ['sid','=',$data['sid']];
 		$map[] = ['status','=',1];
 		$data = Design::updateVerWhere($map,['s_fun_id'=>$id,'s_fun_ver'=>$bill]);
 		return $bill;

@@ -96,7 +96,7 @@ class Control{
 			//创建数据表
 			$BuildTable = BuildTable::Btable($json['name_db'],$varInfo['db'],$all['tpfd_btn'],$all['name']);
 			if($BuildTable['code']==-1){
-				return json($ret2);
+				return json($BuildTable);
 			}
 			//判断是否有附表
 			if(isset($json['sublist']) && $json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
@@ -131,7 +131,7 @@ class Control{
 				return 'Sorry,未找到node_action类，请先配置~';
 			}
 			$ver = Design::findVerWhere([['status','=',1],['sid','=',$sid['sid']]]);//取得版本ID
-			$Node = (new $className())->SaveNode(Design::descVerTodata($ver['id']),$sid['node']);//获取目录节点信息	
+			$Node = (new $className())->SaveNode($sid['sid'],Design::descVerTodata($ver['id']),$sid['node']);//获取目录节点信息
 			if($Node['code']==0){
 				return json(['code'=>0]);
 			}else{
@@ -260,19 +260,36 @@ class Control{
 	 * @param  Array $sid sid值
 	 */
 	static function curd($act,$sid,$data='',$g_js='',$bid=''){
+	    //使用sid找出当前的版本sid_ver; 2021年5月3日22:58:33
+        $sid_ver = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
+        if(!$sid_ver){
+            echo '未发现发行版本';exit;
+        }
+        $sid = $sid_ver['id'];
+
 		if($act =='index'){
-			
 			$modueId = Modue::findWhere([['sid','=',$sid]]);//找出模型
 			$fieldId = Field::select([['sid','=',$sid]]);//找出模型字段
 			$search = [];
+
+
 			foreach($fieldId as $k=>$v){
 				if($v['is_search']==1){
 					if($v['type_lx']==1 && $v['function'] !=''){
-						$getFun = Functions::findWhere([['fun_name','=',$v['function']]]);
-						if(!$getFun){
-							echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
-						}
-						$getData = Common::query($getFun['function']);
+                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+                        if($fun_mode==1 || $fun_mode==''){
+                            $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
+                            if(!$getFun){
+                                echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        }else{
+                            $className = unit::gconfig('fun_namespace');
+                            if(!class_exists($className)){
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
 						}else{
@@ -307,7 +324,6 @@ class Control{
 		}
 		if($act =='GetData'){
 			$map = SfdpUnit::Bsearch($data,$sid);
-			//var_dump($map);
 			$list = Data::getListData($sid,$map,$data['page'],$data['limit']);
 			$jsondata = [];
 			$btnArray = $list['field']['btn'];
@@ -316,8 +332,8 @@ class Control{
 				-1=>'<span class="label label-danger radius" >退回修改</span>',0=>'<span class="label radius">保存中</span>',1=>'<span class="label radius" >流程中</span>',2=>'<span class="label label-success radius" >审核通过</span>'
 			];
 			foreach($list['list'] as $k=>$v){		
-				$list['list'][$k]['id'] = '<input type="checkbox" value="'.$v['id'].'/'.$v['status'].'/'.$tablename.'" name="ids">';
-				$list['list'][$k]['status'] =   $stv[$v['status']] ?? 'ERR';
+				//$list['list'][$k]['id'] = '<input type="checkbox" value="'.$v['id'].'/'.$v['status'].'/'.$tablename.'" name="ids">';
+				//$list['list'][$k]['status'] =   $stv[$v['status']] ?? 'ERR';
 				$list['list'][$k]['url'] = '<a onClick=sfdp.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
 				$jsondata[$k] = array_values($list['list'][$k]);
 			}

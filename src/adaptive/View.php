@@ -22,6 +22,7 @@ class View{
 	public static function ver($sid){
 		$json = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
 		$field = json_decode($json['s_field'],true);
+		$data_ver_db = [];
 		foreach((array)$field['list'] as $k=>$v){
 			foreach($v['data'] as $v2){
 				if(isset($v2['tpfd_db'])){
@@ -56,6 +57,8 @@ class View{
 	 * 添加版本
 	 */
 	public static function verAdd($sid,$info,$json){
+		$json_ver = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);//2021年5月12日 重新部署更新脚本方法
+		
 		$ver = [
 			'sid'=>$sid,
 			's_bill'=>unit::OrderNumber(),
@@ -63,7 +66,8 @@ class View{
 			's_db'=>$json['name_db'],
 			's_list'=>$info['s_list'],
 			's_search'=>$info['s_search'],
-			's_fun_ver'=>'',
+			's_fun_ver'=>$json_ver['s_fun_ver']  ?? '',
+			's_fun_id'=>$json_ver['s_fun_id']  ?? '',
 			's_field'=>$info['s_field'],
 			'add_user'=>1,
 			'status'=>1,

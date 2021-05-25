@@ -48,7 +48,7 @@ class lib{
 			   $btn .='<a onClick=sfdp.Askshow("'.$urls['api'].'?act=deldb&sid='.$v['id'].'","删除备份数据库,是否执行?")  class="button">DelDb</a>';
 			   $btn .='<a onClick=add_fun('.$v['id'].')  class="button">Menu</a>';
 		   }
-		   $tr .='<tr class="text-c"><td>'.$v['s_bill'].'</td><td>'.$v['s_title'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$status_zt[$v['s_design']].'</td><td>'.$status[$v['s_look']].'（'.$v['s_db'].'）</td><td>'.$btn.'</td></tr>';	
+		   $tr .='<tr class="text-c"><td>'.$v['id'].'</td><td>'.$v['s_bill'].'</td><td>'.$v['s_title'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$status_zt[$v['s_design']].'</td><td>'.$status[$v['s_look']].'（'.$v['s_db'].'）</td><td>'.$btn.'</td></tr>';
 		}
 		return <<<php
 		{$tmp['head']}{$tmp['js']}
@@ -60,7 +60,7 @@ class lib{
 			</div>
 			<div style='float: left;width:95%;margin-top: 10px;'>
 				<table class="table" >
-					<tr class="text-c"><th >编码</th><th>标题</th><th>发布时间</th><th>启用状态</th><th>锁定状态</th><th>操作</th></tr>
+					<tr class="text-c"><th >sid</th><th >编码</th><th>标题</th><th>发布时间</th><th>启用状态</th><th>锁定状态</th><th>操作</th></tr>
 					{$tr}
 				</table>
 			</div>
@@ -106,7 +106,7 @@ class lib{
 				return;
 			}
 			var url = "{$node_url}&sid="+sid+"&node="+node;
-			sfdp.Askshow(url,"再次确认是否创建目录，,是否执行?");
+			sfdp.Askshow(url,"再次确认是否创建目录,是否执行?");
 		}
 		</script>
 		</body>
@@ -276,7 +276,7 @@ php;
     <tr><td style='text-align: center;'><b>权限控制<b> </td><td>
 	{$access_html}
 	<div id="access1">控制字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select> 
-	<select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="!=">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select> 
+	<select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="<>">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select>
 	<select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select> 
     <span class='button' onclick=addaccess(1)>Add</span></div>
 	</td><td><a onclick='save_access()'  class='button'>保存</a></td></tr>
@@ -289,7 +289,7 @@ php;
 	function addaccess(id){
 		 $('#access'+id).children('span').attr("onclick","editaccess("+id+")");
 		 $('#access'+id).children('span').html('Del');
-		 var html ='<div id="access'+(id+1)+'">控制字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select> <select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="!=">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select> <select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select> <span class="button" onclick=addaccess('+(id+1)+')>Add</span></div>';
+		 var html ='<div id="access'+(id+1)+'">控制字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select> <select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="<>">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select> <select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select> <span class="button" onclick=addaccess('+(id+1)+')>Add</span></div>';
 		 $('#access'+id).after(html);
 	}
 	function addoption(id){
@@ -390,7 +390,7 @@ php;
 		</div>
 		<script src="{$patch}lib/jquery-1.12.4.js"></script>
 		<script src="{$patch}lib/layer/2.4/layer.js"></script>
-		<script type="text/javascript" src="{$patch}sfdp.5.0.js?v=5.0.1"></script>
+		<script type="text/javascript" src="{$patch}sfdp.5.0.js?v=5.0.322222"></script>
 		<script type="text/javascript" src="{$patch}lib/jquery-ui.js"></script>
 		<script type="text/javascript" language="javascript">
 			var look_db = {$look};
@@ -403,6 +403,24 @@ php;
 				  revert: "invalid",
 				  cursor: "move"
 			});
+			$( "#sfdp-main" ).sortable({
+			    stop: function( event, ui ) {
+			        let obj = {}
+			        let obj2 = []
+			        const json_data = JSON.parse(localStorage.getItem("json_data"));
+			        const sortedList = $("#sfdp-main div.sfdp-rows ")
+			        for(let i= 0; i< sortedList.length ;i++){
+			            let item = sortedList[i]
+			            //删除TR数据
+			            sfdp.dataSave('', item.id , 'tr_del');
+			            //重新写入数据库
+			            sfdp.dataSave(json_data.list[item.id], String(item.id), 'tr')
+			        }
+			    }
+			
+			});
+            $( "#sfdp-main" ).disableSelection();
+            
 			$( "#fb-fz" ).sortable({
 			  cancel: ".fb-disabled"
 			});
@@ -436,22 +454,30 @@ php;
 	public static function script($info,$sid){
 		$tmp = self::commontmp('Sfdp超级表单设计器');
 		$urls= unit::gconfig('url');
+        $info['s_fun'] = $info['s_fun'] ?? '';
 		$action = $urls['api'].'?act=script&sid='.$sid;
+		$patch = unit::gconfig('static_url');
 	return <<<php
 	{$tmp['css']}
+		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/codemirror.css" />
+		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/dracula.css" />
+		<script src="{$patch}lib/codemirror/codemirror.js"></script>
+		<script src="{$patch}lib/codemirror/javascript.js"></script>
 			<form action="{$action}" method="post" name="form" id="form">
 			<input type="hidden" name="sid" value="{$sid}">
 		<table class="table">
 			<tr valign="center">
 			<td style='width:35px;text-align:center'>脚本说明</td>
 			<td style='width:330px;text-align: left;'>
-			<pre><bq>&lt;h2</bq><bq>&gt;</bq>脚本说明：<bq style="">&lt;/h2</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq><bq>&lt;p</bq><bq>&gt;</bq>load_satr_fun();//前置函数在表单构建器之前会执行，比如插入必要的组件代码。<bq>&lt;/p</bq><bq>&lt;/p</bq><bq>&gt;</bq><br><bq>&lt;p</bq><bq>&gt;</bq>load_end_fun();//后置代码用于页面加载完成后的代码执行<bq>&lt;/p</bq><bq>&gt;</bq>
+			脚本说明：<br/>
+			load_satr_fun();//前置函数在表单构建器之前会执行，比如插入必要的组件代码。<br/>
+			</bq>load_end_fun();//后置代码用于页面加载完成后的代码执行<br/>
 			</pre>
 			</td>
 			</tr>
 			<tr valign="center">
 			<td style='width:35px;text-align:center'>单据脚本</td><td style='width:330px' >
-			<textarea placeholder="请填写JQ脚本代码！" name='function' type="text/plain" style="width:100%;height:450px;">{$info['s_fun']}</textarea> </td>
+			<textarea placeholder="请填写JQ脚本代码！" name='function' type="text/plain" style="width:100%;height:450px;display:inline-block;" id='code'>{$info['s_fun']}</textarea> </td>
 			</tr>
 			<tr valign="center">
 			<td style='text-align:center' colspan='2'><button  class="button" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
@@ -459,7 +485,17 @@ php;
 			</tr>
 		</table>
 	</form>
+
 	{$tmp['js']}
+	<script type="text/javascript" language="javascript">
+		  var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+			lineNumbers: true,
+         lineWrapping: true,
+			mode: "text/typescript",
+			theme: "dracula",	//设置主题
+			 matchBrackets: true,
+		  });
+	</script>
 </body>
 </html>
 php;
@@ -477,6 +513,5 @@ php;
 		$head ='<title>'.$title.'</title><head>'.$css.'</head><body style="background-color: white;">';
 		return ['head'=>$head,'css'=>$css,'js'=>$js];
 	}
-	
 }
 

@@ -9,12 +9,8 @@ body {
 	padding: 0;
 	-webkit-tap-highlight-color: rgba(0,0,0,0);
 }
-pre{
-	font:100 12px/18px monaco, andale mono, courier new;padding:1px 2px;border:#ccc 1px solid;border-left-width:4px;background-color:#fefefe;box-shadow:0 0 4px #eee;word-break:break-all;word-wrap:break-word;color:#444
-}
-pre bq{
-	color:#170
-}
+
+
 select{
 	height: 30px;
     margin-top: 3px;
@@ -46,6 +42,11 @@ li{margin: 0;padding: 0;}
     font-size: 16px;
     color: #2d6dcc;
 }
+.red{
+	margin-left: 5px;
+	color: #ff0000;
+}
+
 .sfdp-cl {
 	clear: both;
 }

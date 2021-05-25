@@ -117,11 +117,22 @@ class Design{
 		$searct_array = json_decode($sfdp_ver_info['s_search'],true);
 				foreach($list_field as $k2=>$v2){
 					if(isset($v2['xx_type']) && $v2['xx_type']==1){
-						$map[] = ['fun_name','=',$v2['checkboxes_func']];
-						$getFun = Functions::findWhere($map);
-						if(!$getFun){
-							echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
-						}
+                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+                        if($fun_mode==1 || $fun_mode==''){
+                            $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
+                            if(!$getFun){
+                                echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        }else{
+                            $className = unit::gconfig('fun_namespace');
+                            if(!class_exists($className)){
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
+
+
 						$getData = Common::query($getFun['function']);
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
@@ -149,12 +160,20 @@ class Design{
 				foreach($v['data'] as $k2=>$v2){
 					if(isset($v2['xx_type']) && $v2['xx_type']==1){
 						//函数名转为数据信息
-						$map[] = ['fun_name','=',$v2['checkboxes_func']];
-						$getFun = Functions::findWhere($map);
-						if(!$getFun){
-							echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
-						}
-						$getData = Common::query($getFun['function']);
+                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+                        if($fun_mode==1 || $fun_mode==''){
+                            $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
+                            if(!$getFun){
+                                echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        }else{
+                            $className = unit::gconfig('fun_namespace');
+                            if(!class_exists($className)){
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
 						}else{
@@ -197,13 +216,20 @@ class Design{
 		foreach($field['list'] as $k=>$v){
 				foreach($v['data'] as $k2=>$v2){
 					if(isset($v2['xx_type']) && $v2['xx_type']==1){
-						//函数名转为数据信息
-						$map[] = ['fun_name','=',$v2['checkboxes_func']];
-						$getFun = Functions::findWhere($map);
-						if(!$getFun){
-							echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
-						}
-						$getData = Common::query($getFun['function']);
+					    $fun_mode = unit::gconfig('fun_mode') ?? 1;
+					    if($fun_mode==1 || $fun_mode==''){
+                            $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
+                            if(!$getFun){
+                                echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        }else{
+                            $className = unit::gconfig('fun_namespace');
+                            if(!class_exists($className)){
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
 						}else{
@@ -216,6 +242,43 @@ class Design{
 					}
 				}
 			}
+        //字表数据
+
+        if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
+            foreach($field['sublist'] as $k=>$v){
+                foreach($v['data'] as $k2=>$v2) {
+                    if (isset($v2['xx_type']) && $v2['xx_type'] == 1) {
+                        //函数名转为数据信息
+                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+                        if ($fun_mode == 1 || $fun_mode == '') {
+                            $getFun = Functions::findWhere([['fun_name', '=', $v2['checkboxes_func']]]);
+                            if (!$getFun) {
+                                echo '<h2>系统级别错误(' . $v2['checkboxes_func'] . ')：函数名无法找到~</h2>';
+                                exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        } else {
+                            $className = unit::gconfig('fun_namespace');
+                            if (!class_exists($className)) {
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
+                        if ($getData['code'] == -1) {
+                            echo '<h2>系统级错误：' . $getData['msg'] . '</h2>';
+                            exit;
+                        } else {
+                            $tpfd_data = [];
+                            foreach ($getData['msg'] as $k3 => $v3) {
+                                $tpfd_data[$v3['id']] = $v3['name'];
+                            }
+                        }
+                        $field['sublist'][$k]['data'][$k2]['tpfd_data'] = $tpfd_data;
+                    }
+                }
+            }
+        }
+
 		$sfdp_ver_info['s_field'] = json_encode($field);
 		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
 		return ['info'=>$sfdp_ver_info,'fun'=>$fun,'load_file'=>$load_file];
@@ -246,7 +309,8 @@ class Design{
 				's_list'=>json_encode($list),
 				's_search'=>json_encode($search),
 				's_field'=>htmlspecialchars_decode($data['ziduan']),
-				's_design'=>1
+				's_design'=>1,
+				'add_time'=>time()
 			];
 			if((new Design())->mode->update($ver)){
 				return ['code'=>0,'msg'=>'Success'];

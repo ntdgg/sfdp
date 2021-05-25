@@ -40,7 +40,7 @@ class Modue{
 			'sid'=>$varInfo['ver']['id'],
 			'title'=>$varInfo['ver']['s_name'],
 			'dbtable'=>$varInfo['ver']['s_db'],
-			'btn'=> implode($btn,',')
+			'btn'=> implode(',',$btn)
 		];
 		return (new Modue())->mode->add($data);		
 	}

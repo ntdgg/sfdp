@@ -199,7 +199,7 @@ class Data{
 						$json[$k][$k2] = rtrim($vk2value, ",");
 						
 					}else{
-						$json[$k][$k2] = $jsondata['fieldArrAll'][$k2][$v[$k2]] ?? '<font color="red">索引出错</font>';
+						$json[$k][$k2] = $jsondata['fieldArrAll'][$k2][$v[$k2]] ?? '<font color="red">未选择</font>';
 					}
 				}
 			}
@@ -222,12 +222,20 @@ class Data{
 				foreach($v['data'] as $k2=>$v2){
 					if(isset($v2['xx_type']) && $v2['xx_type']==1){
 						//函数名转为数据信息
-						$map[] = ['fun_name','=',$v2['checkboxes_func']];
-						$getFun = Functions::findWhere($map);
-						if(!$getFun){
-							echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
-						}
-						$getData = Common::query($getFun['function']);
+                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+                        if($fun_mode==1 || $fun_mode==''){
+                            $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
+                            if(!$getFun){
+                                echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        }else{
+                            $className = unit::gconfig('fun_namespace');
+                            if(!class_exists($className)){
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
 						}else{
@@ -246,7 +254,7 @@ class Data{
 						$value_arr = explode(",",$find[$v2['tpfd_db']]);
 						$fiedsver = '';
 						foreach($value_arr as $v3){
-							$fiedsver .=$v2['tpfd_data'][$v3].',';
+							$fiedsver .=($v2['tpfd_data'][$v3] ?? $v3).',';
 						}
 						$field['list'][$k]['data'][$k2]['tpfd_data'] = $tpfd_data;
 						$field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
@@ -259,22 +267,57 @@ class Data{
 		//字表数据
 		$sublist =[];
 		if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
+            foreach($field['sublist'] as $k=>$v){
+                foreach($v['data'] as $k2=>$v2) {
+                    if (isset($v2['xx_type']) && $v2['xx_type'] == 1) {
+                        //函数名转为数据信息
+                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+                        if ($fun_mode == 1 || $fun_mode == '') {
+                            $getFun = Functions::findWhere([['fun_name', '=', $v2['checkboxes_func']]]);
+                            if (!$getFun) {
+                                echo '<h2>系统级别错误(' . $v2['checkboxes_func'] . ')：函数名无法找到~</h2>';
+                                exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        } else {
+                            $className = unit::gconfig('fun_namespace');
+                            if (!class_exists($className)) {
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
+                        if ($getData['code'] == -1) {
+                            echo '<h2>系统级错误：' . $getData['msg'] . '</h2>';
+                            exit;
+                        } else {
+                            $tpfd_data = [];
+                            foreach ($getData['msg'] as $k3 => $v3) {
+                                $tpfd_data[$v3['id']] = $v3['name'];
+                            }
+                        }
+                        $field['sublist'][$k]['data'][$k2]['tpfd_data'] = $tpfd_data;
+                    }
+                }
+            }
 			$Stable = self::getSubData($field['name_db'],$field['sublist']);
-			foreach($Stable as $k=>$v){	
-				
+			foreach($Stable as $k=>$v){
 				$sublist[$k]= self::selectAll($v[0],['d_id'=>$bid]);
 				$datas = self::selectAll($v[0],['d_id'=>$bid]);
-				
 				foreach($datas as $kk=>$vv){
 					$mkey = array_keys($v[1]);
 					$mkey2 = array_keys($vv);
 					foreach($mkey as $kkk=>$vvv){
-						$v[1][$vvv]['value'] =$vv[$mkey2[$kkk]];
+                        if (isset($v[1][$vvv]['xx_type']) && $v[1][$vvv]['xx_type'] == 1) {
+                            $v[1][$vvv]['value'] =$v[1][$vvv]['tpfd_data'][$vv[$mkey2[$kkk]]] ?? '未匹配';
+                        }else{
+                            $v[1][$vvv]['value'] =$vv[$mkey2[$kkk]];
+                        }
 					}
 					$sublist[$k][$kk] = $v[1];
 				}
 			}
 		}
+		//dump($sublist);
 		$field['sublists'] = $sublist;
 		return ['info'=>json_encode($field),'sublist'=>json_encode($sublist),'data'=>$data];
 	}
@@ -301,12 +344,20 @@ class Data{
 				foreach($v['data'] as $k2=>$v2){
 					if(isset($v2['xx_type']) && $v2['xx_type']==1){
 						//函数名转为数据信息
-						$map[] = ['fun_name','=',$v2['checkboxes_func']];
-						$getFun = Functions::findWhere($map);
-						if(!$getFun){
-							echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
-						}
-						$getData = Common::query($getFun['function']);
+                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+                        if($fun_mode==1 || $fun_mode==''){
+                            $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
+                            if(!$getFun){
+                                echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        }else{
+                            $className = unit::gconfig('fun_namespace');
+                            if(!class_exists($className)){
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
 						}else{
@@ -325,7 +376,7 @@ class Data{
 						$value_arr = explode(",",$find[$v2['tpfd_db']]);
 						$fiedsver = '';
 						foreach($value_arr as $v3){
-							$fiedsver .=$v2['tpfd_data'][$v3].',';
+							$fiedsver .=($v2['tpfd_data'][$v3] ?? '未选择').',';
 						}
 						$field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
 					}else{
@@ -336,17 +387,51 @@ class Data{
 		//字表数据
 		$sublist =[];
 		if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
+            foreach($field['sublist'] as $k=>$v){
+                foreach($v['data'] as $k2=>$v2) {
+                    if (isset($v2['xx_type']) && $v2['xx_type'] == 1) {
+                        //函数名转为数据信息
+                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+                        if ($fun_mode == 1 || $fun_mode == '') {
+                            $getFun = Functions::findWhere([['fun_name', '=', $v2['checkboxes_func']]]);
+                            if (!$getFun) {
+                                echo '<h2>系统级别错误(' . $v2['checkboxes_func'] . ')：函数名无法找到~</h2>';
+                                exit;
+                            }
+                            $getData = Common::query($getFun['function']);
+                        } else {
+                            $className = unit::gconfig('fun_namespace');
+                            if (!class_exists($className)) {
+                                return 'Sorry,未找到自定函数，请先配置~';
+                            }
+                            $getData = (new $className())->func($v2['checkboxes_func']);
+                        }
+                        if ($getData['code'] == -1) {
+                            echo '<h2>系统级错误：' . $getData['msg'] . '</h2>';
+                            exit;
+                        } else {
+                            $tpfd_data = [];
+                            foreach ($getData['msg'] as $k3 => $v3) {
+                                $tpfd_data[$v3['id']] = $v3['name'];
+                            }
+                        }
+                        $field['sublist'][$k]['data'][$k2]['tpfd_data'] = $tpfd_data;
+                    }
+                }
+            }
 			$Stable = self::getSubData($field['name_db'],$field['sublist']);
-			foreach($Stable as $k=>$v){	
-				
+			foreach($Stable as $k=>$v){
 				$sublist[$k]= self::selectAll($v[0],['d_id'=>$bid]);
 				$datas = self::selectAll($v[0],['d_id'=>$bid]);
-				
 				foreach($datas as $kk=>$vv){
 					$mkey = array_keys($v[1]);
 					$mkey2 = array_keys($vv);
 					foreach($mkey as $kkk=>$vvv){
-						$v[1][$vvv]['value'] =$vv[$mkey2[$kkk]];
+                        if (isset($v[1][$vvv]['xx_type']) && $v[1][$vvv]['xx_type'] == 1) {
+                            $v[1][$vvv]['value'] =$v[1][$vvv]['tpfd_data'][$vv[$mkey2[$kkk]]] ?? '未匹配';
+                        }else{
+                            $v[1][$vvv]['value'] =$vv[$mkey2[$kkk]];
+                        }
 					}
 					$sublist[$k][$kk] = $v[1];
 				}

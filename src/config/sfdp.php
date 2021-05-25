@@ -18,7 +18,7 @@ return [
 	'db_mode'=>1,
 	'static_url'=>'/static/sfdp/',//资源目录
 	'gateway_mode' =>1,//1,默认使用Tp的助手函数
-	'gateway_action' =>'',//自定义方法返回数据 命名空间 中的GetUserInfo
+	'gateway_action' =>'\\sys\\SfdpGateway',//自定义方法返回数据 命名空间 中的GetUserInfo
 	'url' => [
 		'api'=>"/index/sfdp/sfdpApi.html",
 	],
@@ -27,6 +27,8 @@ return [
 	'node_data'=>[
 		'html'=>'<option value="1">首页</option><option value="2">后台</option>',
 	],//黑名单表，防止重复
-	'node_action'=>'\\Node',//获取目录方法，用于目录挂载  SaveNode保存接口  GetNode获取节点接口
-	'upload_file' => '/gadmin/sys/upload',//附件上传接口
+	'node_action'=>'\\sys\\Node',//获取目录方法，用于目录挂载  SaveNode保存接口  GetNode获取节点接口
+	'upload_file' => '/gadmin/Common/upload',//附件上传接口
+    'fun_mode' => 2,//1、系统模式  2、二次开发模式
+    'fun_namespace' =>'\\sys\\SfdpFun',//自定义方法返回数据 命名空间 中的GetUserInfo
 ];
