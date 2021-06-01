@@ -266,21 +266,18 @@ class Control{
             echo '未发现发行版本';exit;
         }
         $sid = $sid_ver['id'];
-
 		if($act =='index'){
 			$modueId = Modue::findWhere([['sid','=',$sid]]);//找出模型
 			$fieldId = Field::select([['sid','=',$sid]]);//找出模型字段
 			$search = [];
-
-
 			foreach($fieldId as $k=>$v){
 				if($v['is_search']==1){
 					if($v['type_lx']==1 && $v['function'] !=''){
                         $fun_mode = unit::gconfig('fun_mode') ?? 1;
                         if($fun_mode==1 || $fun_mode==''){
-                            $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
+                            $getFun = Functions::findWhere([['fun_name','=',$v['function']]]);
                             if(!$getFun){
-                                echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
+                                echo '<h2>系统级别错误('.$v2['function'].')：函数名无法找到~</h2>';exit;
                             }
                             $getData = Common::query($getFun['function']);
                         }else{
@@ -288,7 +285,7 @@ class Control{
                             if(!class_exists($className)){
                                 return 'Sorry,未找到自定函数，请先配置~';
                             }
-                            $getData = (new $className())->func($v2['checkboxes_func']);
+                            $getData = (new $className())->func($v['function']);
                         }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
@@ -297,12 +294,12 @@ class Control{
 							foreach($getData['msg'] as $k3=>$v3){
 								$sd[$v3['id']] = $v3['name'];
 							}
-							$v['type_data'] = $sd;
+							$v['type_data'] = json_encode($sd);
 						}
 					}
 					$search[] = $v;
 				}
-			}	
+			}
 			$map = SfdpUnit::Bsearch($data,$sid);
 			$list = Data::getListData($sid,$map);
 			$field_name = explode(',',$modueId['field_name']);

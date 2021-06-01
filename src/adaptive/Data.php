@@ -165,7 +165,7 @@ class Data{
 	/**
 	 * 获取列表数据
 	 */
-	static function getListData($sid,$map,$page=1,$limit=10){
+	static function getListData($sid,$map,$page=1,$limit=15){
 		$jsondata = Design::descVerTodata($sid);
 		$Modue = Modue::find($jsondata['sid']);
 		/*权限系统组合过滤*/
@@ -183,7 +183,6 @@ class Data{
 			}
 			$map[] = [$field['field'],$eq,$value];
 		}
-		
 		/*权限系统组合过滤*/
 		$list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit);
 		$json = $list['data'];
@@ -197,14 +196,16 @@ class Data{
 							$vk2value .=$jsondata['fieldArrAll'][$k2][$vvv].',';
 						}
 						$json[$k][$k2] = rtrim($vk2value, ",");
-						
 					}else{
 						$json[$k][$k2] = $jsondata['fieldArrAll'][$k2][$v[$k2]] ?? '<font color="red">未选择</font>';
 					}
 				}
 			}
+				$sys_user = unit::gconfig('sys_user');
+			foreach($jsondata['fieldSysUser'] as $k3=>$v3) {
+				$json[$k][$k3] = (new $sys_user())->value($v3,$v[$k3]);
+			}
 		}
-		
 		return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
 	}
 	static function selectAll($table,$where=[]){
@@ -258,10 +259,13 @@ class Data{
 						}
 						$field['list'][$k]['data'][$k2]['tpfd_data'] = $tpfd_data;
 						$field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
-					}else{
+					}elseif($v2['td_type']=='system_user' || $v2['td_type']=="system_role"){
+                        $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
+                        $sys_user = unit::gconfig('sys_user');
+                        $field['list'][$k]['data'][$k2]['text'] = (new $sys_user())->value($v2['td_type'],$find[$v2['tpfd_db']]);
+                    }else{
 						$field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
 					}
-					
 				}
 		}
 		//字表数据
@@ -317,7 +321,6 @@ class Data{
 				}
 			}
 		}
-		//dump($sublist);
 		$field['sublists'] = $sublist;
 		return ['info'=>json_encode($field),'sublist'=>json_encode($sublist),'data'=>$data];
 	}
@@ -379,7 +382,11 @@ class Data{
 							$fiedsver .=($v2['tpfd_data'][$v3] ?? '未选择').',';
 						}
 						$field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
-					}else{
+					}elseif($v2['td_type']=='system_user' || $v2['td_type']=="system_role"){
+                        $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
+                        $sys_user = unit::gconfig('sys_user');
+                        $field['list'][$k]['data'][$k2]['text'] = (new $sys_user())->value($v2['td_type'],$find[$v2['tpfd_db']]);
+                    }else{
 						$field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
 					}
 				}
@@ -440,9 +447,4 @@ class Data{
 		$field['sublists'] = $sublist;
 		return ['info'=>json_encode($field)];
 	}
-
-	
-	
-	
-	
 }

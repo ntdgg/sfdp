@@ -123,7 +123,8 @@ li{margin: 0;padding: 0;}
 	cursor: move;
 	cursor: -webkit-grabbing;
 	float: left;
-	width: 108px;
+	width: 100px;
+	margin-left: 10px;
 }
 .sfdp-tool-con {
 	padding-left: 5px;
@@ -134,7 +135,8 @@ li{margin: 0;padding: 0;}
 	cursor: move;
 	cursor: -webkit-grabbing;
 	float: left;
-	width: 108px;
+	width: 100px;
+	margin-left: 10px;
 }
 .sfdp-tool-con a img{
 	width: 18px;

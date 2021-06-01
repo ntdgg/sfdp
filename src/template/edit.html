@@ -1,113 +1,98 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8" />
-	<meta name="renderer" content="webkit|ie-comp|ie-stand" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-	<meta http-equiv="Cache-Control" content="no-siteapp" />
-	<title></title>
-
-</head>
-<body>
-{$config.load_file.css|raw}
-<!--加载全局变量函数-->
-{$config.g_js|raw}
-<script src="__SFDP__/lib/jquery-1.12.4.js"></script>
-<script src="__SFDP__/lib/jquery-ui.js"></script>
-<script src="__SFDP__/lib/layer/2.4/layer.js"></script>
-<script src="__SFDP__/lib/Validform/5.3.2/Validform.min.js"></script>
-<script src="__SFDP__/lib/H5upload.js"></script>
-<script src="__SFDP__/lib/laydate5.0.9/laydate.js"></script>
-<script src="__SFDP__/sfdp.5.0.js?v=5.0.31"></script>
-<script src="__SFDP__/sfdp.config.js?v=5.0.31"></script>
-<script src="__SFDP__/sfdp.plug.js?v=5.0.31"></script>
-<script>
-	$("head").append(sfdp.ui.ui_css);
-</script>
-{$config.load_file.js|raw}
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta name="renderer" content="webkit|ie-comp|ie-stand" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /> 
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" /> 
+  <meta http-equiv="Cache-Control" content="no-siteapp" /> 
+  <title></title> 
+ </head> 
+ <body>
+	{$config.load_file.css|raw}
+	<!--加载全局变量函数-->
+	{$config.g_js|raw}
+	<script src="__SFDP__/lib/jquery-1.12.4.js"></script>
+	<script src="__SFDP__/lib/jquery-ui.js"></script>
+	<script src="__SFDP__/lib/layer/2.4/layer.js"></script>
+	<script src="__SFDP__/lib/Validform/5.3.2/Validform.min.js"></script>
+	<script src="__SFDP__/lib/H5upload.js"></script>
+	<script src="__SFDP__/lib/laydate5.0.9/laydate.js"></script>
+	<script src="__SFDP__/sfdp.5.0.js?v=5.0.1"></script>
+	{$config.load_file.js|raw}
 <link rel="stylesheet" href="__SFDP__/sfdp.5.0.css?v=5.0.1" />
-<link rel="stylesheet" href="/static/layui/css/layui.css" />
 <div class="page-container"><div class="tpfd-content" id='table'></div></div>
-<!--动态加载用户自定义脚本-->
-{$config.fun|raw}
-<!--脚本结束-->
-<script>
-	var showtype = '{$showtype}';
-	var uploadurl = '{:url($config["upload_file"])}';
-	try{
-		load_satr_fun(showtype);//后置函数
-	}catch(e){
-		if(Debug){
-			console.log('page no load star fun ~');
-		}
-	}
-	$( function() {
-		sfdp.showadd({$data|raw},showtype);
-		$("#form").Validform({
-			tiptype:function(msg,o,cssctl){
-				if (o.type == 3){
-					layer.msg(msg, {time: 800});
+	<!--动态加载用户自定义脚本-->
+	{$config.fun|raw}
+	<!--脚本结束-->
+	   <script>
+			var uploadurl = '{:url($config["upload_file"])}';
+			try{
+			  load_satr_fun();//后置函数
+			}catch(e){
+				if(Debug){
+				 console.log('page no load star fun ~');
 				}
-			},
-			beforeCheck:function(curform){
-				try{
-					return load_form_check(curform);//后置函数
-				}catch(e){
-					if(Debug){
-						console.log('表单验证后，进行验算');
-					}
-				}
-			},
-			ajaxPost:true,
-			showAllError:true,
-			callback:function(ret){
-				sfdp.common_return(ret);
 			}
-		});
-		$(".savedata").click(function(){
-			/*构建子表json*/
-			var searchdata = [];
-			var stable = [];
-			var allSdata = {};
-			/*遍历找出所有子表*/
-			$(".sub_list").each(function(index, el) {
-				var id = $(this).attr("data");
-				if(typeof(id)!=='undefined'){
-					stable.push(id)
-				}
-			});
-			//遍历子表，找出子表的表单数据
-			$.each(stable, function(index,table) {
-				var search = $('#'+table).serializeArray();
-				//表单数据拼接成数组
-				var i = 0;
-				$.each(search, function(index,vars) {
-					var dbname = this.name;
-					if(searchdata[dbname] == undefined){
-						searchdata[dbname] = [];
-						searchdata[dbname].push(vars.value || '');
-					}else{
-						searchdata[dbname].push(vars.value);
+		  $( function() {
+				sfdp.showadd({$data|raw},'{$showtype}');
+				$("#form").Validform({
+					tiptype:function(msg,o,cssctl){
+					if (o.type == 3){
+						layer.msg(msg, {time: 800}); 
+					}
+					},
+					ajaxPost:true,
+					showAllError:true,
+					callback:function(ret){
+						sfdp.common_return(ret);
 					}
 				});
-				allSdata[table] = {};
-				allSdata[table] = Object.assign({},searchdata);
-				searchdata = [];
+				$(".savedata").click(function(){
+					/*构建子表json*/
+					var searchdata = [];
+					var stable = [];
+					var allSdata = {};
+					/*遍历找出所有子表*/
+					$(".sub_list").each(function(index, el) {
+						var id = $(this).attr("data");
+						if(typeof(id)!=='undefined'){
+							stable.push(id)
+						}
+					});
+					//遍历子表，找出子表的表单数据
+					$.each(stable, function(index,table) {
+						var search = $('#'+table).serializeArray();
+						//表单数据拼接成数组
+						var i = 0;
+						$.each(search, function(index,vars) {
+							var dbname = this.name;
+							if(searchdata[dbname] == undefined){
+								 searchdata[dbname] = [];
+								 searchdata[dbname].push(vars.value || '');
+							}else{
+								 searchdata[dbname].push(vars.value);
+							}
+							;
+							
+						});
+						allSdata[table] = {};
+						allSdata[table] = Object.assign({},searchdata);
+						searchdata = [];
+					});
+					$('#subdata_subdata').val(JSON.stringify(allSdata));
+					$("#form").submit();
+				});
 			});
-			$('#subdata_subdata').val(JSON.stringify(allSdata));
-			$("#form").submit();
-		});
-	});
-	$(document).ready(function(){
-		try{
-			load_end_fun(showtype);//后置函数
-		}catch(e){
-			if(Debug){
-				console.log('page no load end fun ~');
+		$(document).ready(function(){
+			try{
+			  load_end_fun();//后置函数
+			}catch(e){
+			  if(Debug){
+				 console.log('page no load end fun ~');
+			  }
 			}
-		}
-	});
+		});
 </script>
 </body>
 </html>

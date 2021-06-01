@@ -114,39 +114,9 @@ class Design{
 		$sfdp_ver_info =(new Design())->mode->findVer($sid);
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		$list_field = json_decode($sfdp_ver_info['s_list'],true);
+		
 		$searct_array = json_decode($sfdp_ver_info['s_search'],true);
-				foreach($list_field as $k2=>$v2){
-					if(isset($v2['xx_type']) && $v2['xx_type']==1){
-                        $fun_mode = unit::gconfig('fun_mode') ?? 1;
-                        if($fun_mode==1 || $fun_mode==''){
-                            $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
-                            if(!$getFun){
-                                echo '<h2>系统级别错误('.$v2['checkboxes_func'].')：函数名无法找到~</h2>';exit;
-                            }
-                            $getData = Common::query($getFun['function']);
-                        }else{
-                            $className = unit::gconfig('fun_namespace');
-                            if(!class_exists($className)){
-                                return 'Sorry,未找到自定函数，请先配置~';
-                            }
-                            $getData = (new $className())->func($v2['checkboxes_func']);
-                        }
-
-
-						$getData = Common::query($getFun['function']);
-						if($getData['code']==-1){
-							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
-						}else{
-							$sd = [];
-							foreach($getData['msg'] as $k3=>$v3){
-								$sd[$v3['id']] = $v3['name'];
-							}
-							
-							$list_field[$k2]['tpfd_data'] = $sd;
-						}
-						
-					}
-				}
+		
 		$searct_field =json_encode($list_field);
 		$listid = ''; //变量赋值为空
 		$listfield = []; //变量赋值为空
@@ -156,8 +126,12 @@ class Design{
 			}
 		$fieldArr = [];
 		$fieldArrAll = [];
+		$fieldSysUser = [];
 			foreach($field['list'] as $k=>$v){
 				foreach($v['data'] as $k2=>$v2){
+					if($v2['td_type']=='system_user'||$v2['td_type']=='system_role'){
+						$fieldSysUser[$v2['tpfd_db']]=$v2['td_type'];
+					}
 					if(isset($v2['xx_type']) && $v2['xx_type']==1){
 						//函数名转为数据信息
                         $fun_mode = unit::gconfig('fun_mode') ?? 1;
@@ -199,15 +173,14 @@ class Design{
 				}
 			}
 		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
-		return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll];
+		return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser];
 	}
 	/**
 	 * 获取数据
 	 */
 	static function getAddData($sid){
 		$sfdp_ver_info = (new Design())->mode->findVer($sid);
-		
-		if($sfdp_ver_info['s_fun_id']!=''){
+		if($sfdp_ver_info['s_fun_id']>0){
 			$fun = '<script src="/static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js"></script>';	
 		}else{
 			$fun = '';

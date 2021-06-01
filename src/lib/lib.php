@@ -355,7 +355,8 @@ php;
 		<div>
 			<div id="ctlMenus" class="sfdp-con" style="float: left; width: 240px;">
 				<div class="sfdp-tool-title">设计控制区 Design control area</div>
-				<div class="button" onclick='sfdp.sys_config()'>配置</div><div class="button" id='up_save'>保存</div><div class="button">预览</div><div class="button" onClick="sfdp.openfullpage('官网','//cojz8.com')">帮助</div>
+				&#8194;&#8194;
+				<div class="button" onclick='sfdp.sys_config()'>配置</div><div class="button" id='up_save'>保存</div><div onclick='window.location.reload()' class="button">刷新</div><div class="button" onClick="sfdp.openfullpage('官网','//cojz8.com')">帮助</div>
 				<div class="sfdp-cl" ></div>
 				<div class="sfdp-tool-title sfdp-mt10">页面布局 Form control library</div>
 				<div class='sfdp-tool-fix'onclick='sfdp.build_bj()'><a>&#8194;<b class='ico'>↭</b>&#8194;栅格布局 </a></div>
@@ -366,12 +367,20 @@ php;
 					<div class="sfdp-tool-con" ><a data="number">&#8194;<b class='ico'>½</b>&#8194;数字</a></div>
 					<div class="sfdp-tool-con"><a data="checkboxes">&#8194;<b class='ico'>☑</b>&#8194;多选框</a></div>
 					<div class="sfdp-tool-con"><a data="radio">&#8194;<b class='ico'>◉</b>&#8194;单选框</a></div>
-					<div class="sfdp-tool-con"><a data="dropdown">&#8194;<b class='ico'>≡</b>&#8194;下拉 </a></div>
+					<div class="sfdp-tool-con"><a data="dropdown">&#8194;<b class='ico'>≡</b>&#8194;下拉组件 </a></div>
 					<div class="sfdp-tool-con"><a data="date">&#8194;<b class='ico'>◑</b>&#8194;日期时间</a></div>
 					<div class="sfdp-tool-con"><a data="textarea">&#8194;<b class='ico'>〓</b>&#8194;多行文本</a></div>
 					<div class="sfdp-tool-con"><a data="html">&#8194;<b class='ico'>☪</b>&#8194;Html控件</a></div>
 					<div class="sfdp-tool-con"><a data="wenzi">&#8194;<b class='ico'>あ</b>&#8194;文字显示</a></div>
-					<div class="sfdp-tool-con"><a data="upload">&#8194;<b class='ico'>➼</b>&#8194;附件</a></div>
+					<div class="sfdp-tool-con"><a data="upload">&#8194;<b class='ico'>➼</b>&#8194;附件上传</a></div>
+					<div class="sfdp-tool-con"><a data="time_range">&#8194;<b class='ico'>≈</b>&#8194;时间范围</a></div>
+					<div class="sfdp-tool-con"><a data="links">&#8194;<b class='ico'>↔</b>&#8194;超级链接</a></div>
+					<div class="sfdp-tool-con"><a data="upload_img">&#8194;<b class='ico'>Ρ</b>&#8194;单图组件</a></div>
+					<div class="sfdp-tool-con"><a data="edit">&#8194;<b class='ico'>Ε</b>&#8194;富文本框</a></div>
+				<div class="sfdp-cl"></div>
+				<div class="sfdp-tool-title sfdp-mt10">内置组件 System control library</div>
+					<div class="sfdp-tool-con" ><a data="system_user">&#8194;<b class='ico'>ρ</b>&#8194;系统用户</a></div>
+					<div class="sfdp-tool-con" ><a data="system_role">&#8194;<b class='ico'>Θ</b>&#8194;系统角色</a></div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">子表单设计 Form control library</div>
 				<div class='sfdp-tool-fix'onclick='sfdp.build_fb()'><a>&#8194;<b class='ico'>§</b>&#8194; 添加附表 </a></div>

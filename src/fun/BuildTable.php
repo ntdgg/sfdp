@@ -42,7 +42,7 @@ class BuildTable{
         $key = [];
         foreach ($data as $field) {
             if (!in_array($field['tpfd_db'], $auto_create_field)) {
-				if($field['tpfd_dblx']=='datetime'||$field['tpfd_dblx']=='longtext'){
+				if($field['tpfd_dblx']=='datetime'||$field['tpfd_dblx']=='longtext' ||$field['tpfd_dblx']=='date'){
 					$fieldAttr[] = unit::tab(1) . "`{$field['tpfd_db']}` {$field['tpfd_dblx']} COMMENT '{$field['tpfd_name']}'";
 					}else{
 					$fieldAttr[] = unit::tab(1) . "`{$field['tpfd_db']}` {$field['tpfd_dblx']}({$field['tpfd_dbcd']}) DEFAULT NULL COMMENT '{$field['tpfd_name']}'";

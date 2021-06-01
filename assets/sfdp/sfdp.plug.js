@@ -2,8 +2,8 @@
  *
  * @type {string[]}
  */
-
 var dataType = ['yyyy', 'MM-dd', 'yyyy-MM-dd', 'yyyyMMdd', 'yyyy-MM','yyyy-MM-dd HH:mm:ss'];
+var dateType_format= ['date', 'datetime', 'time', 'year', 'month'];
 
 var sfdpPlug = {
     PlugInit:function (type,data,is_sub= false,Curd='add') {
@@ -37,14 +37,14 @@ var sfdpPlug = {
             data = JSON.parse(item.tpfd_data)
         }
         var fieldArray = {
-            text : '<input type="text"  name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input">',
-            number :'<input type="number" name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input">',
+            text : '<input  type="text"  name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input">',
+            number :'<input  type="number" name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input">',
             radio : (sfdpPlug.checkboxes_clss(item.id,'radio','',item.field,'',item.tpfd_data,data.tpfd_check)).replace(/<a>(.+?)<\/a>/g,''),
             checkboxes : sfdpPlug.checkboxes_clss(item.id,'checkboxes','',item.field,'',item.tpfd_data,data.tpfd_check).replace(/<a>(.+?)<\/a>/g,''),
             textarea  : '<textarea  name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input"></textarea>',
             dropdown  : sfdpPlug.view_select(data, item.tpfd_db, 0 , '', item.id),
             upload: sfdpPlug.view_upload(data, item.field, 0),
-            date : '<input type="text"  data-type="' + dataType[data.xx_type] + '" class="datetime sfdp-input layui-input"  name="' + item.field + '">'
+            date : '<input  type="text"  placeholder="'+item.name+'" data-format="' + dataType[item.data] + '" data-type="' + item.name_type + '" class="datetime sfdp-input layui-input"  name="' + item.field + '">'
         }
         return fieldArray[type] || '';
     },
@@ -70,18 +70,25 @@ var sfdpPlug = {
             number :'<input type="number" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
             radio : radios,
             checkboxes : checkboxes,
-            textarea  : '<textarea id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' placeholder="" class="' + sfdp.ui.input_textarea + '">' + value +'</textarea>',
+            textarea  : '<textarea id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea>',
             dropdown  : view_selects,
             upload: sfdpPlug.view_upload(data, name, 0),
-            date : '<input type="text" ' + att + ' data-type="' + dataType[data.xx_type] + '" class="datetime sfdp-input"  name="' + name + '"  id="' + data.tpfd_id + '" value="' + value + '">',
-            html : '<div style="height: 38px;line-height: 38px;">'+ (data.value || data.tpfd_moren) + '</div>',
-            wenzi : '<div style="height: 38px;line-height: 38px;">'+ (data.value || data.tpfd_moren) + '</div>'
+            date : '<input type="text" ' + att + ' data-type="' + data.tpfd_dblx + '" data-format="' + dataType[data.xx_type] + '" class="datetime  layui-input"  name="' + name + '"  id="' + data.tpfd_id + '" value="' + value + '">',
+            time_range : '<input type="text" ' + att + ' data-type="' + data.tpfd_dblx + '" data-format="' + dateType_format[data.xx_type] + '" class="time_range layui-input"  name="' + name + '"  id="' + data.tpfd_id + '" value="' + value + '">',
+            html : '<div style="min-height: 38px;line-height: 38px;">'+ (data.value || data.tpfd_moren) + '</div>',
+            wenzi : '<div style="min-height: 38px;line-height: 38px;">'+ (data.value || data.tpfd_moren) + '</div>',
+            links : `<div style="min-height: 38px;line-height: 38px;"><a href="//${data.tpfd_moren}" target="${data.tpfd_zanwei}" class="layui-btn layui-btn-primary layui-border-blue">${data.tpfd_name}</a></div>`,
+            system_user:'<input name="' + name + '"  type="hidden" readonly id="' + data.tpfd_id + '" value="' + value + '"><input  type="text" readonly id="' + data.tpfd_id + '_text" value="' + (data.text || '请选择') +'" style="width:85%;" class="layui-input"><a  href="javascript:" class="layui-btn  layui-btn-primary layui-border-blue" style="width:15%;" onclick=sfdp.openpage("用户组件","'+sfdp.url.user+'?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-friends"></i> 选择</a>',
+            system_role:'<input name="' + name + '"  type="hidden" readonly id="' + data.tpfd_id + '" value="' + value + '"><input  type="text" readonly id="' + data.tpfd_id + '_text" value="' + (data.text || '请选择') +'" style="width:85%;" class="layui-input"><a  href="javascript:" class="layui-btn  layui-btn-primary layui-border-blue" style="width:15%;" onclick=sfdp.openpage("用户组件","'+sfdp.url.role+'?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-group"></i> 选择</a>',
+            upload_img:sfdpPlug.view_upload_img(data),
+            edit:'<div id="div' + data.tpfd_id + '">' + value +'</div><textarea style="display:none" id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea><script></script><script type="text/javascript">' +
+               '$.getScript("/static/lib/wangEditor.min.js",function(){var html = $(\'#' + data.tpfd_id + '\').val();const E = window.wangEditor; const editor = new E(\'#div' + data.tpfd_id + '\');editor.config.zIndex = 500;const $text1 = $(\'#' + data.tpfd_id + '\');  editor.config.onchange = function (html) {$text1.val(html)};editor.config.uploadImgShowBase64 = true;editor.create();$text1.val(editor.txt.html());}); </script>',
         }
+
         return fieldArray[type];
     },
     view_select: function (data, field, value, attr, selectId) {
-
-        let tags = `<select name="${field}" ${attr} id="${selectId}" data-value="${value}">`
+        let tags = `<select name="${field}" ${attr} id="${selectId}" class="this-select" data-value="${value}">`
         tags += ` <option value="">请选择</option>`;
         for (const key in data) {
             if(data.hasOwnProperty(key)){
@@ -89,21 +96,16 @@ var sfdpPlug = {
             }
         }
         tags += `</select>`
-
         return tags
     },
+    view_upload_img: function (data) {
+        let html= '<input  type="hidden"  name="' + data.tpfd_db + '" style="width:85%;"  id="' + data.tpfd_id + '"><span id="' + data.tpfd_id + '_img"></span>  <a id="' + data.tpfd_id + '_btn" href="javascript:" class="layui-btn layui-btn-radius layui-btn-primary layui-border-blue" style="width:15%;" onclick=sfdp.H5uploadhtml("' + data.tpfd_id + '",1)><i class="layui-icon layui-icon-upload-drag"></i> <span id="' + data.tpfd_id + '_text">选择图片</span></a>';
+        return html;
+    },
     view_upload: function (data) {
-        if (data.tpfd_upload_api === 0) {
-            var html = '<input type="text" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span id="drag" style="width:80px;margin-left:5px">' + '<label onclick=sfdp.H5uploadhtml("' + data.tpfd_id + '")>' + sfdp.Ico(2) + '</label></span>';
-        } else {
-            if (data.value === undefined) {
-                data.value = '';
-            }
-            if (data.tpfd_upload_type === 1) {
-                var html = '<input type="text" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + data.value + '><span id="drag" style="width:80px;margin-left:5px">' + '<label id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + data.tpfd_upload_action + '?id=' + data.tpfd_id + '&value=' + data.value + '",{w:"50%",h:"60%"})>附件</label></span>';
-            } else {
-                var html = '<input type="text" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + data.value + '><span id="drag" style="width:80px;margin-left:5px">' + '<label id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("文件上传","' + data.tpfd_upload_action + '?id=' + data.tpfd_id + '&value=' + data.value + '",{w:"48%",h:"50%"})>附件</label></span>';
-            }
+        var html = '<input type="text" style="width:85%;"class="layui-input" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span>' + '<a id="' + data.tpfd_id + '_btn" href="javascript:" class="layui-btn layui-btn-primary layui-border-blue" style="width:15%;" onclick=sfdp.H5uploadhtml("' + data.tpfd_id + '")><i class="layui-icon layui-icon-upload-drag"></i> <span id="' + data.tpfd_id + '_text">上传1</span></a></span>';
+        if (data.tpfd_upload_type == 1) {
+                var html = '<input type="text" style="width:85%;"class="layui-input" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span>' + '<a class="layui-btn layui-btn-primary layui-border-blue" style="width:15%;" id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + data.tpfd_upload_action + '?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-upload-drag"></i>上传2</a></span>';
         }
         return html;
     },
@@ -155,14 +157,20 @@ var sfdpPlug = {
                 lab = '';
             }
             if(type==='upload'){
-                if (data.tpfd_upload_api == 1) {
-                     html = lab + '<span id="drag" style="width:80px;margin-left:5px">' + '<label id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + data.tpfd_upload_action + '?act=view&id=' + data.tpfd_id + '&value=' + data.value + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-download-circle" style="font-size: 30px; color: #1E9FFF;"></i>  </label></span>';
-                } else {
+                if (data.tpfd_upload_type == 1) {
+                     html = lab + '<label id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + data.tpfd_upload_action + '?act=view&id=' + data.tpfd_id + '&value=' + data.value + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-download-circle" style="font-size: 30px; color: #1E9FFF;"></i>  </label>';
+                }else{
                      html = lab + '<a target="_blank" href="/' + data.value + '" >' + sfdp.Ico(1) + '</a>';
                 }
+            }else if(type==='links'){
+                html = lab + `<div style="min-height: 38px;line-height: 38px;"><a href="//${data.tpfd_moren}" target="${data.tpfd_zanwei}" class="layui-btn layui-btn-primary layui-border-blue">${data.tpfd_name}</a></div>`;
+            }else if(type==='upload_img'){
+                html = lab + `<div style="min-height: 38px;line-height: 38px;"><img src="/${data.value}" width="100px" onclick="window.open($(this).attr('src'))">'</div>`;
+            }else if(type==='system_user' || type==='system_role'){
+                html = lab + `<div style="min-height: 38px;line-height: 38px;">${data.text}</div>`;
             }else{
-                    var data_value = sfdpPlug.htmlEncode(data.value);
-                    html = lab + `<div style="height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data_value}">${data.value}</div>`;
+                var data_value = sfdpPlug.htmlEncode(data.value);
+                html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data_value}">${data.value}</div>`;
             }
         }
         return html + '</div></div>';

@@ -44,7 +44,6 @@ var sfdp = {
                 }
             }
             var xh = 1;
-
             //恢复子表布局
             for (x in int_data.sublist) {
                 let table = sfdp.sublist_build(int_data.sublist[x]['type'], int_data.sublist[x], 'show', int_data.name_db + '_d' + xh, true);
@@ -305,19 +304,20 @@ var sfdp = {
             sfdp.sGet(url);
         });
     },
-    H5uploadhtml: function (ids) {
+    H5uploadhtml: function (ids,img='') {
         var html = '<label for="file-input">' + sfdp.Ico(0) + '</label></span>' +
             '<input type="file" accept="*/*" name="file" data-attr="' + ids + '" id="file-input" multiple  style="display: none">';
         layer.open({
             type: 1,
             title: false,
+            closeBtn: 0,
+            shadeClose: true,
             area: ['125px', '85px'], //宽高
             content: html
         });
-        sfdp.H5upload(ids);
-
+        sfdp.H5upload(img);
     },
-    H5upload: function () {
+    H5upload: function (img) {
         $("#file-input").tpUpload({
             url: uploadurl,
             start: function () {
@@ -328,6 +328,10 @@ var sfdp = {
             },
             success: function (ret) {
                 $('#' + ret.attr_id).val(ret.data);
+                if(img==1){
+                    $('#' + ret.attr_id + '_img').html('<img src="/'+ret.data+'" width="100px" onclick=sfdp.view_img("/'+(ret.data).replace(/\\/g,"/")+'")>');
+                    $('#' + ret.attr_id+ '_text').html('重新上传');
+                }
                 layer.closeAll();
             },
             error: function (ret) {
@@ -338,14 +342,39 @@ var sfdp = {
             }
         });
     },
+    view_img:function(url){
+            layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                shadeClose: true,
+                area: ['80%', '80%'], //宽高
+                content: "<img  src=" + url + " />"
+            });
+
+    },
     setDate: function () {
         $(".datetime").click(function () {
-            var format = $(this).attr('data-type');
+            var type = $(this).attr('data-type');
+            var format = $(this).attr('data-format');
             $(this).removeAttr("lay-key");
             laydate.render({
                 elem: this,
                 format: format,
                 show: true,
+                type: type,
+                zIndex: 99999999,
+                trigger: 'click'
+            });
+        });
+        $(".time_range").click(function () {
+            var format = $(this).attr('data-format');
+            $(this).removeAttr("lay-key");
+            laydate.render({
+                elem: this,
+                show: true,
+                type: format,
+                range: true,
                 zIndex: 99999999,
                 trigger: 'click'
             });
@@ -461,7 +490,12 @@ var sfdp = {
     /*5.0.1 日期组件*/
     tpfd_date: function (data) {
         var default_data = [{cid: 0, clab: 'yyyy'}, {cid: 1, clab: 'MM-dd'}, {cid: 2, clab: 'yyyy-MM-dd'}, {cid: 3,clab: 'yyyyMMdd'}, {cid: 4, clab: 'yyyy-MM'}, {cid: 5, clab: 'yyyy-MM-dd HH:mm:ss'}];
-        return '<div class="sfdp-form-item"><label class="sfdp-label">日期格式</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'xx_type', '2') + '</div></div>';
+        return '<div class="sfdp-form-item"><label class="sfdp-label">日期格式</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'xx_type', data.xx_type || "2") + '</div></div>';
+    },
+    /*5.0.1 日期组件*/
+    tpfd_date_type: function (data) {
+        var default_data = [{cid: 0, clab: 'date'}, {cid: 1, clab: 'datetime'}, {cid: 2, clab: 'time'}, {cid: 3,clab: 'year'}, {cid: 4, clab: 'month'}];
+        return '<div class="sfdp-form-item"><label class="sfdp-label">日期格式</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'xx_type', data.xx_type || "2") + '</div></div>';
     },
     /*5.0.1 多选组建*/
     tpfd_checkboxes: function (data, type = 'checkbox') {
@@ -491,7 +525,7 @@ var sfdp = {
             var tpfd_read = data.tpfd_read;
             var tpfd_must = data.tpfd_must;
         }
-        return '<div class="sfdp-form-item"><label class="sfdp-label">字段只读</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_read', tpfd_read) + '</div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段必填</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_must', tpfd_must) + '</div></div>';
+        return '<div class="sfdp-form-item"><label class="sfdp-label">字段只读</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_read', tpfd_read) + '</div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段必填</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_must', tpfd_must) + '</div></div><br/>';
     },
     /*5.0.1 默认组件*/
     tpfd_moren: function (data) {
@@ -539,6 +573,22 @@ var sfdp = {
     tpfd_upload: function (data) {
         if (data.tpfd_upload_type === 'undefined') {
             var tpfd_upload_type = 0;
+            var tpfd_upload_api = 0;
+            var tpfd_upload_action = 0;
+        } else {
+            var tpfd_upload_type = data.tpfd_upload_type;
+            var tpfd_upload_api = data.tpfd_upload_api;
+            var tpfd_upload_action = data.tpfd_upload_action;
+        }
+        var default_data = [{cid: 0, clab: '单文件上传'}, {cid: 1, clab: '多文件上传'}];
+        var action_data = [{cid: 0, clab: '内置接口'}, {cid: 1, clab: '自定义API'}];
+        return '<div class="sfdp-form-item"><label class="sfdp-label">上传配置</label>' + sfdp.tpfd_select(default_data, 'tpfd_upload_type', tpfd_upload_type) + '</div><div class="sfdp-form-item"><label class="sfdp-label">上传接口</label>' + sfdp.tpfd_select(action_data, 'tpfd_upload_api', tpfd_upload_api) + '' +
+            ' API:<input style="width:80px;display: inline;" name="tpfd_upload_action" type="text" value="' + (tpfd_upload_action || '') + '"  class="sfdp-input"></div>';
+    },
+    /*5.0.2 上传控制组件*/
+    tpfd_upload_img: function (data) {
+        if (data.tpfd_upload_type === 'undefined') {
+            var tpfd_upload_type = 0;
             var tpfd_upload_xz = 0;
             var tpfd_upload_api = 0;
             var tpfd_upload_action = 0;
@@ -552,16 +602,16 @@ var sfdp = {
         var action_data = [{cid: 0, clab: '内置接口'}, {cid: 1, clab: '自定义API'}];
         var word_type = [{cid: 0, clab: '不限制'}, {cid: 1, clab: '*.jpg/*.png/*.gif'}, {cid: 2, clab: '*.doc/*.txt/*.xlx/*.xlxs/*.docx'}];
 
-        return '<div class="sfdp-form-item"><label class="sfdp-label">上传配置</label>' + sfdp.tpfd_select(default_data, 'tpfd_upload_type', tpfd_upload_type) + '' +
-            ' ' + sfdp.tpfd_select(word_type, 'tpfd_upload_xz', tpfd_upload_xz) + '</div><div class="sfdp-form-item"><label class="sfdp-label">上传接口</label>' + sfdp.tpfd_select(action_data, 'tpfd_upload_api', tpfd_upload_api) + '' +
-            ' API:<input style="width:80px;display: inline;" name="tpfd_upload_action" type="text" value="' + (tpfd_upload_action || '') + '"  class="sfdp-input"></div>';
-
+        return '<div class="sfdp-form-item"><label class="sfdp-label">上传API</label> <div class="sfdp-input-block"><input  name="tpfd_upload_action" placeholder="不填写则为默认接口" type="text" value="' + (tpfd_upload_action || '') + '"  class="sfdp-input"></div></div>';
     },
     /*5.0.1 返回基础数据*/
     tpfd_return: function (type, data) {
         switch (type) {
             case 'text':
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + sfdp.tpfd_gaoji(data) + sfdp.tpfd_moren(data) + '</div>';
+                break;
+            case 'edit':
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + '</div>';
                 break;
             case 'number':
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + sfdp.tpfd_gaoji(data)+ sfdp.tpfd_moren(data) + '</div>';
@@ -575,8 +625,17 @@ var sfdp = {
             case 'date':
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_date(data) + sfdp.tpfd_gaoji(data) + '</div>';
                 break;
+            case 'time_range':
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_date_type(data) + sfdp.tpfd_gaoji(data) + '</div>';
+                break;
             case 'dropdown':
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_checkboxes(data, 'radio') + sfdp.tpfd_gaoji(data) + '</div>';
+                break;
+            case 'system_user':
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + sfdp.tpfd_gaoji(data) + '</div>';
+                break;
+            case 'system_role':
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + sfdp.tpfd_gaoji(data) + '</div>';
                 break;
             case 'textarea':
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_gaoji(data)+ sfdp.tpfd_moren(data) + '</div>';
@@ -587,11 +646,22 @@ var sfdp = {
             case 'wenzi':
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_xianshi(data) + '</div>';
                 break;
+            case 'links':
+                data.tpfd_zanwei = '_blank'
+                data.tpfd_moren = 'www.gadmin8.com';
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + sfdp.tpfd_moren(data) + '</div>';
+                break;
             case 'upload':
                 data.tpfd_list = 'no';
                 data.tpfd_chaxun = 'no';
                 data.tpfd_show = 'no';
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_upload(data) + sfdp.tpfd_gaoji(data) + '</div>';
+                break;
+            case 'upload_img':
+                data.tpfd_list = 'no';
+                data.tpfd_chaxun = 'no';
+                data.tpfd_show = 'no';
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_upload_img(data) + sfdp.tpfd_gaoji(data) + '</div>';
                 break;
             default:
                 var html = '';
@@ -604,11 +674,17 @@ var sfdp = {
             case 'text':
                 var html = '<label ' + labid + ' class="sfdp-label">文本控件</label><div class="sfdp-input-block"><input  type="text"  placeholder="请输入信息~" disabled class="sfdp-input"></div><b class="ico red" id="del_con">㊀</b>';
                 break;
+            case 'edit':
+                var html = '<label ' + labid + ' class="sfdp-label">编辑器</label><div class="sfdp-input-block"><textarea  disabled class="sfdp-input"></textarea></div> <b class="ico red" id="del_con">㊀</b>';
+                break;
             case 'number':
                 var html = '<label ' + labid + ' class="sfdp-label">数字控件</label><div class="sfdp-input-block"><input  type="number"  placeholder="" disabled class="sfdp-input"></div><b class="ico red" id="del_con">㊀</b>';
                 break;
             case 'upload':
                 var html = '<label ' + labid + ' class="sfdp-label">上传控件</label>上传 <b class="ico red" id="del_con">㊀</b>';
+                break;
+            case 'upload_img':
+                var html = '<label ' + labid + ' class="sfdp-label">单图上传</label>上传 <b class="ico red" id="del_con">㊀</b>';
                 break;
             case 'checkboxes':
                 var html = '<label ' + labid + ' class="sfdp-label">多选控件</label><div class="sfdp-input-block">选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled></div> <b class="ico red" id="del_con">㊀</b>';
@@ -619,8 +695,17 @@ var sfdp = {
             case 'date':
                 var html = '<label ' + labid + ' class="sfdp-label">时间日期</label><div class="sfdp-input-block"><input type="text"  placeholder="" disabled class="sfdp-input"></div> <b class="ico red" id="del_con">㊀</b>';
                 break;
+            case 'time_range':
+                var html = '<label ' + labid + ' class="sfdp-label">时间范围</label><div class="sfdp-input-block"><input type="text"  placeholder="" disabled class="sfdp-input"></div> <b class="ico red" id="del_con">㊀</b>';
+                break;
             case 'dropdown':
                 var html = '<label ' + labid + ' class="sfdp-label">下拉选择</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> <b class="ico red" id="del_con">㊀</b>';
+                break;
+            case 'system_user':
+                var html = '<label ' + labid + ' class="sfdp-label">系统用户</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> <b class="ico red" id="del_con">㊀</b>';
+                break;
+            case 'system_role':
+                var html = '<label ' + labid + ' class="sfdp-label">系统角色</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> <b class="ico red" id="del_con">㊀</b>';
                 break;
             case 'textarea':
                 var html = '<label ' + labid + ' class="sfdp-label">多行控件</label><div class="sfdp-input-block"><textarea  disabled class="sfdp-input"></textarea></div> <b class="ico red" id="del_con">㊀</b>';
@@ -630,6 +715,9 @@ var sfdp = {
                 break;
             case 'wenzi':
                 var html = '<label ' + labid + ' class="sfdp-label">文字控件</label>默认现实的文本 <b class="ico red" id="del_con">㊀</b>';
+                break;
+            case 'links':
+                var html = '<label ' + labid + ' class="sfdp-label">按钮控件</label><a class="button">按钮<a/>*默认内容即为链接地址 <b class="ico red" id="del_con">㊀</b>';
                 break;
             default:
                 var html = '';
@@ -676,6 +764,7 @@ var sfdp = {
         mycars['time'] = 0
         mycars['datetime'] = 0
         mycars['longtext'] = 0
+        mycars['date'] = 0
         var tpfd_dblx = $("select[name='tpfd_dblx']").val();
         $("input[name='tpfd_dbcd']").val(mycars[tpfd_dblx]);
     },
@@ -975,7 +1064,7 @@ var sfdp = {
         return true;
     },
     Ico: function (id = 0) {
-        var data = ['<svg t="1616854567257" class="icon" viewBox="0 0 1352 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2095" width="120" height="80"><path d="M1086.603604 415.596184c-13.65934-211.566186-160.799312-415.596184-430.627602-415.596184-246.810151 0-437.119373 183.448833-447.215407 428.272544-135.037018 42.022439-208.760594 186.520649-208.760594 291.699618 0 161.946123 134.586485 303.986881 287.99296 303.986881l207.982401 0c8.82635 0 15.99392-7.16757 15.99392-15.99392s-7.16757-15.99392-15.99392-15.99392l-207.982401 0c-136.368138 0-255.984641-127.091255-255.984641-271.978561 0-97.622303 85.560306-271.978561 255.984641-271.978561l48.00224 0c8.82635 0 15.99392-7.16757 15.99392-15.99392s-7.16757-15.99392-15.99392-15.99392l-48.00224 0c-16.280623 0-31.680659 1.822611-46.691599 4.443893 12.553487-191.66082 158.239466-388.420855 414.654161-388.420855 274.804632 0 399.970882 215.641462 399.970882 415.985281l0 48.00224c0 8.82635 7.16757 15.99392 15.99392 15.99392s15.99392-7.16757 15.99392-15.99392l0-48.00224c0-0.102394 0-0.184309 0-0.286703 96.598364 10.587525 223.9968 114.271544 223.9968 272.265264 0 122.422095-118.101074 271.978561-255.984641 271.978561l-239.990721 0c-103.602104 0-143.986241-40.384137-143.986241-143.986241l0-438.921505 130.490731 130.224507c3.133252 3.133252 7.229006 4.710117 11.324761 4.710117s8.191509-1.576865 11.324761-4.66916c6.246025-6.246025 6.246025-16.423975 0-22.629042l-142.737036-142.450333c-19.0043-18.942863-33.749015-18.942863-52.732836 0l-142.737036 142.450333c-6.246025 6.205068-6.246025 16.383017 0 22.629042s16.383017 6.246025 22.629042 0l130.449773-130.265464 0 438.921505c0 121.725816 54.268744 175.99456 175.99456 175.99456l239.990721 0c155.085735 0 287.99296-167.16821 287.99296-303.986881 0-165.32512-135.118933-294.628082-257.33624-304.375977z" p-id="2096" fill="#2d6dcc"></path></svg>', '<svg t="1616854233639" class="icon" viewBox="0 0 1352 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1148" width="20" height="20"><path d="M1086.667547 415.408012c-13.762285-211.51321-160.867183-415.408012-430.644827-415.408012-32.931181 0-65.411812 3.194816-96.581748 9.50253-8.662867 1.761245-14.233315 10.178356-12.51303 18.882182 1.761245 8.662867 10.055479 14.233315 18.882182 12.51303 29.060539-5.918602 59.431771-8.888142 90.212596-8.888142 274.815624 0 399.98688 215.650087 399.98688 416.00192l0 48.00416c0 8.826703 7.167857 15.99456 15.99456 15.99456s15.99456-7.167857 15.99456-15.99456l0-48.00416c0-0.163837-0.040959-0.348153-0.040959-0.51199 98.01532 8.437591 224.026239 93.817004 224.026239 272.50143 0 152.531989-112.453431 271.98944-255.99488 271.98944l-767.98464 0c-127.239695 0-255.99488-93.448371-255.99488-271.98944 0-131.00794 80.116158-271.98944 255.99488-271.98944l48.00416 0c8.826703 0 15.99456-7.167857 15.99456-15.99456s-7.167857-15.99456-15.99456-15.99456l-48.00416 0 0-63.99872c0-119.252655 73.562689-193.347813 191.99616-193.347813 107.640727 0 191.99616 84.928861 191.99616 193.347813l0 415.776644-133.117338-123.51241c-6.410112-6.021-16.547509-5.672847-22.588988 0.839663-6.021 6.471551-5.672847 16.608948 0.839663 22.588988l144.50399 134.038919c9.563969 9.543489 18.02204 14.233315 26.459631 14.233315 8.355673 0 16.649907-4.648867 25.845243-13.864683l144.934061-134.468991c6.49203-6.021 6.881142-16.137917 0.839663-22.588988-6.021-6.532989-16.199356-6.881142-22.588988-0.839663l-133.117338 123.553369 0-415.776644c0-126.359073-98.404432-225.336933-224.00576-225.336933-136.066399 0-224.00576 88.451351-224.00576 225.336933l0 65.637087c-168.157917 16.260795-255.99488 160.088958-255.99488 302.360673 0 147.350653 100.923422 303.99904 288.00448 303.99904l767.98464 0c161.50205 0 288.00448-133.526929 288.00448-303.99904 0-201.723966-145.814684-296.892622-257.346533-304.572469z" p-id="1149" fill="#2d6dcc"></path></svg>', '<svg t="1616854567257" class="icon" viewBox="0 0 1352 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2095" width="20" height="20"><path d="M1086.603604 415.596184c-13.65934-211.566186-160.799312-415.596184-430.627602-415.596184-246.810151 0-437.119373 183.448833-447.215407 428.272544-135.037018 42.022439-208.760594 186.520649-208.760594 291.699618 0 161.946123 134.586485 303.986881 287.99296 303.986881l207.982401 0c8.82635 0 15.99392-7.16757 15.99392-15.99392s-7.16757-15.99392-15.99392-15.99392l-207.982401 0c-136.368138 0-255.984641-127.091255-255.984641-271.978561 0-97.622303 85.560306-271.978561 255.984641-271.978561l48.00224 0c8.82635 0 15.99392-7.16757 15.99392-15.99392s-7.16757-15.99392-15.99392-15.99392l-48.00224 0c-16.280623 0-31.680659 1.822611-46.691599 4.443893 12.553487-191.66082 158.239466-388.420855 414.654161-388.420855 274.804632 0 399.970882 215.641462 399.970882 415.985281l0 48.00224c0 8.82635 7.16757 15.99392 15.99392 15.99392s15.99392-7.16757 15.99392-15.99392l0-48.00224c0-0.102394 0-0.184309 0-0.286703 96.598364 10.587525 223.9968 114.271544 223.9968 272.265264 0 122.422095-118.101074 271.978561-255.984641 271.978561l-239.990721 0c-103.602104 0-143.986241-40.384137-143.986241-143.986241l0-438.921505 130.490731 130.224507c3.133252 3.133252 7.229006 4.710117 11.324761 4.710117s8.191509-1.576865 11.324761-4.66916c6.246025-6.246025 6.246025-16.423975 0-22.629042l-142.737036-142.450333c-19.0043-18.942863-33.749015-18.942863-52.732836 0l-142.737036 142.450333c-6.246025 6.205068-6.246025 16.383017 0 22.629042s16.383017 6.246025 22.629042 0l130.449773-130.265464 0 438.921505c0 121.725816 54.268744 175.99456 175.99456 175.99456l239.990721 0c155.085735 0 287.99296-167.16821 287.99296-303.986881 0-165.32512-135.118933-294.628082-257.33624-304.375977z" p-id="2096" fill="#2d6dcc"></path></svg>'];
+        var data = ['<svg style="padding: 10px;" t="1616854567257" class="icon" viewBox="0 0 1352 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2095" width="120" height="80"><path d="M1086.603604 415.596184c-13.65934-211.566186-160.799312-415.596184-430.627602-415.596184-246.810151 0-437.119373 183.448833-447.215407 428.272544-135.037018 42.022439-208.760594 186.520649-208.760594 291.699618 0 161.946123 134.586485 303.986881 287.99296 303.986881l207.982401 0c8.82635 0 15.99392-7.16757 15.99392-15.99392s-7.16757-15.99392-15.99392-15.99392l-207.982401 0c-136.368138 0-255.984641-127.091255-255.984641-271.978561 0-97.622303 85.560306-271.978561 255.984641-271.978561l48.00224 0c8.82635 0 15.99392-7.16757 15.99392-15.99392s-7.16757-15.99392-15.99392-15.99392l-48.00224 0c-16.280623 0-31.680659 1.822611-46.691599 4.443893 12.553487-191.66082 158.239466-388.420855 414.654161-388.420855 274.804632 0 399.970882 215.641462 399.970882 415.985281l0 48.00224c0 8.82635 7.16757 15.99392 15.99392 15.99392s15.99392-7.16757 15.99392-15.99392l0-48.00224c0-0.102394 0-0.184309 0-0.286703 96.598364 10.587525 223.9968 114.271544 223.9968 272.265264 0 122.422095-118.101074 271.978561-255.984641 271.978561l-239.990721 0c-103.602104 0-143.986241-40.384137-143.986241-143.986241l0-438.921505 130.490731 130.224507c3.133252 3.133252 7.229006 4.710117 11.324761 4.710117s8.191509-1.576865 11.324761-4.66916c6.246025-6.246025 6.246025-16.423975 0-22.629042l-142.737036-142.450333c-19.0043-18.942863-33.749015-18.942863-52.732836 0l-142.737036 142.450333c-6.246025 6.205068-6.246025 16.383017 0 22.629042s16.383017 6.246025 22.629042 0l130.449773-130.265464 0 438.921505c0 121.725816 54.268744 175.99456 175.99456 175.99456l239.990721 0c155.085735 0 287.99296-167.16821 287.99296-303.986881 0-165.32512-135.118933-294.628082-257.33624-304.375977z" p-id="2096" fill="#2d6dcc"></path></svg>', '<svg t="1616854233639" class="icon" viewBox="0 0 1352 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1148" width="20" height="20"><path d="M1086.667547 415.408012c-13.762285-211.51321-160.867183-415.408012-430.644827-415.408012-32.931181 0-65.411812 3.194816-96.581748 9.50253-8.662867 1.761245-14.233315 10.178356-12.51303 18.882182 1.761245 8.662867 10.055479 14.233315 18.882182 12.51303 29.060539-5.918602 59.431771-8.888142 90.212596-8.888142 274.815624 0 399.98688 215.650087 399.98688 416.00192l0 48.00416c0 8.826703 7.167857 15.99456 15.99456 15.99456s15.99456-7.167857 15.99456-15.99456l0-48.00416c0-0.163837-0.040959-0.348153-0.040959-0.51199 98.01532 8.437591 224.026239 93.817004 224.026239 272.50143 0 152.531989-112.453431 271.98944-255.99488 271.98944l-767.98464 0c-127.239695 0-255.99488-93.448371-255.99488-271.98944 0-131.00794 80.116158-271.98944 255.99488-271.98944l48.00416 0c8.826703 0 15.99456-7.167857 15.99456-15.99456s-7.167857-15.99456-15.99456-15.99456l-48.00416 0 0-63.99872c0-119.252655 73.562689-193.347813 191.99616-193.347813 107.640727 0 191.99616 84.928861 191.99616 193.347813l0 415.776644-133.117338-123.51241c-6.410112-6.021-16.547509-5.672847-22.588988 0.839663-6.021 6.471551-5.672847 16.608948 0.839663 22.588988l144.50399 134.038919c9.563969 9.543489 18.02204 14.233315 26.459631 14.233315 8.355673 0 16.649907-4.648867 25.845243-13.864683l144.934061-134.468991c6.49203-6.021 6.881142-16.137917 0.839663-22.588988-6.021-6.532989-16.199356-6.881142-22.588988-0.839663l-133.117338 123.553369 0-415.776644c0-126.359073-98.404432-225.336933-224.00576-225.336933-136.066399 0-224.00576 88.451351-224.00576 225.336933l0 65.637087c-168.157917 16.260795-255.99488 160.088958-255.99488 302.360673 0 147.350653 100.923422 303.99904 288.00448 303.99904l767.98464 0c161.50205 0 288.00448-133.526929 288.00448-303.99904 0-201.723966-145.814684-296.892622-257.346533-304.572469z" p-id="1149" fill="#2d6dcc"></path></svg>', '<svg t="1616854567257" class="icon" viewBox="0 0 1352 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2095" width="20" height="20"><path d="M1086.603604 415.596184c-13.65934-211.566186-160.799312-415.596184-430.627602-415.596184-246.810151 0-437.119373 183.448833-447.215407 428.272544-135.037018 42.022439-208.760594 186.520649-208.760594 291.699618 0 161.946123 134.586485 303.986881 287.99296 303.986881l207.982401 0c8.82635 0 15.99392-7.16757 15.99392-15.99392s-7.16757-15.99392-15.99392-15.99392l-207.982401 0c-136.368138 0-255.984641-127.091255-255.984641-271.978561 0-97.622303 85.560306-271.978561 255.984641-271.978561l48.00224 0c8.82635 0 15.99392-7.16757 15.99392-15.99392s-7.16757-15.99392-15.99392-15.99392l-48.00224 0c-16.280623 0-31.680659 1.822611-46.691599 4.443893 12.553487-191.66082 158.239466-388.420855 414.654161-388.420855 274.804632 0 399.970882 215.641462 399.970882 415.985281l0 48.00224c0 8.82635 7.16757 15.99392 15.99392 15.99392s15.99392-7.16757 15.99392-15.99392l0-48.00224c0-0.102394 0-0.184309 0-0.286703 96.598364 10.587525 223.9968 114.271544 223.9968 272.265264 0 122.422095-118.101074 271.978561-255.984641 271.978561l-239.990721 0c-103.602104 0-143.986241-40.384137-143.986241-143.986241l0-438.921505 130.490731 130.224507c3.133252 3.133252 7.229006 4.710117 11.324761 4.710117s8.191509-1.576865 11.324761-4.66916c6.246025-6.246025 6.246025-16.423975 0-22.629042l-142.737036-142.450333c-19.0043-18.942863-33.749015-18.942863-52.732836 0l-142.737036 142.450333c-6.246025 6.205068-6.246025 16.383017 0 22.629042s16.383017 6.246025 22.629042 0l130.449773-130.265464 0 438.921505c0 121.725816 54.268744 175.99456 175.99456 175.99456l239.990721 0c155.085735 0 287.99296-167.16821 287.99296-303.986881 0-165.32512-135.118933-294.628082-257.33624-304.375977z" p-id="2096" fill="#2d6dcc"></path></svg>'];
         return data[id];
     }
 }

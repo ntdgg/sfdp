@@ -40,13 +40,14 @@ class Field{
 	 */
 	static function add($varId,$varInfo){
 		$field = [
-				['sid'=>$varId,'field'=>'id','name'=>'主键','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','is_list'=>'','is_search'=>'','search_type'=>'','type_lx'=>''],
-				['sid'=>$varId,'field'=>'uid','name'=>'用户id','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','is_list'=>'','is_search'=>'','search_type'=>'','type_lx'=>''],
-				['sid'=>$varId,'field'=>'status','name'=>'审核状态','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','is_list'=>'','is_search'=>'','search_type'=>'','type_lx'=>''],
-				['sid'=>$varId,'field'=>'create_time','name'=>'新增时间','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','is_list'=>'','is_search'=>'','search_type'=>'','type_lx'=>''],
-				['sid'=>$varId,'field'=>'update_time','name'=>'更新时间','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','is_list'=>'','is_search'=>'','search_type'=>'','type_lx'=>'']
+				['sid'=>$varId,'field'=>'id','name'=>'主键','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','search_type'=>''],
+				['sid'=>$varId,'field'=>'uid','name'=>'用户id','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','search_type'=>''],
+				['sid'=>$varId,'field'=>'status','name'=>'审核状态','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','search_type'=>''],
+				['sid'=>$varId,'field'=>'create_time','name'=>'新增时间','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','search_type'=>''],
+				['sid'=>$varId,'field'=>'update_time','name'=>'更新时间','name_type'=>'int','zanwei'=>'','moren'=>'','is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','search_type'=>'']
 			];
 			foreach($varInfo as $k=>$v){
+				$type_lx = intval($v['xx_type'] ?? 0);
 				$field[] = [
 					'sid'=>$varId,
 					'field'=>$v['tpfd_db'],
@@ -61,12 +62,13 @@ class Field{
 					'type'=>$v['td_type'],//输入类型
 					'data'=>$v['xx_type'] ?? '',
 					'function'=>$v['checkboxes_func'] ??'',
-					'type_lx'=>$v['xx_type'] ?? 0,
+					'type_lx'=>1,
 					'is_list'=>$v['tpfd_list']=='yes'?1:0,
 					'is_search'=>$v['tpfd_chaxun']=='yes'?1:0,
 					'search_type'=>''
 				];
 			}
+			
 		return (new Field())->mode->add($field);		
 	}
 	/**
