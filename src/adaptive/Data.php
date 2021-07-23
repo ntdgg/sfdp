@@ -202,12 +202,17 @@ class Data{
 				}
 			}
 				$sys_user = unit::gconfig('sys_user');
-			foreach($jsondata['fieldSysUser'] as $k3=>$v3) {
-				$json[$k][$k3] = (new $sys_user())->value($v3,$v[$k3]);
-			}
+                foreach($jsondata['fieldSysUser'] as $k3=>$v3) {
+                    if(isset($v[$k3])){
+                        $json[$k][$k3] = (new $sys_user())->value($v3,$v[$k3]);
+                    }
+                }
+
 		}
 		return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
 	}
+
+	
 	static function selectAll($table,$where=[]){
 		return  (new Data())->mode->selectAll($table,$where);
 	}
@@ -359,7 +364,7 @@ class Data{
                             if(!class_exists($className)){
                                 return 'Sorry,未找到自定函数，请先配置~';
                             }
-                            $getData = (new $className())->func($v2['checkboxes_func']);
+                            $getData = (new $className())->func($v2['checkboxes_func'],'all');
                         }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
@@ -411,7 +416,7 @@ class Data{
                             if (!class_exists($className)) {
                                 return 'Sorry,未找到自定函数，请先配置~';
                             }
-                            $getData = (new $className())->func($v2['checkboxes_func']);
+                            $getData = (new $className())->func($v2['checkboxes_func'],'all');
                         }
                         if ($getData['code'] == -1) {
                             echo '<h2>系统级错误：' . $getData['msg'] . '</h2>';
@@ -430,6 +435,7 @@ class Data{
 			foreach($Stable as $k=>$v){
 				$sublist[$k]= self::selectAll($v[0],['d_id'=>$bid]);
 				$datas = self::selectAll($v[0],['d_id'=>$bid]);
+				$find['sublist_data'][$v[0]] = $datas;
 				foreach($datas as $kk=>$vv){
 					$mkey = array_keys($v[1]);
 					$mkey2 = array_keys($vv);
@@ -445,6 +451,6 @@ class Data{
 			}
 		}
 		$field['sublists'] = $sublist;
-		return ['info'=>json_encode($field)];
+		return ['info'=>json_encode($field),'row'=>$find];
 	}
 }

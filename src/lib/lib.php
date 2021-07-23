@@ -346,6 +346,7 @@ php;
 		$patch = unit::gconfig('static_url');
 		$urls= unit::gconfig('url');
 		$save = $urls['api'].'?act=save';
+        $server_save = $urls['api'].'?act=field&sid='.$fid;
 		$script = $urls['api'].'?act=script&sid='.$fid;
 	return <<<php
 	<html>
@@ -383,6 +384,7 @@ php;
 					<div class="sfdp-tool-con" ><a data="system_role">&#8194;<b class='ico'>Θ</b>&#8194;系统角色</a></div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">子表单设计 Form control library</div>
+				<div class="sfdp-tool-con"><a data="group">&#8194;<b class='ico'>§</b>&#8194; 分组线条 </a></div>
 				<div class='sfdp-tool-fix'onclick='sfdp.build_fb()'><a>&#8194;<b class='ico'>§</b>&#8194; 添加附表 </a></div>
 				<div class="sfdp-cl"></div>
 			</div>
@@ -392,7 +394,7 @@ php;
 			</div>
 			<div class="sfdp-con" style="float: right; width: 360px;">
 				<div class="sfdp-att">
-				<br/><br/><div style="padding: 24px 48px;"> <h1>\﻿ (•◡•) / </h1><p> Sfdp V5.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © Guoguo <a href="https://www.cojz8.com/">Sfdp</a> 版权禁删！ ]</span></div>
+				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><p> Sfdp V5.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © Guoguo <a href="https://www.cojz8.com/">Sfdp</a> 版权禁删！ ]</span></div>
 				</div>
 			</div>
 			<div class="sfdp-cl"></div>
@@ -400,9 +402,11 @@ php;
 		<script src="{$patch}lib/jquery-1.12.4.js"></script>
 		<script src="{$patch}lib/layer/2.4/layer.js"></script>
 		<script type="text/javascript" src="{$patch}sfdp.5.0.js?v=5.0.322222"></script>
+		<script type="text/javascript" src="{$patch}sfdp.config.js?v=5.0.322222"></script>
 		<script type="text/javascript" src="{$patch}lib/jquery-ui.js"></script>
 		<script type="text/javascript" language="javascript">
 			var look_db = {$look};
+			const server_url ='{$server_save}';
 		    $(function(){
 				sfdp.int_data({$json});
 			});
@@ -455,6 +459,20 @@ php;
 php;
 }
 	/**
+	 * 设计器界面
+	 *
+	 * @param  json $json 设计数据
+	 * @param  int   $fid 设计ID
+	 * @param  int $look 是否锁定
+	 */
+	public static function desc2($json,$fid,$look){
+		$patch = unit::gconfig('static_url');
+		$urls= unit::gconfig('url');
+		$save = $urls['api'].'?act=save';
+		$script = $urls['api'].'?act=script&sid='.$fid;
+		return view(ROOT_PATH.'/desc.html',['patch'=>$patch,'script'=>$script,'save'=>$save,'urls'=>$urls,'json'=>$json,'fid'=>$fid,'look'=>$look]);
+	}
+	/**
 	 * 脚本函数
 	 *
 	 * @param  Array $info 设计数据
@@ -504,6 +522,7 @@ php;
 			theme: "dracula",	//设置主题
 			 matchBrackets: true,
 		  });
+		   editor.setSize('auto',"auto");
 	</script>
 </body>
 </html>

@@ -112,6 +112,11 @@ class Design{
      */
 	static function descVerTodata($sid){
 		$sfdp_ver_info =(new Design())->mode->findVer($sid);
+        if($sfdp_ver_info['s_fun_id']>0){
+            $fun = '<script src="/static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js"></script>';
+        }else{
+            $fun = '';
+        }
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		$list_field = json_decode($sfdp_ver_info['s_list'],true);
 		
@@ -146,7 +151,7 @@ class Design{
                             if(!class_exists($className)){
                                 return 'Sorry,未找到自定函数，请先配置~';
                             }
-                            $getData = (new $className())->func($v2['checkboxes_func']);
+                            $getData = (new $className())->func($v2['checkboxes_func'],'all');
                         }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
@@ -173,7 +178,7 @@ class Design{
 				}
 			}
 		$load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
-		return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser];
+		return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'fun'=>$fun,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser];
 	}
 	/**
 	 * 获取数据
@@ -298,6 +303,7 @@ class Design{
 				's_bill'=>unit::OrderNumber(),
 				'add_user'=>'Sys',
 				's_field'=>1,
+				's_type'=>$data ?? 0,
 				'add_time'=>time()
 			];
 			return (new Design())->mode->insert($ver);

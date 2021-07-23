@@ -16,7 +16,15 @@ use think\facade\Db;
 
 class AdapteeField{
 
-	function add($data){
+    function add($data){
+        $info = Db::name('sfdp_field')->insertGetId($data);
+        if($info){
+            return  $info;
+        }else{
+            return  false;
+        }
+    }
+	function add_all($data){
 		$info = Db::name('sfdp_field')->insertAll($data);
 		if($info){
 			return  $info;

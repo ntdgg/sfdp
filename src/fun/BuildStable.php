@@ -43,7 +43,7 @@ class BuildStable{
 				$fieldAttr[] = unit::tab(1) . "`d_id` int(10) DEFAULT '0' COMMENT '关联主表id'";
 				foreach ($v['data'] as $v) {
 						if (!in_array($v['tpfd_db'], $auto_create_field)) {
-							if($v['tpfd_dblx']=='datetime'||$v['tpfd_dblx']=='longtext'){
+							if($v['tpfd_dblx']=='datetime'||$v['tpfd_dblx']=='longtext'||$v['tpfd_dblx']=='date'){
 								$fieldAttr[] = unit::tab(1) . "`{$v['tpfd_db']}` {$v['tpfd_dblx']} COMMENT '{$v['tpfd_name']}'";
 								}else{
 								$fieldAttr[] = unit::tab(1) . "`{$v['tpfd_db']}` {$v['tpfd_dblx']}({$v['tpfd_dbcd']}) DEFAULT NULL COMMENT '{$v['tpfd_name']}'";

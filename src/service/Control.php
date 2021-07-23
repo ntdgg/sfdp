@@ -21,6 +21,7 @@ use sfdp\adaptive\Common;
 use sfdp\adaptive\Modue;
 use sfdp\adaptive\Field;
 
+use sfdp\fun\BuildFix;
 use sfdp\fun\BuildFun;
 use sfdp\fun\SfdpUnit;
 use sfdp\fun\BuildTable;
@@ -28,6 +29,8 @@ use sfdp\fun\BuildStable;
 use sfdp\lib\lib;
 
 use sfdp\lib\unit;
+
+use think\facade\Db;
 
 class Control{
 	/**
@@ -42,15 +45,25 @@ class Control{
 			$list = Design::select();
 			return lib::index($list);
 		}
+        if($act =='listData'){
+            $list = Design::select();
+            return $list;
+        }
 		if($act =='fun'){
 			$list = Functions::select();
-			
 			return lib::fun($list);
 		}
 		if($act =='desc'){
 			 $info = Design::find($sid);
-			 return lib::desc($info['s_field'],$info['id'],$info['s_look']);
+			// if($info['s_type']==0){
+				 return lib::desc($info['s_field'],$info['id'],$info['s_look']);
+			// }else{
+				 //return lib::desc2($info['s_field'],$info['id'],$info['s_look']);
+			// }
 		}
+		if($act =='field'){
+		    
+        }
 		if($act =='script'){
 			if($sid !='' && is_array($sid)){
 				$bill = Script::scriptSave($sid);
@@ -78,6 +91,14 @@ class Control{
 			 }
 			 return json($ret);
 		}
+		/*免部署生成*/
+        if($act =='fix2'){
+        	$ret = BuildFix::Bfix($sid);
+        	if($ret['code']==-1){
+
+            }
+            return json($ret);
+        }
 		if($act =='fix'){
 			$info = Design::find($sid);
 			$json = Design::getDesignJson($sid);
@@ -122,7 +143,7 @@ class Control{
 			}
 		}
 		if($act=='create'){
-			$id = Design::saveDesc('','create');
+			$id = Design::saveDesc($sid,'create');
 			return json(['code'=>0]);
 		}
 		if($act=='node'){
@@ -285,7 +306,7 @@ class Control{
                             if(!class_exists($className)){
                                 return 'Sorry,未找到自定函数，请先配置~';
                             }
-                            $getData = (new $className())->func($v['function']);
+                            $getData = (new $className())->func($v['function'],'all');
                         }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;
@@ -308,6 +329,7 @@ class Control{
 				'sid' =>$sid,
 				'field'=>$field_name,
 				'search' =>json_encode($search),
+                'fun' =>$list['field']['fun'],
 				'title' =>$modueId['title'],
 				'load_file' =>$list['field']['load_file'],
 			];
@@ -343,9 +365,9 @@ class Control{
 		if($act=='view'){
 			$info = Data::getViewData($sid,$data);
 			if(unit::gconfig('return_mode')==1){
-				return view(ROOT_PATH.'/view.html',['info'=>$info['info']]);
+				return view(ROOT_PATH.'/view.html',['info'=>$info['info'],'row'=>$info['row']]);
 				}else{
-				return ['info'=>$info['info']];
+				return ['info'=>$info['info'],'row'=>$info['row']];
 			}
 		}
 		if($act =='edit'){

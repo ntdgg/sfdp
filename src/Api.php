@@ -34,7 +34,6 @@ class Api
 		if($sid==''){
 			$sid = input('sid');
 		}
-		
 		$this->topconfig = 
 		'<script>
 		var g_uid='.$ginfo['uid'].';
@@ -49,15 +48,16 @@ class Api
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
 	 public function sfdpApi($act='list',$sid=''){
-		if($act=='list' || $act=='fun' || $act=='create'){
-			return Control::api($act);
+		if($act=='list' || $act=='fun' || $act=='create' || $act=='listData' ){
+			$s_type = input('s_type');
+			return Control::api($act,$s_type);
 		}
 		if($act=='node'){
 			$node = input('node');
 			$data = ['sid'=>$sid,'node'=>$node];
 			return Control::api($act,$data);
 		}
-		if($act=='desc' || $act=='script' || $act=='ui' || $act=='fix' || $act=='deldb' || $act=='custom' || $act=='customSave' || $act=='customSearch'|| $act=='customAccess'|| $act=='customOrder'){
+		if(in_array($act,['desc','script','ui','fix','fix2','deldb','custom','customSave','customSearch','customSearch','customAccess','customOrder','customOrder'])){
 			if (unit::is_post()) {
 				$data = input('post.');
 				return Control::api($act,$data);
@@ -65,10 +65,15 @@ class Api
                return Control::api($act,$sid);
 			 }
 		}
-		if($act=='save' || $act=='fun_save' ){
+		if($act=='save' || $act=='fun_save'){
 			$data = input('post.');
 			return Control::api($act,$data);
 		}
+         if($act=='field'){
+             $data = input('post.');
+             $data['sid'] = $sid;
+             return Control::api($act,$data);
+         }
 		if($act=='fun_update'){
 			$data = ['id'=>input('id'),'status'=>input('status')];;
 			return Control::api($act,$data);
