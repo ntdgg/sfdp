@@ -26,7 +26,7 @@ th,td {border-left: 1px solid #ddd;padding: 8px;line-height: 20px;border-bottom:
 tr{height: 40px;}
 ul{margin: 0;}
 li{margin: 0;padding: 0;}
-#table input, #table select{padding: 5px 5px;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}
+#table input, #table select{padding: 5px 5px;display: inline-block;box-sizing: border-box;}
 
 .sfdp-field-con-view{
 	min-height: 35px;

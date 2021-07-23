@@ -18,7 +18,7 @@ var sfdp = {
         return {
             name: '',//表单名称
             name_db: '',//数据表名称
-            tpfd_id: 'SFDP' + sfdp.dateFormat(new Date(), "mmssS"),//表单ID
+            tpfd_id: 'SFDP' + sfdp.dateFormat(new Date(), "yyyyMMddhhmmssS"),//表单ID
             tpfd_btn: {},
             tpfd_script: '',//数据表脚本
             tpfd_class: '',//数据表脚本
@@ -141,7 +141,7 @@ var sfdp = {
         var heads = {};
         for (x in td_data) {
             var type = td_data[x]['td_type'];
-            heads[x] = td_data[x]['tpfd_name'];
+            heads[td_data[x]['td']] = td_data[x]['tpfd_name'];
             if (types === 'add') {
                 var html = sfdpPlug.PlugInit(type,td_data[x],true);
             } else if (types === 'edit') {
@@ -151,6 +151,7 @@ var sfdp = {
             }
             json[td_data[x]['td']] = html;
         }
+
         var htmls = '<tr class="text-c">';
         for (var i = 1; i <= id; i++) {
             htmls += '<td>' + json[i] + '</td>';
@@ -164,13 +165,13 @@ var sfdp = {
         } else {
             html = '<form id="' + stable + '" class="sub_list" data="' + stable + '"><fieldset  id="' + data.id + '_field" class="' + sfdp.ui.field + '_field"  mode="field" > <legend id="' + code + '">' + data['title'] + '</legend><table class="'+sfdp.ui.table+' table"><tr class="text-c title">' + head_html + '<th>操作</th></tr>' + htmls + '<td><a onclick="sfdp.fz(this)">增</a> <a onclick="sfdp.dl(this)">删</a></td></tr></table></fieldset></form>';
         }
-
         return html;
     },
     fz: function (obj) {
         var tr = $(obj).parent().parent();
         tr.after(tr.clone());
         sfdp.setDate();
+
     },
     dl: function (obj) {
         var length= $(obj).parent().parent().parent().children("tr").length;
@@ -470,6 +471,7 @@ var sfdp = {
                 json_data['list'][key]['data'][data.tpfd_id] = data;
                 break;
             case 'td_data':
+                data.field_id = json_data['list'][key]['data'][data.tpfd_id]['field_id'];
                 data.td = json_data['list'][key]['data'][data.tpfd_id]['td'];
                 data.td_type = json_data['list'][key]['data'][data.tpfd_id]['td_type'];
                 json_data['list'][key]['data'][data.tpfd_id] = data;
@@ -482,7 +484,6 @@ var sfdp = {
         var index = parent.layer.getFrameIndex(window.name);
         parent.layer.close(index);
     },
-
     /*5.0.1 显示组件*/
     tpfd_xianshi: function (data) {
         return '<div class="sfdp-form-item"><label class="sfdp-label">显示类型：</label><div class="sfdp-input-block"><textarea name="tpfd_moren" >' + data.tpfd_moren + '</textarea> </div></div><br/><br/>';
@@ -513,14 +514,14 @@ var sfdp = {
             }
             var default_data = JSON.parse(JSON.stringify(datas));
         }
-        return '<div class="sfdp-form-item"><label class="sfdp-label"><input ' + ((data.xx_type) === '0' ? 'checked' : '') + '  name="xx_type" value=0 type="radio">静态方法</label><div class="sfdp-input-block">' + sfdp.tpfd_checkboxes_clss(default_data, type) + '</div></div><div class="sfdp-form-item"><label class="sfdp-label"><input ' + ((data.xx_type) === '1' ? 'checked' : '') + ' name="xx_type" value=1 type="radio">动态方法</label><div class="sfdp-input-block"><input name="checkboxes_func" placeholder="函数" type="text" value="' +(data.checkboxes_func || '') + '" class="sfdp-input" style="width:50%"></div></div>';
+        return '<div class="sfdp-form-item"><label class="sfdp-label"><input ' + ((data.xx_type) === '0' ? 'checked' : '') + '  name="xx_type" value=0 type="radio">静态方法</label><div class="sfdp-input-block">' + sfdp.tpfd_checkboxes_clss(default_data, type) + '</div></div><div class="sfdp-form-item"><label class="sfdp-label"><input ' + ((data.xx_type) === '1' ? 'checked' : '') + ' name="xx_type" value=1 type="radio">动态方法</label><div class="sfdp-input-block"><input name="checkboxes_func" placeholder="函数" type="text" value="' +(data.checkboxes_func || '') + '" class="sfdp-input" style="width:70%;display: inline;" id="checkboxes_func"><span class="button" onclick=sfdp.openpage("元数组件","'+sfdp.url.fun+'?id=checkboxes_func&value=' + (data.checkboxes_func || '') + '",{w:"50%",h:"80%"})>关联</span></div></div>';
     },
     /*5.0.1 高级组件*/
     tpfd_gaoji: function (data) {
         var default_data = [{cid: 0, clab: '是'}, {cid: 1, clab: '否'}];
         if (data.tpfd_read == undefined) {
             var tpfd_read = 1;
-            var tpfd_must = 0;
+            var tpfd_must = 1;
         } else {
             var tpfd_read = data.tpfd_read;
             var tpfd_must = data.tpfd_must;
@@ -663,6 +664,9 @@ var sfdp = {
                 data.tpfd_show = 'no';
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_upload_img(data) + sfdp.tpfd_gaoji(data) + '</div>';
                 break;
+            case 'group':
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) +  '</div>';
+                break;
             default:
                 var html = '';
         }
@@ -718,6 +722,9 @@ var sfdp = {
                 break;
             case 'links':
                 var html = '<label ' + labid + ' class="sfdp-label">按钮控件</label><a class="button">按钮<a/>*默认内容即为链接地址 <b class="ico red" id="del_con">㊀</b>';
+                break;
+            case 'group':
+                var html = '<fieldset ' + labid + '  class="layui-elem-field layui-field-title sfdp-label" style="text-align: left;border-width: 1px 0 0;float: left;width: 95%;"><legend>分组标题 </fieldset><b class="ico red" id="del_con">㊀</b></legend>';
                 break;
             default:
                 var html = '';
@@ -975,7 +982,7 @@ var sfdp = {
     /*5.0.1 拖拽进去转换信息*/
     bulid_tpl: function (type, parent_code, td_xh, old_data = 0) {
         if (old_data === 0) {
-            var td_id = type + '_' + sfdp.dateFormat(new Date(), "mmssS");
+            var td_id = type + '_' + sfdp.dateFormat(new Date(), "yyyyMMddhhmmssS");
         } else {
             var td_id = old_data;
         }

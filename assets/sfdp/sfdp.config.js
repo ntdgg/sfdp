@@ -1,13 +1,14 @@
 var sfdp = (function($){
     $.url = {
         user : '/gadmin/common/system_user',
-        role :'/gadmin/common/system_role'
+        role :'/gadmin/common/system_role',
+        fun :'/gadmin/common/system_fun'
     }
     $.ui = {
         css : '/static/layui/css/layui.css',
         ui_css :'<style>select{width: 100%} .layui-form-label{box-sizing: initial;}</style>',
         ui_js :'',
-        form :'layui-form ',
+        form :'layui-form layui-form-pane',
         btn_ok:'layui-btn',//一行的样式
         table :'layui-table',
         field :'layui-elem-field layui-field-title',
