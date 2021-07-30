@@ -49,6 +49,9 @@ class AdapteeData{
 		}
 	}
 	function delSub($table,$id){
+		if(Db::name($table)->where('d_id',$id)->count()<=0){
+	        return  true;
+	    }
 		$info = Db::name($table)->where('d_id',$id)->delete();
 		if($info){
 			return  $info;
