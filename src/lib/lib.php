@@ -1,15 +1,15 @@
 <?php
 /**
-  *+------------------
-  * SFDP-超级表单开发平台V5.0
-  *+------------------
-  * Sfdp 工具类
-  *+------------------
-  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
-  *+------------------
-  * Author: guoguo(1838188896@qq.com)
-  *+------------------ 
-  */
+ *+------------------
+ * SFDP-超级表单开发平台V5.0
+ *+------------------
+ * Sfdp 工具类
+ *+------------------
+ * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+ *+------------------
+ * Author: guoguo(1838188896@qq.com)
+ *+------------------
+ */
 namespace sfdp\lib;
 
 
@@ -37,18 +37,18 @@ class lib{
 		$node_url =$urls['api'].'?act=node';
 		$create_url =$urls['api'].'?act=create';
 		foreach($data as $k=>$v){
-		   $status = ['未锁定','已锁定'];
-		   $status_zt = [0=>'未部署',1=>'未部署',2=>'已部署'];
-		   $btn = '<a onClick=sfdp.openfullpage("设计——'.$v['s_bill'].'","'.$urls['api'].'?act=desc&sid='.$v['id'].'") class="button">设计</a>';
-		   if($v['s_field'] <> 1){
-			   $fix = $urls['api'].'?act=fix&sid='.$v['id'];
-			   $btn .= ' <a onClick=sfdp.Askshow("'.$fix.'","部署后将生成最新版本,确定是否执行?") class="button">部署</a><a onClick=sfdp.openpage("定义管理——'.$v['s_bill'].'","'.$urls['api'].'?act=custom&sid='.$v['id'].'") class="button">定义</a>';
-		   }
-		   if($v['s_db_bak']==1){
-			   $btn .='<a onClick=sfdp.Askshow("'.$urls['api'].'?act=deldb&sid='.$v['id'].'","删除备份数据库,是否执行?")  class="button">DelDb</a>';
-			   $btn .='<a onClick=add_fun('.$v['id'].')  class="button">Menu</a>';
-		   }
-		   $tr .='<tr class="text-c"><td>'.$v['id'].'</td><td>'.$v['s_bill'].'</td><td>'.$v['s_title'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$status_zt[$v['s_design']].'</td><td>'.$status[$v['s_look']].'（'.$v['s_db'].'）</td><td>'.$btn.'</td></tr>';
+			$status = ['未锁定','已锁定'];
+			$status_zt = [0=>'未部署',1=>'未部署',2=>'已部署'];
+			$btn = '<a onClick=sfdp.openfullpage("设计——'.$v['s_bill'].'","'.$urls['api'].'?act=desc&sid='.$v['id'].'") class="button">设计</a>';
+			if($v['s_field'] <> 1){
+				$fix = $urls['api'].'?act=fix&sid='.$v['id'];
+				$btn .= ' <a onClick=sfdp.Askshow("'.$fix.'","部署后将生成最新版本,确定是否执行?") class="button">部署</a><a onClick=sfdp.openpage("定义管理——'.$v['s_bill'].'","'.$urls['api'].'?act=custom&sid='.$v['id'].'") class="button">定义</a>';
+			}
+			if($v['s_db_bak']==1){
+				$btn .='<a onClick=sfdp.Askshow("'.$urls['api'].'?act=deldb&sid='.$v['id'].'","删除备份数据库,是否执行?")  class="button">DelDb</a>';
+				$btn .='<a onClick=add_fun('.$v['id'].')  class="button">Menu</a>';
+			}
+			$tr .='<tr class="text-c"><td>'.$v['id'].'</td><td>'.$v['s_bill'].'</td><td>'.$v['s_title'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$status_zt[$v['s_design']].'</td><td>'.$status[$v['s_look']].'（'.$v['s_db'].'）</td><td>'.$btn.'</td></tr>';
 		}
 		return <<<php
 		{$tmp['head']}{$tmp['js']}
@@ -124,13 +124,13 @@ php;
 		$urls= unit::gconfig('url');
 		$fun_save = $urls['api'].'?act=fun_save&sid=';
 		foreach($data as $k=>$v){
-		   $status = ['编辑中','已启用'];
-		   if($v['status']==0){
-			   $btn ='<a onClick=sfdp.Askshow("'.$urls['api'].'?act=fun_update&status=1&id='.$v['id'].'","是否启用,是否执行?")  class="button">启用</a>';
+			$status = ['编辑中','已启用'];
+			if($v['status']==0){
+				$btn ='<a onClick=sfdp.Askshow("'.$urls['api'].'?act=fun_update&status=1&id='.$v['id'].'","是否启用,是否执行?")  class="button">启用</a>';
 			}else{
-			   $btn ='<a onClick=sfdp.Askshow("'.$urls['api'].'?act=fun_update&status=0&id='.$v['id'].'","是否禁用,是否执行?")  class="button" style="    background-color: indianred;">禁用</a>';
-		   }
-		   $tr .='<tr class="text-c"><td>'.$v['bill'].'</td><td>'.$v['title'].'</td><td>'.$v['fun_name'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$v['add_user'].'</td><td>'.$status[$v['status']].'</td><td><input id="fun_'.$v['fun_name'].'" value="'.$v['function'].'" type=hidden><a onClick=add_fun("'.$v['title'].'","'.$v['fun_name'].'","'.$v['id'].'")	class="button">编辑</a>'.$btn.'</td></tr>';	
+				$btn ='<a onClick=sfdp.Askshow("'.$urls['api'].'?act=fun_update&status=0&id='.$v['id'].'","是否禁用,是否执行?")  class="button" style="    background-color: indianred;">禁用</a>';
+			}
+			$tr .='<tr class="text-c"><td>'.$v['bill'].'</td><td>'.$v['title'].'</td><td>'.$v['fun_name'].'</td><td>'.date('Y/m/d H:i',$v['add_time']).'</td><td>'.$v['add_user'].'</td><td>'.$status[$v['status']].'</td><td><input id="fun_'.$v['fun_name'].'" value="'.$v['function'].'" type=hidden><a onClick=add_fun("'.$v['title'].'","'.$v['fun_name'].'","'.$v['id'].'")	class="button">编辑</a>'.$btn.'</td></tr>';
 		}
 		return <<<php
 		{$tmp['css']}{$tmp['head']}{$tmp['js']}
@@ -174,7 +174,7 @@ function save_fun(id){
 }
 </script>
 php;
-}
+	}
 	/**
 	 * 定义函数
 	 *
@@ -191,55 +191,27 @@ php;
 		$url =$urls['api'];
 		$fun_save = $urls['api'].'?act=customSave&sid='.$sid;
 		$access = json_decode($modue['access'],true);
-		 $search ='';
-		 $field_html ='';
-		 $access_html ='';
-		 foreach($field as $k=>$v){
-			$search .=' <option value="'.$v['id'].'">'.$v['name'].'('.$v['field'].')</option>';	 
-		 }
-		 foreach($field as $k=>$v){
-			 if($v['is_search']==1){
+        $show_type=  $modue['show_type'];
+        $show_fun=  $modue['show_fun'];
+		$show_field=  $modue['show_field'];
+		$search ='';
+		$field_html ='';
+		$access_html ='';
+		foreach($field as $k=>$v){
+			$search .=' <option value="'.$v['id'].'">'.$v['name'].'('.$v['field'].')</option>';
+		}
+		foreach($field as $k=>$v){
+			if($v['is_search']==1){
 				$field_html .='<div id="checkboxes_id'.$v['id'].'">查询字段：<select style="width:200px" class="smalls" name="search_ids"><option value="'.$v['id'].'">'.$v['name'].'('.$v['field'].')</option></select>  查询条件：<input name="search_value" type="text" value="'.$v['search_type'].'">    <span class="button" onclick=editoption("_id'.$v['id'].'")>Del</span></div>';
-			 }		
-		 }
-		 $user = ['uid'=>'当前用户','role'=>'当前角色'];
-		 $eq = ['='=>'等于','<>'=>'不等于','in'=>'包含','no in'=>'不包含'];
-		 foreach((array)$access as $k=>$v){
-			$access_html .='<div id="access_id'.$v[0].'">控制字段：<select style="width:200px" name="accsee_ids"><option value="'.$v[0].'">'.$v[3].'</option></select> <select style="width:200px" name="accsee_eq"><option value="'.$v[1].'">'.$eq[$v[1]].'</option></select> <select style="width:200px" name="accsee_user"><option value="'.$v[2].'">'.$user[$v[2]].'</option></select> <span class="button" onclick=editaccess("_id'.$v[0].'")>del</span></div>';
-		 }
-	return <<<php
+			}
+		}
+		$user = ['uid'=>'当前用户','role'=>'当前角色'];
+		$eq = ['='=>'等于','<>'=>'不等于','in'=>'包含','no in'=>'不包含'];
+		foreach((array)$access as $k=>$v){
+			$access_html .='<div id="access_id'.$v[0].'">控制字段：<select style="width:200px" name="accsee_ids"><option value="'.$v[0].'">'.$v[3].'</option></select> <select style="width:200px" name="accsee_eq"><option value="'.$v[1].'">'.$eq[$v[1]].'</option></select> <select style="width:200px" name="accsee_user"><option value="'.$v[2].'">'.$user[$v[2]].'</option></select> <select style="width:200px" name="accsee_fun"><option value="'.$v[4].'">'.$v[4].'</option></select> <span class="button" onclick=editaccess("_id'.$v[0].'")>del</span></div>';
+		}
+		return <<<php
   <link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" />
-  <style>
-  #sortable1, #sortable2 {
-    border: 1px solid #eee;
-    min-height: 30px;
-    list-style-type: none;
-    margin: 0;
-    padding: 5px 0 0 0;
-    margin-right: 10px;
-	display:inline-block;
-	min-width: 150px;
-  }
-  .ui-state-highlight{
-	 border: 1px solid #dad55e;
-    background: #fffa90;
-    color: #777620;
-  }
-  .ui-state-default{
-	  border: 1px solid #c5c5c5;
-    background: #f6f6f6;
-    font-weight: normal;
-    color: #454545;
-  }
-  #sortable1 li, #sortable2 li {
-    margin: 0 5px 5px 5px;
-    padding: 5px;
-    font-size: 1.2em;
-    width: 120px;
-	float:left;
-	font-size: 10px;
-  }
-  </style>
   <script src="{$patch}lib/jquery-1.12.4.js"></script>
   <script src="{$patch}lib/jquery-ui.js"></script>
 	<script src="{$patch}lib/layer/2.4/layer.js"></script>
@@ -275,17 +247,23 @@ php;
   </tr>
     <tr><td style='text-align: center;'><b>权限控制<b> </td><td>
 	{$access_html}
-	<div id="access1">控制字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select> 
+	<div id="access1">控制字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select>
 	<select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="<>">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select>
-	<select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select> 
+	<select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select>
+	<select style="width:200px" name="accsee_fun"><option value="and">and</option><option value="or">or</option></select>
     <span class='button' onclick=addaccess(1)>Add</span></div>
 	</td><td><a onclick='save_access()'  class='button'>保存</a></td></tr>
 	<tr><td style='text-align: center;'><b>查询设置<b> </td><td>
 	{$field_html}
-	<div id="checkboxes1">查询字段：<select style="width:200px" name="search_ids"><option value="">请选择</option>{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,LIKE     <span class='button' onclick=addoption(1)>Add</span></div>
+	<div id="checkboxes1">查询字段：<select style="width:200px" name="search_ids"><option value="">请选择</option>{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,like     <span class='button' onclick=addoption(1)>Add</span></div>
 	</td><td><a onclick='save_search()'  class='button'>保存</a></td></tr>
+	<tr><td style='text-align: center;'><b>列表展示<b> </td><td>
+
+	<div id="checkboxes1">展示形式：<select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">数形列表</option></select> 关联字段：<input id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 80px;"> 数型函数：<input style="width: 80px;" id="show_fun" name="show_fun" type="text" value="{$show_fun}">注：函数符合Tree 建议层级>3级别;内置组织树：sys_role</div>
+	</td><td><a onclick='save_show()'  class='button'>保存</a></td></tr>
  </table>
 <script type="text/javascript" language="javascript">
+    $("#show_type").find("option[value='{$show_type}']").attr("selected",true);
 	function addaccess(id){
 		 $('#access'+id).children('span').attr("onclick","editaccess("+id+")");
 		 $('#access'+id).children('span').html('Del');
@@ -305,7 +283,7 @@ php;
 		$('#checkboxes'+id).remove();
 	}
 	function save_access(){
-		var ids = [] , value =[] , user =[];
+		var ids = [] , value =[] , user =[], fun =[];
 		$("select[name='accsee_ids']").each(function () {
 			ids.push(this.value);
 		});
@@ -315,7 +293,10 @@ php;
 		$("select[name='accsee_user']").each(function () {
 			user.push(this.value);
 		});
-		sfdp.sAjax("{$url}?act=customAccess",{sid:{$sid},ids_val:ids.join(','),value_val:value.join(','),user_val:user.join(',')});
+		$("select[name='accsee_fun']").each(function () {
+			fun.push(this.value);
+		});
+		sfdp.sAjax("{$url}?act=customAccess",{sid:{$sid},ids_val:ids.join(','),value_val:value.join(','),user_val:user.join(','),fun_val:fun.join(',')});
 	}
 	function save_search(){
 		var ids = [] , value =[];
@@ -327,14 +308,18 @@ php;
 		});
 		sfdp.sAjax("{$url}?act=customSearch",{sid:{$sid},ids_val:ids.join(','),value_val:value.join(',')});
 	}
+	save_show
 	function save_order(){
 		sfdp.sAjax("{$url}?act=customOrder",{sid:{$sid},order:$('#order').val()});
+	}
+	function save_show(){
+		sfdp.sAjax("{$url}?act=customShow",{sid:{$sid},show_field:$('#show_field').val(),show_type:$('#show_type').val(),show_fun:$('#show_fun').val()});
 	}
  </script>
 </body>
 </html>
 php;
-}
+	}
 	/**
 	 * 设计器界面
 	 *
@@ -346,9 +331,9 @@ php;
 		$patch = unit::gconfig('static_url');
 		$urls= unit::gconfig('url');
 		$save = $urls['api'].'?act=save';
-        $server_save = $urls['api'].'?act=field&sid='.$fid;
+		$server_save = $urls['api'].'?act=field&sid='.$fid;
 		$script = $urls['api'].'?act=script&sid='.$fid;
-	return <<<php
+		return <<<php
 	<html>
 	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
 	<link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" /> 
@@ -457,7 +442,7 @@ php;
 			})
   </script>
 php;
-}
+	}
 	/**
 	 * 设计器界面
 	 *
@@ -481,10 +466,10 @@ php;
 	public static function script($info,$sid){
 		$tmp = self::commontmp('Sfdp超级表单设计器');
 		$urls= unit::gconfig('url');
-        $info['s_fun'] = $info['s_fun'] ?? '';
+		$info['s_fun'] = $info['s_fun'] ?? '';
 		$action = $urls['api'].'?act=script&sid='.$sid;
 		$patch = unit::gconfig('static_url');
-	return <<<php
+		return <<<php
 	{$tmp['css']}
 		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/codemirror.css" />
 		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/dracula.css" />
@@ -527,11 +512,11 @@ php;
 </body>
 </html>
 php;
-}
+	}
 	/**
-	  * 公用模板方法
-	  *
-	  **/
+	 * 公用模板方法
+	 *
+	 **/
 	static function commontmp($title){
 		$patch = unit::gconfig('static_url');
 		$css = '<link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.5.0.css?v=5.0.1" />';
@@ -542,4 +527,3 @@ php;
 		return ['head'=>$head,'css'=>$css,'js'=>$js];
 	}
 }
-

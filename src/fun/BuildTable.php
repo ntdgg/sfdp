@@ -62,11 +62,11 @@ class BuildTable{
 		if((in_array('WorkFlow',$btn))){
 			$sql_create = "CREATE TABLE `{$tableName}` (\n"
 				. implode(",\n", array_merge($fieldAttr, $key))
-				. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '[work]{$name}'";
+				. "\n)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '[work]{$name}'";
         }else{
 			$sql_create = "CREATE TABLE `{$tableName}` (\n"
 				. implode(",\n", array_merge($fieldAttr, $key))
-				. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$name}'";
+				. "\n)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '{$name}'";
 		}
         $ret = Common::execute($sql_drop);
 		if($ret['code']==-1){

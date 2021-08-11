@@ -58,7 +58,7 @@ class BuildStable{
 				$sql_drop = "DROP TABLE IF EXISTS `{$buile_table}`";//删除数据表
 				$sql_create = "CREATE TABLE `{$buile_table}` (\n"
 					. implode(",\n", array_merge($fieldAttr, $key))
-					. "\n)ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT '{$table}子表'";
+					. "\n)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '{$table}子表'";
 				$ret = Common::execute($sql_drop);
 				if($ret['code']==-1){
 					return ['msg'=>'<h2>系统级错误：'.$ret['msg'].'</h2>','code'=>-1];
@@ -89,5 +89,6 @@ class BuildStable{
 			}
 			$i++;
 		}
+		return ['msg'=>'删除成功！','code'=>0];
 	}
 }

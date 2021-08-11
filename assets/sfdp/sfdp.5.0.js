@@ -64,7 +64,7 @@ var sfdp = {
         let htmlTags = ``
         for (const item of list) {
             let type = item.type || 'text'
-            htmlTags += `<div class='layui-input-inline'>` +sfdpPlug.PlugList(type,item) + `</div>`;
+            htmlTags += `<div class='layui-input-inline' style="width:90px">` +sfdpPlug.PlugList(type,item) + `</div>`;
         }
         $('#search').html(htmlTags);
         sfdp.setDate();
@@ -83,7 +83,6 @@ var sfdp = {
         if (int_data == null) {
             layer.msg('对不起，没有任何数据~');
         } else {
-
             $('#table').html('<form action="" method="post" name="form" id="form" class="'+ sfdp.ui.form +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"></div></form>');
             //恢复主表单设计
             for (x in int_data.list) {
@@ -100,8 +99,14 @@ var sfdp = {
             if (showtype === 'edit') {
                 for (x in int_data.sublists) {
                     for (y in int_data.sublists[x]) {
-
-                        $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table .title").after(sfdp.sublist_r(int_data.sublists[x][y]));
+                        let htmls = sfdp.sublist_r(int_data.sublists[x][y]);
+                        var length= $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table tbody").children("tr").length;
+                        var str=new RegExp('dropdown_');
+                        if(str.test(htmls)){
+                            var reg = new RegExp("dropdown_","g");//g,表示全部替换。
+                            htmls = htmls.replace(reg,'Etr'+length+"_dropdown_");
+                        }
+                        $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table .title").after(htmls);
                     }
                 }
             }
@@ -130,7 +135,7 @@ var sfdp = {
         if (show_type) {
             return htmls + '</tr>';
         } else {
-            return htmls + '<td><a onclick="sfdp.fz(this)">增</a> <a onclick="sfdp.dl(this)">删</a></td></tr>';
+            return htmls + '<td><a class="layui-btn layui-btn-sm layui-btn-primary" onclick="sfdp.dl(this)">删</a></td></tr>';
         }
 
     },
@@ -143,7 +148,7 @@ var sfdp = {
             var type = td_data[x]['td_type'];
             heads[td_data[x]['td']] = td_data[x]['tpfd_name'];
             if (types === 'add') {
-                var html = sfdpPlug.PlugInit(type,td_data[x],true);
+                var html = '';// sfdpPlug.PlugInit(type,td_data[x],true);
             } else if (types === 'edit') {
                 var html = sfdpPlug.PlugInit(type,td_data[x],true,);
             } else {
@@ -163,13 +168,54 @@ var sfdp = {
         if (show_type) {
             html = '<div id="' + stable + '"><fieldset  id="' + data.id + '_field"  mode="field" > <legend id="' + code + '">' + data['title'] + '</legend><table class="'+sfdp.ui.table+' table"><tr class="text-c title">' + head_html + '</tr></table></fieldset></div>';
         } else {
-            html = '<form id="' + stable + '" class="sub_list" data="' + stable + '"><fieldset  id="' + data.id + '_field" class="' + sfdp.ui.field + '_field"  mode="field" > <legend id="' + code + '">' + data['title'] + '</legend><table class="'+sfdp.ui.table+' table"><tr class="text-c title">' + head_html + '<th>操作</th></tr>' + htmls + '<td><a onclick="sfdp.fz(this)">增</a> <a onclick="sfdp.dl(this)">删</a></td></tr></table></fieldset></form>';
+            localStorage.setItem("sub"+code, JSON.stringify(td_data));
+            html = '<form id="' + stable + '" class="sub_list  layui-form" data="' + stable + '"><fieldset  id="' + data.id + '_field" class="' + sfdp.ui.field + '_field"  mode="field" > <legend id="' + code + '">' + data['title'] + ' <a class="layui-btn layui-btn-sm layui-btn-primary" onclick=sfdp.add_sub("' + code + '","sub'+code+'",'+id+')>增加</a></legend><table class="'+sfdp.ui.table+' table" style="margin: 5px;width: 99%;" id="' + code + '_table"><tr class="text-c title">' + head_html + '<th>操作</th></tr></table></fieldset></form>';
         }
         return html;
     },
+    add_sub: function (id,Item,id2) {
+        let td_data = JSON.parse(localStorage.getItem(Item));
+        var json = {1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '', 10: '', 11: '', 12: ''};
+        for (x in td_data) {
+            var type = td_data[x]['td_type'];
+            var html = sfdpPlug.PlugInit(type,td_data[x],true);
+            json[td_data[x]['td']] = html;
+        }
+        var htmls = '<tr class="text-c">';
+        for (var i = 1; i <= id2; i++) {
+            htmls += '<td>' + json[i] + '</td>';
+        }
+        var length= $('#'+id+'_table tbody').children("tr").length;
+        var str=new RegExp('dropdown_');
+        if(str.test(htmls)){
+            var reg = new RegExp("dropdown_","g");//g,表示全部替换。
+            htmls = htmls.replace(reg,'Atr'+length+"_dropdown_");
+        }
+        $('#'+id+'_table tbody').append(htmls+'<td> <a onclick="sfdp.dl(this)" class="layui-btn layui-btn-sm layui-btn-primary">删</a></td>');
+        $('.this-select').select2();
+    },
     fz: function (obj) {
         var tr = $(obj).parent().parent();
+        tr.next().find("input").val("");
+        tr.find('[data-widget="select2"]').each(function(){
+            $(this).select2('destroy');
+        })
         tr.after(tr.clone());
+        tr.find('[data-widget="select2"]').each(function(){
+            $(this).select2({
+                minimumResultsForSearch: -1,
+                width: 'resolve'
+            });
+            $(this).select2();
+        })
+        tr.next().find('[data-widget="select2"]').each(function(){
+            $(this).select2({
+                minimumResultsForSearch: -1,
+                width: 'resolve'
+            });
+            $(this).select2();
+        })
+
         sfdp.setDate();
 
     },
@@ -344,14 +390,14 @@ var sfdp = {
         });
     },
     view_img:function(url){
-            layer.open({
-                type: 1,
-                title: false,
-                closeBtn: 0,
-                shadeClose: true,
-                area: ['80%', '80%'], //宽高
-                content: "<img  src=" + url + " />"
-            });
+        layer.open({
+            type: 1,
+            title: false,
+            closeBtn: 0,
+            shadeClose: true,
+            area: ['80%', '80%'], //宽高
+            content: "<img  src=" + url + " />"
+        });
 
     },
     setDate: function () {
@@ -1015,14 +1061,14 @@ var sfdp = {
         html = '<div class="sfdp-rows " id="' + code + '"><div class="view-action"><b class="ico" id="del" data="' + code + '" >㊀</b></div>' + html + '</div>';
         var logs = '新增1*' + id + '单元行';
         if (old_data === '') {
-                sfdp.dataSave({tr: code, data: {}, type: id}, code, 'tr');
-                logout(logs);
-            } else {
-                logout('[恢复]' + logs);
-            }
-            if (showtype === '') {
-                $('#sfdp-main').append(html);
-                $(".fb-fz").sortable({
+            sfdp.dataSave({tr: code, data: {}, type: id}, code, 'tr');
+            logout(logs);
+        } else {
+            logout('[恢复]' + logs);
+        }
+        if (showtype === '') {
+            $('#sfdp-main').append(html);
+            $(".fb-fz").sortable({
                 opacity: 0.5,
                 revert: true,
                 animation: 150,
@@ -1129,9 +1175,9 @@ $("#sfdp-main").on("click", "#del_con", function (event) {
     let id = $(this).parent().children("label").attr("data-id");
     var mode = $('#' + parent_id).attr('mode') || 'zhubiao';
     if (mode === 'zhubiao') {
-            sfdp.dataSave({tpfd_id: id}, parent_id, 'td_del');
+        sfdp.dataSave({tpfd_id: id}, parent_id, 'td_del');
     } else {
-            sfdp.dataSave({tpfd_id: id}, parent_id, 'sublist_td_del');
+        sfdp.dataSave({tpfd_id: id}, parent_id, 'sublist_td_del');
     }
     $(this).parent().empty();
     event.stopPropagation();

@@ -57,7 +57,7 @@ class Api
 			$data = ['sid'=>$sid,'node'=>$node];
 			return Control::api($act,$data);
 		}
-		if(in_array($act,['desc','script','ui','fix','fix2','deldb','custom','customSave','customSearch','customSearch','customAccess','customOrder','customOrder'])){
+		if(in_array($act,['desc','script','ui','fix','fix2','deldb','custom','customSave','customSearch','customSearch','customAccess','customOrder','customShow'])){
 			if (unit::is_post()) {
 				$data = input('post.');
 				return Control::api($act,$data);

@@ -222,3 +222,32 @@ li{margin: 0;padding: 0;}
 	border-radius: 2px;
 	border-color: #dadada;
 }
+#sortable1, #sortable2 {
+	border: 1px solid #eee;
+	min-height: 30px;
+	list-style-type: none;
+	margin: 0;
+	padding: 5px 0 0 0;
+	margin-right: 10px;
+	display:inline-block;
+	min-width: 150px;
+}
+.ui-state-highlight{
+	border: 1px solid #dad55e;
+	background: #fffa90;
+	color: #777620;
+}
+.ui-state-default{
+	border: 1px solid #c5c5c5;
+	background: #f6f6f6;
+	font-weight: normal;
+	color: #454545;
+}
+#sortable1 li, #sortable2 li {
+	margin: 0 5px 5px 5px;
+	padding: 5px;
+	font-size: 1.2em;
+	width: 120px;
+	float:left;
+	font-size: 10px;
+}

@@ -137,7 +137,7 @@ class Design{
 					if($v2['td_type']=='system_user'||$v2['td_type']=='system_role'){
 						$fieldSysUser[$v2['tpfd_db']]=$v2['td_type'];
 					}
-					if(isset($v2['xx_type']) && $v2['xx_type']==1){
+					if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
 						//函数名转为数据信息
                         $fun_mode = unit::gconfig('fun_mode') ?? 1;
                         if($fun_mode==1 || $fun_mode==''){
@@ -193,7 +193,7 @@ class Design{
 		$field = json_decode($sfdp_ver_info['s_field'],true);
 		foreach($field['list'] as $k=>$v){
 				foreach($v['data'] as $k2=>$v2){
-					if(isset($v2['xx_type']) && $v2['xx_type']==1){
+					if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
 					    $fun_mode = unit::gconfig('fun_mode') ?? 1;
 					    if($fun_mode==1 || $fun_mode==''){
                             $getFun = Functions::findWhere([['fun_name','=',$v2['checkboxes_func']]]);
@@ -225,7 +225,7 @@ class Design{
         if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
             foreach($field['sublist'] as $k=>$v){
                 foreach($v['data'] as $k2=>$v2) {
-                    if (isset($v2['xx_type']) && $v2['xx_type'] == 1) {
+                    if (isset($v2['xx_type']) && $v2['xx_type'] == 1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
                         //函数名转为数据信息
                         $fun_mode = unit::gconfig('fun_mode') ?? 1;
                         if ($fun_mode == 1 || $fun_mode == '') {

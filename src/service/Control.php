@@ -81,7 +81,7 @@ class Control{
 			 //判断是否有附表
 			if(isset($json['sublist']) && $json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
 				$Stable = BuildStable::delDbbak($json['name_db'],$json['sublist']);
-				if($Stable['code']==-1){
+				if($Stable['code']==1){
 					return json($Stable);
 				}
 			}
@@ -217,6 +217,15 @@ class Control{
 				return json(['code'=>1,'msg'=>'保存失败']);
 			}
 		}
+        if($act =='customShow'){
+            $json = View::ver($sid['sid']);
+            $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['show_field'=>$sid['show_field'],'show_fun'=>$sid['show_fun'],'show_type'=>$sid['show_type'],'update_time'=>time()]);
+            if($ret){
+                return json(['code'=>0,'msg'=>'保存成功']);
+            }else{
+                return json(['code'=>1,'msg'=>'保存失败']);
+            }
+        }
 		if($act =='customSearch'){
 			$ids = explode(",",$sid['ids_val']);
 			$value = explode(",",$sid['value_val']);
@@ -237,12 +246,13 @@ class Control{
 			$ids = explode(",",$sid['ids_val']);//字段
 			$value = explode(",",$sid['value_val']);//表达式
 			$user = explode(",",$sid['user_val']);//用户值
+            $fun = explode(",",$sid['fun_val']);//用户值
 			$json = View::ver($sid['sid']);
 			$access = [];
 			foreach($ids as $k=>$v){		
 				if($v <> '' && $value[$k] <> '' && $user[$k] <> ''){
 					$name =Field::value($v);
-					$access[] = [$v,$value[$k],$user[$k],$name];
+					$access[] = [$v,$value[$k],$user[$k],$name,$fun[$k]];
 				}
 			}
 			$ret = Modue::saveWhere([['sid','=',$json['ver']['id']]],['access'=>json_encode($access),'update_time'=>time()]);
@@ -332,6 +342,9 @@ class Control{
                 'fun' =>$list['field']['fun'],
 				'title' =>$modueId['title'],
 				'load_file' =>$list['field']['load_file'],
+				'show_field' =>$modueId['show_field'],
+                'show_type' =>$modueId['show_type'],
+                'show_fun' =>$modueId['show_fun']
 			];
 			$btns = explode(',',$modueId['btn']);
 			$btns_tohtml = self::btnArray($btns,$sid);
