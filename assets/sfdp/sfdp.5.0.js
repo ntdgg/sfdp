@@ -374,6 +374,9 @@ var sfdp = {
                 $('.layui-layer-msg .layui-layer-content').html('已上传' + (loaded / total * 100).toFixed(2) + '%');
             },
             success: function (ret) {
+                if(ret.code==1){
+                    layer.alert(ret.data); return;
+                }
                 $('#' + ret.attr_id).val(ret.data);
                 if(img==1){
                     $('#' + ret.attr_id + '_img').html('<img src="/'+ret.data+'" width="100px" onclick=sfdp.view_img("/'+(ret.data).replace(/\\/g,"/")+'")>');

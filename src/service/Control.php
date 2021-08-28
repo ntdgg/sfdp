@@ -152,6 +152,9 @@ class Control{
 				return 'Sorry,未找到node_action类，请先配置~';
 			}
 			$ver = Design::findVerWhere([['status','=',1],['sid','=',$sid['sid']]]);//取得版本ID
+			if(!$ver){
+				return json(['code'=>1,'msg'=>'请检查是否已经部署项目！']);
+			}
 			$Node = (new $className())->SaveNode($sid['sid'],Design::descVerTodata($ver['id']),$sid['node']);//获取目录节点信息
 			if($Node['code']==0){
 				return json(['code'=>0]);

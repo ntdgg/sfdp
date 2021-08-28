@@ -507,7 +507,7 @@ php;
 			theme: "dracula",	//设置主题
 			 matchBrackets: true,
 		  });
-		   editor.setSize('auto',"auto");
+		   editor.setSize('auto',document.body.clientHeight - 140 +"px");
 	</script>
 </body>
 </html>
