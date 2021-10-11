@@ -21,6 +21,8 @@ use sfdp\fun\SfdpUnit;
 
 use sfdp\lib\unit;
 
+define('BEASE_SFDPURL', realpath ( dirname ( __FILE__ ) ) );
+
 define('ROOT_PATH',dirname(dirname(__DIR__) . DIRECTORY_SEPARATOR, 1) . DIRECTORY_SEPARATOR . 'sfdp' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'template');
 
 class Api
@@ -99,7 +101,6 @@ class Api
 			return Control::curd($act,$sid,$data,$this->topconfig);
 		}
 		if($act=='add'){
-			
 			if (unit::is_post()) {
 				$data = input('post.');
 				return Control::curd($act,$sid,$data,$this->topconfig);
@@ -125,6 +126,9 @@ class Api
 			$data = input('post.');
 			return Control::curd($act,$sid,$data,$this->topconfig);
 		}
+        if($act=='Data'){
+            return Control::curd($act,$sid,$bid);
+        }
 		
 	}
 	/**

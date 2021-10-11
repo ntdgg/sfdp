@@ -73,7 +73,15 @@ class AdapteeData{
 		if($whereRaw !=''){
 			$list = $list->whereRaw($whereRaw);
 		}
-		$list = $list->limit($offset,$limit)->field('id'.$field.'status,"url",uid,create_time')->order('id desc')->select()->toarray();
+		$list = $list->limit($offset,$limit)->field('id'.$field.'status,"url"')->order('id desc')->select()->toarray();
+        foreach($list as $k=>$v){
+            if(isset($list[$k]['create_time'])){
+                $list[$k]['create_time'] = date('Y-m-d H:i:s',$list[$k]['create_time']);
+            }
+            if(isset($list[$k]['update_time'])){
+                $list[$k]['update_time'] = date('Y-m-d H:i:s',$list[$k]['update_time']);
+            }
+        }
 		$count = Db::name($table)->where($map);
 		if($whereRaw !=''){
 			$count = $count->whereRaw($whereRaw);

@@ -363,6 +363,7 @@ php;
 					<div class="sfdp-tool-con"><a data="links">&#8194;<b class='ico'>↔</b>&#8194;超级链接</a></div>
 					<div class="sfdp-tool-con"><a data="upload_img">&#8194;<b class='ico'>Ρ</b>&#8194;单图组件</a></div>
 					<div class="sfdp-tool-con"><a data="edit">&#8194;<b class='ico'>Ε</b>&#8194;富文本框</a></div>
+					<div class="sfdp-tool-con"><a data="dropdowns">&#8194;<b class='ico'>S</b>&#8194;下拉多选</a></div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">内置组件 System control library</div>
 					<div class="sfdp-tool-con" ><a data="system_user">&#8194;<b class='ico'>ρ</b>&#8194;系统用户</a></div>
@@ -384,8 +385,9 @@ php;
 			</div>
 			<div class="sfdp-cl"></div>
 		</div>
-		<script src="{$patch}lib/jquery-1.12.4.js"></script>
+		<script src="{$patch}lib/jquery-3.4.1.min.js"></script>
 		<script src="{$patch}lib/layer/2.4/layer.js"></script>
+		<script src="{$patch}lib/pingyin.js"></script>
 		<script type="text/javascript" src="{$patch}sfdp.5.0.js?v=5.0.322222"></script>
 		<script type="text/javascript" src="{$patch}sfdp.config.js?v=5.0.322222"></script>
 		<script type="text/javascript" src="{$patch}lib/jquery-ui.js"></script>
@@ -422,6 +424,10 @@ php;
 			$( "#fb-fz" ).sortable({
 			  cancel: ".fb-disabled"
 			});
+			
+            $(document).on("input propertychange", "#tpfd_name", function (e) {
+                $("#tpfd_db").val($("#tpfd_name").toPinyin().toLowerCase());
+            });
 			$("#up_save").click(function(){
 				var int_data = localStorage.getItem("json_data");
 				var id='{$fid}';

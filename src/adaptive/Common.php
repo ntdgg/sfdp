@@ -42,6 +42,7 @@ class Common{
     {
 		return (new Common())->mode->execute($sql);
     }
+
 	
 	
 }

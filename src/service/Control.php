@@ -20,6 +20,7 @@ use sfdp\adaptive\Data;
 use sfdp\adaptive\Common;
 use sfdp\adaptive\Modue;
 use sfdp\adaptive\Field;
+use sfdp\adaptive\M;
 
 use sfdp\fun\BuildFix;
 use sfdp\fun\BuildFun;
@@ -203,7 +204,7 @@ class Control{
 			}
 			$listtrue ='';
 			foreach($field as $k=>$v){
-				if(!in_array($v['field'], ['id','status','update_time','create_time','uid'])){
+				if(!in_array($v['field'], ['id','status'])){
 					if($v['is_list']<>1){
 						  $listtrue  .= '<li class="ui-state-highlight " data-name="'.$v['name'].'" data-id="'.$v['id'].'" data-field="'.$v['field'].'">'.$v['name'].'('.$v['field'].')</li>'; 
 					  }
@@ -340,6 +341,7 @@ class Control{
 			$config = [
 				'g_js'=>$g_js,
 				'sid' =>$sid,
+                'table' => $sid_ver['s_db'],
 				'field'=>$field_name,
 				'search' =>json_encode($search),
                 'fun' =>$list['field']['fun'],
@@ -431,6 +433,10 @@ class Control{
 				return ['config'=>$config,'data'=>$data['info']['s_field']];
 			}
 		}
+        if($act=='Data'){
+            return M::Save($data);
+        }
+
 	}
 	static function fapi($post){
 		$key_name = [];
