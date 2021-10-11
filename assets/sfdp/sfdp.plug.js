@@ -48,7 +48,7 @@ var sfdpPlug = {
             radio : (sfdpPlug.checkboxes_clss(item.id,'radio','',item.field,'',item.tpfd_data,data.tpfd_check)).replace(/<a>(.+?)<\/a>/g,''),
             checkboxes : sfdpPlug.checkboxes_clss(item.id,'checkboxes','',item.field,'',item.tpfd_data,data.tpfd_check).replace(/<a>(.+?)<\/a>/g,''),
             textarea  : '<textarea  name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input"></textarea>',
-            dropdown  : sfdpPlug.view_select(data, item.tpfd_db, 0 , '', item.id),
+            dropdown  : sfdpPlug.view_select(data, item.tpfd_db, '' , '', item.id),
             upload: sfdpPlug.view_upload(data, item.field, 0),
             date : '<input  type="text"  placeholder="'+item.name+'起" data-format="yyyy-MM-dd" data-type="date" class="datetime sfdp-input layui-input"  name="@' + item.field + '[]"></div><div class="layui-input-inline" style="width:90px"><input  type="text"  placeholder="'+item.name+'止" data-format="yyyy-MM-dd" data-type="date" class="datetime sfdp-input layui-input"  name="@' + item.field + '[]">',
             group : ''
@@ -72,6 +72,10 @@ var sfdpPlug = {
         if(type=='dropdown'){
             view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id);
         }
+        if(type=='dropdowns'){
+            console.log(data);
+            view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,1,data.rvalue);
+        }
         var fieldArray = {
             text : '<input type="text" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
             number :'<input type="number" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
@@ -79,6 +83,7 @@ var sfdpPlug = {
             checkboxes : checkboxes,
             textarea  : '<textarea id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea>',
             dropdown  : view_selects,
+            dropdowns  : view_selects,
             upload: sfdpPlug.view_upload(data, name, 0),
             date : '<input type="text" ' + att + ' data-type="' + data.tpfd_dblx + '" data-format="' + dataType[data.xx_type] + '" class="datetime  layui-input"  name="' + name + '"  id="' + data.tpfd_id + '" value="' + value + '">',
             time_range : '<input type="text" ' + att + ' data-type="' + data.tpfd_dblx + '" data-format="' + dateType_format[data.xx_type] + '" class="time_range layui-input"  name="' + name + '"  id="' + data.tpfd_id + '" value="' + value + '">',
@@ -95,26 +100,38 @@ var sfdpPlug = {
 
         return fieldArray[type];
     },
-    view_select: function (data, field, value, attr, selectId) {
+    view_select: function (data, field, value, attr, selectId,is_dx=0,rvalue='') {
 
-        let tags = `<select name="${field}" ${attr} id="${selectId}" class="this-select" data-widget="select2"  data-value="${value}" lay-search>`
-        tags += ` <option value="">请选择</option>`;
+        if(is_dx==1){
+            var tags = `<input id="${selectId}_val" type="hidden" value="${rvalue}" name="${field}"><select  ${attr} id="${selectId}" class="this-select" data-widget="select2"  data-value="${value}" lay-search multiple="true">`
+        }else{
+            var tags = `<select name="${field}" ${attr} id="${selectId}" class="this-select" data-widget="select2"  data-value="${value}" lay-search>`
+            tags += ` <option value="">请选择</option>`;
+        }
+        if (value !== undefined ) {
+            var strs = (value).split(",");
+        }
+
         for (const key in data) {
+                var check ='';
             if(data.hasOwnProperty(key)){
-                tags += `<option value="${key}" ${value == data[key] ? 'selected' : ''}>${data[key]}</option>`;
+                if (value !== undefined  && sfdpPlug.isInArray(strs, data[key])) {
+                    check = 'selected';
+                }
+                tags += `<option value="${key}" ${check}>${data[key]}</option>`;
             }
         }
         tags += `</select>`
         return tags
     },
     view_upload_img: function (data) {
-        let html= '<input  type="hidden"  name="' + data.tpfd_db + '" style="width:85%;"  id="' + data.tpfd_id + '"><span id="' + data.tpfd_id + '_img"></span>  <a id="' + data.tpfd_id + '_btn" href="javascript:" class="layui-btn layui-btn-radius layui-btn-primary layui-border-blue" style="" onclick=sfdp.H5uploadhtml("' + data.tpfd_id + '",1)><i class="layui-icon layui-icon-upload-drag"></i> <span id="' + data.tpfd_id + '_text">选择图片</span></a>';
+        let html= '<input  type="hidden"  name="' + data.tpfd_db + '" style="width:85%;"  id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span id="' + data.tpfd_id + '_img"></span>  <a id="' + data.tpfd_id + '_btn" href="javascript:" class="layui-btn layui-btn-radius layui-btn-primary layui-border-blue" style="" onclick=sfdp.H5uploadhtml("' + data.tpfd_id + '",1)><i class="layui-icon layui-icon-upload-drag"></i> <span id="' + data.tpfd_id + '_text">选择图片</span></a>';
         return html;
     },
     view_upload: function (data) {
-        var html = '<input type="text" style="width:85%;"class="layui-input" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span>' + '<a id="' + data.tpfd_id + '_btn" href="javascript:" class="layui-btn layui-btn-primary layui-border-blue" style="" onclick=sfdp.H5uploadhtml("' + data.tpfd_id + '")><i class="layui-icon layui-icon-upload-drag"></i> <span id="' + data.tpfd_id + '_text">上传1</span></a></span>';
+        var html = '<input type="text" style="width:85%;"class="layui-input" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span>' + '<a id="' + data.tpfd_id + '_btn" href="javascript:" class="layui-btn layui-btn-primary layui-border-blue" style="" onclick=sfdp.H5uploadhtml("' + data.tpfd_id + '")><i class="layui-icon layui-icon-upload-drag"></i> <span id="' + data.tpfd_id + '_text">上传</span></a></span>';
         if (data.tpfd_upload_type == 1) {
-            var html = '<input type="text" style="width:85%;"class="layui-input" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span>' + '<a class="layui-btn layui-btn-primary layui-border-blue" style="" id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + data.tpfd_upload_action + '?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-upload-drag"></i>上传2</a></span>';
+            var html = '<input type="text" style="width:85%;"class="layui-input" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span>' + '<a class="layui-btn layui-btn-primary layui-border-blue" style="" id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + data.tpfd_upload_action + '?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-upload-drag"></i>上传</a></span>';
         }
         return html;
     },

@@ -193,6 +193,7 @@ var sfdp = {
         }
         $('#'+id+'_table tbody').append(htmls+'<td> <a onclick="sfdp.dl(this)" class="layui-btn layui-btn-sm layui-btn-primary">删</a></td>');
         $('.this-select').select2();
+        sfdp.setDate();
     },
     fz: function (obj) {
         var tr = $(obj).parent().parent();
@@ -374,6 +375,9 @@ var sfdp = {
                 $('.layui-layer-msg .layui-layer-content').html('已上传' + (loaded / total * 100).toFixed(2) + '%');
             },
             success: function (ret) {
+                if(ret.code==1){
+                    layer.alert(ret.data); return;
+                }
                 $('#' + ret.attr_id).val(ret.data);
                 if(img==1){
                     $('#' + ret.attr_id + '_img').html('<img src="/'+ret.data+'" width="100px" onclick=sfdp.view_img("/'+(ret.data).replace(/\\/g,"/")+'")>');
@@ -614,7 +618,7 @@ var sfdp = {
     /*5.0.1 通用设置组件*/
     tpfd_common: function (data) {
         var default_field = [{cid: 'int', clab: 'int', checked: ''}, {cid: 'time', clab: 'time', checked: ''}, {cid: 'varchar', clab: 'varchar', checked: 'checked'}, {cid: 'datetime', clab: 'datetime',checked: ''}, {cid: 'date', clab: 'date',checked: ''}, {cid: 'longtext', clab: 'longtext', checked: ''}];
-        return '<input name="tpfd_id" type="hidden" value="' + data.tpfd_id + '"><input name="tr_id" type="hidden" value="' + data.tr_id + '"><div  style="margin: 5px;"><div class="sfdp-title">字段设置</div></div><div class="sfdp-form-item"><label class="sfdp-label">唯一标识</label><div class="sfdp-input-block"><input type="text"  autocomplete="off" value="' + data.tpfd_id + '" readonly class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">字段标题</label><div class="sfdp-input-block"> <input  name="tpfd_name" type="text"  value="' + data.tpfd_name + '"  class="sfdp-input"> </div></div><div class="sfdp-form-item"><label class="sfdp-label">字段名称</label><div class="sfdp-input-block"> <input name="tpfd_db" type="text" value="' + data.tpfd_db + '"  class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段类型</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_field, 'tpfd_dblx', (data.tpfd_dblx || 'varchar')) + ' </div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段长度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_dbcd" type="text" value="' + (data.tpfd_dbcd || '255')  + '" class="sfdp-input"></div></div>' + sfdp.tpfd_list(data);
+        return '<input name="tpfd_id" type="hidden" value="' + data.tpfd_id + '"><input name="tr_id" type="hidden" value="' + data.tr_id + '"><div  style="margin: 5px;"><div class="sfdp-title">字段设置</div></div><div class="sfdp-form-item"><label class="sfdp-label">唯一标识</label><div class="sfdp-input-block"><input type="text"  autocomplete="off" value="' + data.tpfd_id + '" readonly class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">字段标题</label><div class="sfdp-input-block"> <input id="tpfd_name"  name="tpfd_name" type="text"  value="' + data.tpfd_name + '"  class="sfdp-input"> </div></div><div class="sfdp-form-item"><label class="sfdp-label">字段名称</label><div class="sfdp-input-block"> <input id="tpfd_db" name="tpfd_db" type="text" value="' + data.tpfd_db + '"  class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段类型</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_field, 'tpfd_dblx', (data.tpfd_dblx || 'varchar')) + ' </div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段长度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_dbcd" type="text" value="' + (data.tpfd_dbcd || '255')  + '" class="sfdp-input"></div></div>' + sfdp.tpfd_list(data);
     },
     /*5.0.1 上传控制组件*/
     tpfd_upload: function (data) {
@@ -676,6 +680,9 @@ var sfdp = {
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_date_type(data) + sfdp.tpfd_gaoji(data) + '</div>';
                 break;
             case 'dropdown':
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_checkboxes(data, 'radio') + sfdp.tpfd_gaoji(data) + '</div>';
+                break;
+            case 'dropdowns':
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data) + sfdp.tpfd_checkboxes(data, 'radio') + sfdp.tpfd_gaoji(data) + '</div>';
                 break;
             case 'system_user':
@@ -750,6 +757,8 @@ var sfdp = {
                 break;
             case 'dropdown':
                 var html = '<label ' + labid + ' class="sfdp-label">下拉选择</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> <b class="ico red" id="del_con">㊀</b>';
+            case 'dropdowns':
+                var html = '<label ' + labid + ' class="sfdp-label">下拉多选</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> <b class="ico red" id="del_con">㊀</b>';
                 break;
             case 'system_user':
                 var html = '<label ' + labid + ' class="sfdp-label">系统用户</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> <b class="ico red" id="del_con">㊀</b>';
