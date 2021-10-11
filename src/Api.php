@@ -4,21 +4,12 @@
   * SFDP-超级表单开发平台V5.0
   *+------------------
   * Sfdp Api接口类
-  *+------------------
-  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
-  *+------------------
-  * Author: guoguo(1838188896@qq.com)
   *+------------------ 
   */
 namespace sfdp;
 
-use think\Request;
-use think\Db;
-
 use sfdp\service\Control;//引入核心控制器
-
 use sfdp\fun\SfdpUnit;
-
 use sfdp\lib\unit;
 
 define('BEASE_SFDPURL', realpath ( dirname ( __FILE__ ) ) );
