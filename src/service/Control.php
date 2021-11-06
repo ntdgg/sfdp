@@ -65,6 +65,15 @@ class Control{
 		if($act =='field'){
 		    
         }
+        if($act =='mysql'){
+            if($sid !='' && is_array($sid)){
+                $bill = Script::scriptSave($sid);
+                BuildFun::Bfun($sid['function'],$bill);
+                $action = $urls['api'].'?act=script&sid='.$sid['sid'];
+                echo "<script language='javascript'>alert('Success,脚本生成成功！'); location.assign('".$action."');</script>";exit;
+            }
+            return lib::mysql(Script::script($sid),$sid);
+        }
 		if($act =='script'){
 			if($sid !='' && is_array($sid)){
 				$bill = Script::scriptSave($sid);
@@ -196,7 +205,6 @@ class Control{
 			$fielselect = explode(",",$modue['field']);
 			$list = '';
 			foreach($fielselect as $k=>$v){
-				
 				$find = Field::findWhere([['sid','=',$json['ver']['id']],['field','=',$v]]);//找出模型字段
 				if($find){
 					$list  .= '<li class="ui-state-highlight " data-name="'.$find['name'].'" data-id="'.$find['id'].'" data-field="'.$find['field'].'">'.$find['name'].'('.$find['field'].')</li>'; 
@@ -206,11 +214,22 @@ class Control{
 			foreach($field as $k=>$v){
 				if(!in_array($v['field'], ['id','status'])){
 					if($v['is_list']<>1){
-						  $listtrue  .= '<li class="ui-state-highlight " data-name="'.$v['name'].'" data-id="'.$v['id'].'" data-field="'.$v['field'].'">'.$v['name'].'('.$v['field'].')</li>'; 
+						  $listtrue  .= '<li class="ui-state-highlight " data-name="'.$v['name'].'" data-id="'.$v['id'].'" data-field="'.$v['field'].'">'.$v['name'].'('.$v['field'].')</li>';
 					  }
 				}
 			}
-			return lib::custom($sid,$list,$listtrue,$field,$modue);
+            $fielcount = explode(",",$modue['count_field']);
+            $listcount ='';
+            foreach($field as $k=>$v){
+                if(!in_array($v['field'], ['id','status'])){
+                    if(in_array($v['field'], $fielcount)){
+                        $listcount  .= '<input id="listcount" type="checkbox" value="'.$v['field'].'" checked>'.$v['name'].'('.$v['field'].')</li>';
+                    }else{
+                        $listcount  .= '<input id="listcount" type="checkbox" value="'.$v['field'].'">'.$v['name'].'('.$v['field'].')</li>';
+                    }
+                }
+            }
+			return lib::custom($sid,$list,$listtrue,$field,$modue,$listcount);
 		}
 		if($act =='customOrder'){
 			$json = View::ver($sid['sid']);
@@ -221,6 +240,15 @@ class Control{
 				return json(['code'=>1,'msg'=>'保存失败']);
 			}
 		}
+        if($act =='customCount'){
+            $json = View::ver($sid['sid']);
+            $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['count_field'=>$sid['count_field'],'update_time'=>time()]);
+            if($ret){
+                return json(['code'=>0,'msg'=>'保存成功']);
+            }else{
+                return json(['code'=>1,'msg'=>'保存失败']);
+            }
+        }
         if($act =='customShow'){
             $json = View::ver($sid['sid']);
             $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['show_field'=>$sid['show_field'],'show_fun'=>$sid['show_fun'],'show_type'=>$sid['show_type'],'update_time'=>time()]);
@@ -338,11 +366,14 @@ class Control{
 			$map = SfdpUnit::Bsearch($data,$sid);
 			$list = Data::getListData($sid,$map);
 			$field_name = explode(',',$modueId['field_name']);
+            $field_mysql_name = explode(',',$modueId['field']);
 			$config = [
 				'g_js'=>$g_js,
 				'sid' =>$sid,
                 'table' => $sid_ver['s_db'],
 				'field'=>$field_name,
+                'sql_field'=>$field_mysql_name,
+                'count_field'=>$modueId['count_field'],
 				'search' =>json_encode($search),
                 'fun' =>$list['field']['fun'],
 				'title' =>$modueId['title'],

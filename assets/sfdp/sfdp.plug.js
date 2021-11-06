@@ -5,27 +5,29 @@
 var dataType = ['yyyy', 'MM-dd', 'yyyy-MM-dd', 'yyyyMMdd', 'yyyy-MM','yyyy-MM-dd HH:mm:ss'];
 var dateType_format= ['date', 'datetime', 'time', 'year', 'month'];
 
+
 var sfdpPlug = {
     PlugInit:function (type,data,is_sub= false,Curd='add') {
         var maste ='';
         var read ='';
+        var maste_class ='';
         if (data.tpfd_must == 0) {
-            var maste = 'datatype="*" nullmsg="请填写'+data.tpfd_name+'"';
+            maste = ' datatype="*" nullmsg="请填写'+data.tpfd_name+'"';
+            maste_class ='border-left: 3px solid #ff5722 !important;';
         }
         if (data.tpfd_read == 0) {
-            var read = 'readonly';
+            read = 'readonly';
         }
-        var field_att = maste + read;
+        var field_att = read + maste;
         if (typeof (data['tpfd_name']) == 'undefined') {
             return sfdpPlug.view_default(type, data);
         } else {
-
-            var lab = '<label class="' + sfdp.ui.rows_label + '"><b>' + data.tpfd_name + '</b></label><div class="' + sfdp.ui.rows_block + '">';
+            var lab = `<label class="${sfdp.ui.rows_label}" style="${maste_class}"><b>${data.tpfd_name}</b></label><div class="${sfdp.ui.rows_block}">`;
             if (is_sub) {
                 lab = '';
             }
             if(type=='group'){
-                lab ='<fieldset class="layui-elem-field layui-field-title" style="margin: 0px;"><legend>' + data.tpfd_name + '</legend></fieldset>';
+                lab =`<fieldset class="layui-elem-field layui-field-title" style="margin: 0px;"><legend>${data.tpfd_name}</legend></fieldset>`;
             }
             var html = lab + sfdpPlug.common(type,data,field_att,Curd);
         }
@@ -94,7 +96,7 @@ var sfdpPlug = {
             system_role:'<input name="' + name + '"  type="hidden" readonly id="' + data.tpfd_id + '" value="' + value + '"><input  type="text" readonly id="' + data.tpfd_id + '_text" value="' + (data.text || '请选择') +'" style="width:85%;" class="layui-input"><a  href="javascript:" class="layui-btn  layui-btn-primary layui-border-blue" style="" onclick=sfdp.openpage("用户组件","'+sfdp.url.role+'?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-group"></i> 选择</a>',
             upload_img:sfdpPlug.view_upload_img(data),
             edit:'<div id="div' + data.tpfd_id + '">' + value +'</div><textarea style="display:none" id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea><script></script><script type="text/javascript">' +
-                '$.getScript("/static/lib/wangEditor.min.js",function(){var html = $(\'#' + data.tpfd_id + '\').val();const E = window.wangEditor; const editor = new E(\'#div' + data.tpfd_id + '\');editor.config.zIndex = 500;const $text1 = $(\'#' + data.tpfd_id + '\');  editor.config.onchange = function (html) {$text1.val(html)};editor.config.uploadImgShowBase64 = true;editor.create();$text1.val(editor.txt.html());}); </script>',
+                '$.getScript("/static/lib/wangEditor.min.js",function(){var html = $(\'#' + data.tpfd_id + '\').val();const E = window.wangEditor; const editor = new E(\'#div' + data.tpfd_id + '\');editor.config.zIndex = 500;const $text1 = $(\'#' + data.tpfd_id + '\');  editor.config.onchange = function (html) {$text1.val(html)};editor.config.uploadImgServer="/gadmin/common/eupload";editor.config.uploadFileName ="file";editor.create();$text1.val(editor.txt.html());}); </script>',
             group:'',
         }
 

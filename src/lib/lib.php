@@ -185,7 +185,7 @@ php;
 	 * @param  array $field 所有字段数据
 	 * @param  array $modue 模块数据
 	 */
-	public static function custom($sid,$list,$listtrue,$field,$modue){
+	public static function custom($sid,$list,$listtrue,$field,$modue,$listcount){
 		$patch = unit::gconfig('static_url');
 		$urls= unit::gconfig('url');
 		$url =$urls['api'];
@@ -245,6 +245,10 @@ php;
 	  <ul id="sortable2" class="connectedSortable">{$list}</ul>
 	  </td><td><a onclick='save_list()'  class='button'>保存</a></td>
   </tr>
+  <tr><td style='text-align: center;'><b>列表统计<b> </td><td>
+	  {$listcount}
+	  </td><td><a onclick='save_count()'  class='button'>保存</a></td>
+  </tr>
     <tr><td style='text-align: center;'><b>权限控制<b> </td><td>
 	{$access_html}
 	<div id="access1">控制字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select>
@@ -259,7 +263,7 @@ php;
 	</td><td><a onclick='save_search()'  class='button'>保存</a></td></tr>
 	<tr><td style='text-align: center;'><b>列表展示<b> </td><td>
 
-	<div id="checkboxes1">展示形式：<select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">数形列表</option></select> 关联字段：<input id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 80px;"> 数型函数：<input style="width: 80px;" id="show_fun" name="show_fun" type="text" value="{$show_fun}">注：函数符合Tree 建议层级>3级别;内置组织树：sys_role</div>
+	<div id="checkboxes1">展示形式：<select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">树形列表</option></select> 关联字段：<input id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 80px;"> 树型函数：<input style="width: 80px;" id="show_fun" name="show_fun" type="text" value="{$show_fun}">注：函数符合Tree 建议层级>3级别;内置组织树：sys_role</div>
 	</td><td><a onclick='save_show()'  class='button'>保存</a></td></tr>
  </table>
 <script type="text/javascript" language="javascript">
@@ -275,6 +279,13 @@ php;
 		 $('#checkboxes'+id).children('span').html('Del');
 		 var html ='<div id="checkboxes'+(id+1)+'">查询字段：<select style="width:200px" name="search_ids"><option value="">请选择</option>{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,LIKE     <span onclick=addoption('+(id+1)+') class="button">Add</span></div>';
 		 $('#checkboxes'+id).after(html);
+	}
+	function save_count(){
+	 var ids = '';
+       $('input[type="checkbox"]:checked').each(function(index,value) {
+                ids += $(this).val() + ',';
+       });
+       sfdp.sAjax("{$url}?act=customCount",{sid:{$sid},count_field:ids});
 	}
 	function editaccess(id){
 		$('#access'+id).remove();
@@ -333,6 +344,7 @@ php;
 		$save = $urls['api'].'?act=save';
 		$server_save = $urls['api'].'?act=field&sid='.$fid;
 		$script = $urls['api'].'?act=script&sid='.$fid;
+        $mysql = $urls['api'].'?act=mysql&sid='.$fid;
 		return <<<php
 	<html>
 	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
@@ -347,6 +359,7 @@ php;
 				<div class="sfdp-tool-title sfdp-mt10">页面布局 Form control library</div>
 				<div class='sfdp-tool-fix'onclick='sfdp.build_bj()'><a>&#8194;<b class='ico'>↭</b>&#8194;栅格布局 </a></div>
 				<div class='sfdp-tool-fix'onclick='sfdp.openfullpage("脚本","{$script}")'><a>&#8194;<b class='ico'>∮</b>&#8194;脚本开发 </a></div>
+				<div class='sfdp-tool-fix'onclick='sfdp.openfullpage("构建助手","{$mysql}")'><a>&#8194;<b class='ico'>ς</b>&#8194;构建助手 </a></div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">表单控件库 Form control library</div>
 					<div class="sfdp-tool-con" ><a data="text">&#8194;<b class='ico'>Α</b>&#8194;文本</a></div>
@@ -403,6 +416,7 @@ php;
 				  revert: "invalid",
 				  cursor: "move"
 			});
+			
 			$( "#sfdp-main" ).sortable({
 			    stop: function( event, ui ) {
 			        let obj = {}
@@ -519,6 +533,155 @@ php;
 </html>
 php;
 	}
+    /**
+     * 脚本函数
+     *
+     * @param  Array $info 设计数据
+     * @param  int   $sid 设计ID
+     */
+    public static function mysql($info,$sid){
+        $tmp = self::commontmp('Sfdp超级表单设计器');
+        $urls= unit::gconfig('url');
+        $info['s_fun'] = $info['s_fun'] ?? '';
+        $action = $urls['api'].'?act=mysql&sid='.$sid;
+        $patch = unit::gconfig('static_url');
+        return <<<php
+	{$tmp['css']}
+		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/codemirror.css" />
+		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/dracula.css" />
+		<script src="{$patch}lib/codemirror/codemirror.js"></script>
+		<script src="{$patch}lib/codemirror/javascript.js"></script>
+		<table class="table">
+			<tr valign="center">
+			<td style='width:35px;text-align:center'>构建助手说明</td>
+			<td style='width:330px;text-align: left;'>
+			    *你可以使用 导出的数据表，快速构建一个项目模型
+			</td>
+			</tr>
+			<tr valign="center">
+			<td style='width:35px;text-align:center'>建表语句</td><td style='width:330px' >
+			<textarea placeholder="请填写JQ脚本代码！" type="text/plain" style="width:100%;height:450px;display:inline-block;" id='code'></textarea> </td>
+			</tr>
+			<tr valign="center">
+			<td style='width:35px;text-align:center'>字段完善</td>
+			<td style='width:330px;text-align: left;' id='field'>
+			        
+			</td>
+			</tr>
+			<tr valign="center">
+			<td style='text-align:center' colspan='2' id="btn">
+			    <button  class="button" onclick="save()">&nbsp;&nbsp;数据分析执行&nbsp;&nbsp;</button>
+			    
+			</td>
+			</tr>
+		</table>
+	{$tmp['js']}
+	<script type="text/javascript" language="javascript">
+	    var field =[]; //组成字段数组
+		  var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+			lineNumbers: true,
+         lineWrapping: true,
+			mode: "text/typescript",
+			theme: "dracula",	//设置主题
+			 matchBrackets: true,
+		  });
+		  function build(){
+		      $('#btn').html(``);
+		      var data = [];
+		      var search = $('#fields').serializeArray();
+		      $.each(search, function(index,vars) {
+                    var dbname = this.name;
+                    if(data[dbname] == undefined){
+                        data[dbname] = [];
+                        data[dbname].push(vars.value || '');
+                    }else{
+                        data[dbname].push(vars.value);
+                    }
+              });
+             var field_json ={}; //组成字段数组  
+		     $.each(field,function(index,value){
+		             var type = data[value.Field+'[t1]'][0]
+		             var code = 'Id' + sfdp.dateFormat(new Date(), "hhmmssS")+index;
+		             var td_id = type + '_' + sfdp.dateFormat(new Date(), "yyyyMMddhhmmssS")+index;
+		             field_json[code] = {
+		             data:{},
+		             tr: code,
+                     type: 1
+		             };
+		             var tpfd_dbcd = value.FieldType.match(/\(([^)]*)\)/);
+		             if(tpfd_dbcd==null){
+		                var tpfd_dblx = value.FieldType
+		                var tpfd_dbcd = '0';
+		                }else{
+		                var tpfd_dblx = value.FieldType.replace(tpfd_dbcd[0], '')
+		                var tpfd_dbcd = tpfd_dbcd[1];
+		             }
+		             console.log(tpfd_dblx);
+		             field_json[code].data[td_id] = {
+                        td: 1,
+                        td_type: type,
+                        tpfd_chaxun: "no",
+                        tpfd_check: "1",
+                        tpfd_db: value.Field,
+                        tpfd_dbcd: tpfd_dbcd,
+                        tpfd_dblx: tpfd_dblx,
+                        tpfd_id: td_id,
+                        tpfd_list: "no",
+                        tpfd_must: data[value.Field+'[t3]'][0],
+                        tpfd_name: value.FieldNote,
+                        tpfd_read: data[value.Field+'[t2]'][0],
+                        tr_id: code,
+                        tpfd_moren: "",
+                        tpfd_zanwei:""
+
+		             }
+		             if(jQuery.inArray(type, [ 'dropdown', 'radio','checkboxes']) !== -1){
+		                field_json[code].data[td_id].checkboxes_func = ''
+		                field_json[code].data[td_id].tpfd_data = ["类别1", "类别2"]
+		                field_json[code].data[td_id].xx_type = 0
+		             }
+             });
+             var json_data = JSON.parse(localStorage.getItem("json_data"));
+                json_data.list = field_json;
+		        localStorage.setItem("json_data", JSON.stringify(json_data));
+		        parent.$("#up_save").trigger("click");
+		        layer.msg('构建成功，页面即将刷新',{icon:1,time: 3500},function(){
+                    parent.location.reload(); // 父页面刷新
+                }); 
+		        
+		  }
+		   function save(){
+		        $('#btn').html(`<button  class="button" onclick="build()" style="background-color: #e55417;">&nbsp;&nbsp;立即构建&nbsp;&nbsp;</button>`);
+		        var Reg = /`(?<Field>\S+)` (?<FieldType>[a-z\d()]+) .*?COMMENT '(?<FieldNote>.*?)'/;
+		        var data = editor.getValue().split(',');;
+		        $.each(data,function(index,value){
+		            var f = Reg.exec(value);
+		            if(f != null){
+                        if(jQuery.inArray(f.groups.Field, [ 'id', 'uid','status','create_time','update_time','uptime']) == -1){
+                            field.push(f.groups);
+                        }
+		            }
+                 });
+                 var html ='<form id="fields"><table class="table"><tr><td>字段名称</td><td>字段描述</td><td>字段类型</td><td>组件类型</td><td>是否只读</td><td>是否必填</td></tr>';
+                 //field转为数组，并渲染给用户确认组件模块 edit
+                 $.each(field,function(index,value){
+                        html += `<tr><td>`+value.FieldNote+`</td><td>`+value.Field+`</td><td>`+value.FieldType+`</td><td><select name="`+value.Field+`[t1]"><option value="text">输入框</option><option  value="dropdown">下拉框</option><option value="radio">单选框</option><option value="date">时间日期</option><option value="textarea">多行文本</option><option value="edit">富文本编辑器</option><option value="upload">上传组件</option><option value="upload_img">图片上传</option><option value="dropdowns">下拉多选</option></select></td><td><select name="`+value.Field+`[t2]"><option value="0">是</option><option value="1" selected="">否</option></select></td><td><select name="`+value.Field+`[t3]"><option value="0">是</option><option value="1" selected="">否</option></select></td></tr>`;
+                 });
+                 $('#field').append(html+'</tbale><form>');
+                 
+		        console.log(field);
+		        
+                
+
+
+		   
+		   
+		   }
+	</script>
+</body>
+</html>
+php;
+    }
 	/**
 	 * 公用模板方法
 	 *

@@ -726,7 +726,7 @@ var sfdp = {
         return html + '<div style="margin-left: 5%;" class="button" onclick="sfdp.save_field()">保存</div></form>';
     },
     /*5.0.1 拖拽进去设计容器的时候改变为响应的控件样式*/
-    btn_to_input: function (labid, type) {
+    btn_to_input: function (labid, type ,mode) {
         switch (type) {
             case 'text':
                 var html = '<label ' + labid + ' class="sfdp-label">文本控件</label><div class="sfdp-input-block"><input  type="text"  placeholder="请输入信息~" disabled class="sfdp-input"></div><b class="ico red" id="del_con">㊀</b>';
@@ -784,7 +784,12 @@ var sfdp = {
             default:
                 var html = '';
         }
-        return html;
+        if(mode=='zhubiao'){
+            return `<div class="move_field" >${html}</div>`;
+            }else{
+            return html;
+        }
+
     },
     /*5.0.1 数据库设计自动带数据*/
     sys_config: function () {
@@ -854,6 +859,13 @@ var sfdp = {
                 sfdp.recovery_sub(desc_data.sublist[y]);
             }
         }
+        $('.move_field').draggable({
+            connectToSortable: ".fb-fz",
+            helper: "original",
+            revert: "invalid",
+            cursor: "move"
+        });
+
     },
     /*5.0.1 恢复UI布局*/
     recovery_ui: function (id, data) {
@@ -869,13 +881,36 @@ var sfdp = {
             revert: true,
             animation: 150,
             stop: function (event, ui) {
-                var type = $(this).children('div').children('a').attr("data");
-                var parent_code = $(this).parent().attr("id");
-                $(this).removeClass("fb-fz");
-                $(this).removeClass("ui-sortable");
-                $(this).addClass("fb-disabled");
-                $(".fb-disabled").sortable("disable");
-                $(this).html(sfdp.bulid_tpl(type, parent_code, $(this).attr("id")));
+                var field_code = $(ui.item).children('label').attr("data-code");
+                console.log(field_code);
+                //拖动放置后的代码转换，或者代码处理
+                if(field_code !==undefined){
+                    var field_id = $(ui.item).children('label').attr("data-id");
+                    var json_data = JSON.parse(localStorage.getItem("json_data"));
+                    var old_tr = json_data.list[field_code].data[field_id];
+                    /*旧数据的样式处理下*/
+                    $('#'+field_code+' #'+old_tr.td).addClass("fb-fz ui-sortable");
+                    $('#'+field_code+' #'+old_tr.td).removeClass("fb-disabled ui-sortable-disabled");
+                    $('#'+field_code+' #'+old_tr.td).sortable("enable");
+                    /*获取放置点的位置*/
+                    var parent_td = $(this).attr("id");
+                    var parent_code = $(this).parent().attr("id");
+                    old_tr.td = parent_td;
+                    old_tr.tr_id = parent_code;
+                    sfdp.dataSave({tpfd_id: old_tr.tpfd_id}, field_code, 'td_del');//删除旧的
+                    sfdp.dataSave(old_tr, parent_code, 'tr_data');
+                    console.log($(ui.item));
+                    $(this).html($(ui.item));
+                    $("#up_save").trigger("click");
+                }else{
+                    var type = $(this).children('div').children('a').attr("data");
+                    var parent_code = $(this).parent().attr("id");
+                    $(this).removeClass("fb-fz");
+                    $(this).removeClass("ui-sortable");
+                    $(this).addClass("fb-disabled");
+                    $(".fb-disabled").sortable("disable");
+                    $(this).html(sfdp.bulid_tpl(type, parent_code, $(this).attr("id")));
+                }
             }
         });
     },
@@ -1042,8 +1077,9 @@ var sfdp = {
             var td_id = old_data;
         }
         var labid = ' data-type="' + type + '" data-id="' + td_id + '" data-code="' + parent_code + '" id="label' + td_id + '"';
-        var html = sfdp.btn_to_input(labid, type);
         var mode = $('#' + parent_code).attr('mode') || 'zhubiao';
+        var html = sfdp.btn_to_input(labid, type ,mode);
+
         if (mode === 'zhubiao') {
             if (old_data === 0) {
                 sfdp.dataSave({td: td_xh, td_type: type, tpfd_id: td_id}, parent_code, 'tr_data');
@@ -1082,15 +1118,39 @@ var sfdp = {
                 revert: true,
                 animation: 150,
                 stop: function (event, ui) {
-                    var type = $(this).children('div').children('a').attr("data");
-                    var parent_code = $(this).parent().attr("id");
-                    $(this).removeClass("fb-fz");
-                    $(this).removeClass("ui-sortable");
-                    $(this).addClass("fb-disabled");
-                    $(".fb-disabled").sortable("disable");
-                    $(this).html(sfdp.bulid_tpl(type, parent_code, $(this).attr("id")));
+                    var field_code = $(ui.item).children('label').attr("data-code");
+                    console.log(field_code);
+                    //拖动放置后的代码转换，或者代码处理
+                    if(field_code !==undefined){
+                        var field_id = $(ui.item).children('label').attr("data-id");
+                        var json_data = JSON.parse(localStorage.getItem("json_data"));
+                        var old_tr = json_data.list[field_code].data[field_id];
+                        /*旧数据的样式处理下*/
+                        $('#'+field_code+' #'+old_tr.td).addClass("fb-fz ui-sortable");
+                        $('#'+field_code+' #'+old_tr.td).removeClass("fb-disabled ui-sortable-disabled");
+                        $('#'+field_code+' #'+old_tr.td).sortable("enable");
+                        /*获取放置点的位置*/
+                        var parent_td = $(this).attr("id");
+                        var parent_code = $(this).parent().attr("id");
+                        old_tr.td = parent_td;
+                        old_tr.tr_id = parent_code;
+                        sfdp.dataSave({tpfd_id: old_tr.tpfd_id}, field_code, 'td_del');//删除旧的
+                        sfdp.dataSave(old_tr, parent_code, 'tr_data');
+                        console.log($(ui.item));
+                        $(this).html($(ui.item));
+                        $("#up_save").trigger("click");
+                    }else{
+                        var type = $(this).children('div').children('a').attr("data");
+                        var parent_code = $(this).parent().attr("id");
+                        $(this).removeClass("fb-fz");
+                        $(this).removeClass("ui-sortable");
+                        $(this).addClass("fb-disabled");
+                        $(".fb-disabled").sortable("disable");
+                        $(this).html(sfdp.bulid_tpl(type, parent_code, $(this).attr("id")));
+                    }
                 }
             });
+
         } else {
             return html;
         }
@@ -1103,7 +1163,6 @@ var sfdp = {
             for (x in td_data) {
                 var type = td_data[x]['td_type'];
                 var parent_code = old_data['tr'];
-
                 var html = sfdp.bulid_tpl(type, parent_code, td_data[x]['td'], td_data[x]['tpfd_id']);
                 $('#' + parent_code).children('div').eq(td_data[x]['td']).removeClass("fb-fz");
                 $('#' + parent_code).children('div').eq(td_data[x]['td']).removeClass("ui-sortable");

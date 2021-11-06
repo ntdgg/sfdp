@@ -28,6 +28,11 @@ class M{
         }
         $this->mode = new $className();
     }
+
+    /**
+     * @param $data
+     * @return array
+     */
     static function Save($data){
         $find = (new M())->mode->find($data['sid']);
         if($find){
@@ -70,9 +75,13 @@ class M{
         return ['code'=>0,'msg'=>'success'];
     }
 
+    /**
+     * @param $sid
+     * @return array
+     */
     static function CreatePHP($sid){
         $find = (new M())->mode->find($sid);
-        $class = ucwords(str_replace('_','',$find['table']));
+        $class = self::convertUnderline($find['table']);
         $template = file_get_contents(BEASE_SFDPURL . "/adaptive/M.tpl");
         $str = str_replace(
             ["[class]"],
@@ -86,5 +95,15 @@ class M{
         return ['code'=>0,'msg'=>'success'];
     }
 
-
+    /**
+     * @param $str
+     * @param bool $ucfirst
+     * @return mixed|string
+     */
+    static function convertUnderline($str,$ucfirst = true)
+    {
+        while(($pos = strpos($str , '_'))!==false)
+            $str = substr($str , 0 , $pos).ucfirst(substr($str , $pos+1));
+        return $ucfirst ? ucfirst($str) : $str;
+    }
 }
