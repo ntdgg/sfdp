@@ -406,6 +406,7 @@ php;
 		<script type="text/javascript" src="{$patch}lib/jquery-ui.js"></script>
 		<script type="text/javascript" language="javascript">
 			var look_db = {$look};
+			var s_type = 0;
 			const server_url ='{$server_save}';
 		    $(function(){
 				sfdp.int_data({$json});

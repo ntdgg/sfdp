@@ -1,7 +1,7 @@
 <html>
 <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
 <link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" />
-<body><div class="sfdp-top">Sfdp超级表单开发平台 v5.0 流程表单开发</div>
+<body><div class="sfdp-top">Sfdp超级表单开发平台 v6.0 编辑器表单</div>
 <style>
     .btn-list-group {
         position: relative;
@@ -32,6 +32,14 @@
         -ms-user-select: none;
         user-select: none;
     }
+    #div1 .sfdp-input{
+        text-align: left;
+        width: 150px;
+    }
+    .sfdp-input, .sfdp-textarea {
+        display: inline-block;
+        padding-left: 10px;
+    }
 </style>
 <div>
     <div id="ctlMenus" class="sfdp-con" style="float: left; width: 240px;">
@@ -39,112 +47,86 @@
         <div class="button" onclick='sfdp.sys_config()'>配置</div><div class="button" id='up_save'>保存</div><div onclick='window.location.reload()' class="button">刷新</div><div class="button" onClick="sfdp.openfullpage('官网','//cojz8.com')">帮助</div>
         <div class="sfdp-cl" ></div>
         <div class="sfdp-tool-title sfdp-mt10">页面布局 Form control library</div>
-        <div class='sfdp-tool-fix'onclick='sfdp.openfullpage("脚本","{$script}")'><a>&#8194;<b class='ico'>∮</b>&#8194;脚本开发 </a></div>
+        <div class='sfdp-tool-fix' onclick='sfdp.openfullpage("脚本","{$script}")'><a>&#8194;<b class='ico'>∮</b>&#8194;脚本开发 </a></div>
         <div class="sfdp-cl"></div>
         <div class="sfdp-tool-title sfdp-mt10">表单控件库 Form control library</div>
-        <div class="sfdp-tool-con" ><a data="text">&#8194;<b class='ico'>Α</b>&#8194;文本</a></div>
-        <div class="sfdp-tool-con" ><a data="number">&#8194;<b class='ico'>½</b>&#8194;数字</a></div>
-        <div class="sfdp-tool-con"><a data="checkboxes">&#8194;<b class='ico'>☑</b>&#8194;多选框</a></div>
-        <div class="sfdp-tool-con"><a data="radio">&#8194;<b class='ico'>◉</b>&#8194;单选框</a></div>
-        <div class="sfdp-tool-con"><a data="dropdown">&#8194;<b class='ico'>≡</b>&#8194;下拉组件 </a></div>
-        <div class="sfdp-tool-con"><a data="date">&#8194;<b class='ico'>◑</b>&#8194;日期时间</a></div>
-        <div class="sfdp-tool-con"><a data="textarea">&#8194;<b class='ico'>〓</b>&#8194;多行文本</a></div>
-        <div class="sfdp-tool-con"><a data="html">&#8194;<b class='ico'>☪</b>&#8194;Html控件</a></div>
-        <div class="sfdp-tool-con"><a data="wenzi">&#8194;<b class='ico'>あ</b>&#8194;文字显示</a></div>
-        <div class="sfdp-tool-con"><a data="upload">&#8194;<b class='ico'>➼</b>&#8194;附件上传</a></div>
-        <div class="sfdp-tool-con"><a data="time_range">&#8194;<b class='ico'>≈</b>&#8194;时间范围</a></div>
-        <div class="sfdp-tool-con"><a data="links">&#8194;<b class='ico'>↔</b>&#8194;超级链接</a></div>
-        <div class="sfdp-tool-con"><a data="upload_img">&#8194;<b class='ico'>Ρ</b>&#8194;单图组件</a></div>
-        <div class="sfdp-tool-con"><a data="edit">&#8194;<b class='ico'>Ε</b>&#8194;富文本框</a></div>
+        <div class="sfdp-tool-con" onclick="ins('text')"><a data="text">&#8194;<b class='ico'>Α</b>&#8194;文本</a></div>
+        <div class="sfdp-tool-con" onclick="ins('number')"><a data="number">&#8194;<b class='ico'>½</b>&#8194;数字</a></div>
+        <div class="sfdp-tool-con" onclick="ins('checkboxes')"><a data="checkboxes">&#8194;<b class='ico'>☑</b>&#8194;多选框</a></div>
+        <div class="sfdp-tool-con" onclick="ins('radio')"><a data="radio">&#8194;<b class='ico'>◉</b>&#8194;单选框</a></div>
+        <div class="sfdp-tool-con" onclick="ins('dropdown')"><a data="dropdown">&#8194;<b class='ico'>≡</b>&#8194;下拉组件 </a></div>
+        <div class="sfdp-tool-con" onclick="ins('date')"><a data="date">&#8194;<b class='ico'>◑</b>&#8194;日期时间</a></div>
+        <div class="sfdp-tool-con" onclick="ins('textarea')"><a data="textarea">&#8194;<b class='ico'>〓</b>&#8194;多行文本</a></div>
+        <div class="sfdp-tool-con" onclick="ins('upload')"><a data="upload">&#8194;<b class='ico'>➼</b>&#8194;附件上传</a></div>
+        <div class="sfdp-tool-con" onclick="ins('time_range')"><a data="time_range">&#8194;<b class='ico'>≈</b>&#8194;时间范围</a></div>
+        <div class="sfdp-tool-con" onclick="ins('upload_img')"><a data="upload_img">&#8194;<b class='ico'>Ρ</b>&#8194;单图组件</a></div>
+        <div class="sfdp-tool-con" onclick="ins('edit')"><a data="edit">&#8194;<b class='ico'>Ε</b>&#8194;富文本框</a></div>
         <div class="sfdp-cl"></div>
         <div class="sfdp-tool-title sfdp-mt10">内置组件 System control library</div>
-        <div class="sfdp-tool-con" ><a data="system_user">&#8194;<b class='ico'>ρ</b>&#8194;系统用户</a></div>
-        <div class="sfdp-tool-con" onclick="ins()"><a data="system_role">&#8194;<b class='ico'>Θ</b>&#8194;系统角色</a></div>
+        <div class="sfdp-tool-con" onclick="ins('system_user')"><a data="system_user">&#8194;<b class='ico'>ρ</b>&#8194;系统用户</a></div>
+        <div class="sfdp-tool-con" onclick="ins('system_role')"><a data="system_role">&#8194;<b class='ico'>Θ</b>&#8194;系统角色</a></div>
         <div class="sfdp-cl"></div>
     </div>
     <div class="sfdp-con" style="float: left; width: calc(100% - 600px);">
         <div id="sfdp-main">
-            <div><div class="button">流表步骤一</div><div class="button">流表步骤二</div><div class="button">流表步骤三</div><div class="button">流表步骤四</div></div>
+            <!--<div><div class="button">流表步骤一</div><div class="button">流表步骤二</div><div class="button">流表步骤三</div><div class="button">流表步骤四</div></div>
+            -->
             <div id="div1">
-                <span class="btn-list-group">
-  <a class="btn">悬停</a>
-  <span class="btn-list-area">
-    <a class="btn">新建</a>
-    <a class="btn">编辑</a>
-    <a class="btn">打开</a>
-    <a class="btn">导出</a>
-    <a class="btn">导入</a>
-    <a class="btn">退出</a>
-  </span>
-</span>
-                <input type="text" placeholder="请输入信息~" disabled="" class="sfdp-input btn">
+
             </div>
         </div>
     </div>
     <div class="sfdp-con" style="float: right; width: 360px;">
         <div class="sfdp-att">
-            <br/><br/><div style="padding: 24px 48px;"> <h1>\﻿ (•◡•) / </h1><p> Sfdp V5.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © Guoguo <a href="https://www.cojz8.com/">Sfdp</a> 版权禁删！ ]</span></div>
+            <br/><br/><div style="padding: 24px 48px;"> <h1>\﻿ (•◡•) / </h1><p> Sfdp V6.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © Guoguo <a href="https://www.cojz8.com/">Sfdp</a> 版权禁删！ ]</span></div>
         </div>
     </div>
     <div class="sfdp-cl"></div>
+    <div id="sfdp_html2">
+
+    </div>
 </div>
-<script src="{$patch}lib/jquery-1.12.4.js"></script>
-<script src="{$patch}lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="{$patch}lib/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="{$patch}lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="{$patch}lib/pingyin.js"></script>
 <script type="text/javascript" src="{$patch}sfdp.5.0.js?v=5.0.322222"></script>
+<script type="text/javascript" src="{$patch}sfdp.editor.js?v=5.0.322222"></script>
+<script type="text/javascript" src="{$patch}sfdp.config.js?v=5.0.322222"></script>
 <script type="text/javascript" src="{$patch}lib/jquery-ui.js"></script>
 <script type="text/javascript" src="/static/lib/wangEditor.min.js"></script>
 <script type="text/javascript">
     const E = window.wangEditor
     const editor = new E('#div1')
     editor.config.height = document.body.clientHeight - 123
-    // 或者 const editor = new E( document.getElementById('div1') )
-    editor.create()
-    function ins(){
-        var type = 'text';
-        var parent_code = '1123'; //code id
+    editor.config.menus = ['table', 'head', 'bold', 'fontSize', 'fontName','underline', 'strikeThrough', 'foreColor', 'backColor', 'link', 'justify', 'image']
 
-        var labid = ' data-type="' + type + '" data-id="1" data-code="2" id="label1"';
-        var html = sfdp.btn_to_input(labid, type);
-
-
-        editor.cmd.do('insertHTML', '<input type="text" placeholder="请输入信息~" disabled="" class="sfdp-input btn">')
+    editor.config.onchange = function (html) {
+        var ids = [];
+        $("#div1 .set_att").each(function() {
+            ids.push($(this).attr("data-id"));
+        });
+        sfdpEditor.check_data_ids(ids);
+        sfdp.dataSave(html,'','con')
     }
-    $(".btn").hover(
-        function () {
-           layer.msg('1');
-        },
-        function () {
-            layer.msg('2');
-        }
-    );
-
-    $("body").on("mouseenter", ".sfdp-input", function() {
-        layer.msg('1');
+    editor.create()
+    function ins(type){
+        editor.cmd.do('insertHTML', sfdpEditor.ToEditor(type))
+    }
+    $("body").on("click", ".set_att", function(event) {
+        var dataId = $(this).attr("data-id");
+        var dataCode = $(this).attr("data-code");
+        var dataType = $(this).attr("data-type");
+        var html = sfdp.field_config(dataType, dataId, 'Editor');
+        $('.sfdp-att').html(html);
+        event.stopPropagation();
+        console.log(this.id)
     });
-    $("body").on("mouseleave", ".sfdp-input", function() {
-        layer.msg('2');
-    });
-
-
-
-
-
 </script>
 <script type="text/javascript" language="javascript">
     var look_db = {$look};
+    var s_type = 1;
     $(function(){
-        sfdp.int_data({$json});
-    });
-    $( ".sfdp-tool-con" ).draggable({
-        connectToSortable: ".fb-fz",
-        helper: "clone",
-        revert: "invalid",
-        cursor: "move"
-    });
-
-
-    $( "#fb-fz" ).sortable({
-        cancel: ".fb-disabled"
+        sfdp.int_data({$json|raw},1);
     });
     $("#up_save").click(function(){
         var int_data = localStorage.getItem("json_data");

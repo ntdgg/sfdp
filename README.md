@@ -1,4 +1,4 @@
-# ❤️Sfdp V5.0正式版
+# ❤️Sfdp V6.0正式版
 
 **欢迎使用 Sfdp 超级表单开发平台**
 
@@ -23,7 +23,7 @@ Vip交流群：1062040103  加群条件：[申请加群](https://gadmin8.com/ind
 
 Gadmin企业级开发平台：  [传送门](https://gadmin8.com "Demo") 包含在线演示模块 测试账号：test 123456
 
-* Gadmin V3.0.0 企业级极速开发平台，
+* Gadmin V5.0.0 企业级极速开发平台，
 * 深耕OA、ERP的开发经验，整合TPFLOW、SFDP，
 * 企业级授权机制，
 * 企业级的日志管理平台，
@@ -34,7 +34,21 @@ Gadmin企业级开发平台：  [传送门](https://gadmin8.com "Demo") 包含�
 
 > 下载地址：https://gitee.com/ntdgg/tpflow  PHP优秀开源工作流引擎
 
+# ✈️6.0版本主要特性 Characteristic
 
+#### &hearts; 编辑器表单
+
+- 基于 `WangEditor` 表单设计器
+- 个性化设计表单
+- 界面布局更加自由
+
+#### &hearts; 事件模型
+- 支持多个事件管理
+- 支持多个脚本管理
+
+#### &hearts; 丰富组件
+
+- 支持文本、数字、上传、富文本、系统组件等等
 
 # ✈️5.0版本主要特性 Characteristic
 

@@ -154,8 +154,7 @@ li{margin: 0;padding: 0;}
 }
 .sfdp-ctrl-active {
 	position: relative;
-	border: 2px solid #2d6dcc;
-	
+	border: 1px solid #ff0000;
 }
 .sfdp-rows{
 	position: relative;
@@ -247,7 +246,10 @@ li{margin: 0;padding: 0;}
 	margin: 0 5px 5px 5px;
 	padding: 5px;
 	font-size: 1.2em;
-	width: 120px;
+	width: 140px;
 	float:left;
 	font-size: 10px;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
 }

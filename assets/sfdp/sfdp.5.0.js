@@ -14,7 +14,17 @@ var DbNameExp = /^(?!_)(?!.*?_$)[a-z0-9_]+$/; //数据库名称校验
 var DbFieldExp = /^(?!_)(?!.*?_$)[a-z_]+$/; //数据库字段校验
 
 var sfdp = {
-    sfdp_int_data: function () {
+    sfdp_int_data: function (type=0) {
+        if(type==1){
+            var listcon = {
+                Editor:{
+                    data:{}
+                }
+            }
+        }else{
+            var listcon = {
+            }
+        }
         return {
             name: '',//表单名称
             name_db: '',//数据表名称
@@ -22,38 +32,42 @@ var sfdp = {
             tpfd_btn: {},
             tpfd_script: '',//数据表脚本
             tpfd_class: '',//数据表脚本
-            list: {
-                //设计数据
-            },
+            list: listcon,
             sublist: {
                 //子表数据
             },
+            tpfd_content:'',//6.0版本新增设计器内容
             tpfd_time: sfdp.dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"),//表单设计时间
-            tpfd_ver: 'v5.0'//表单设计器版本
+            tpfd_ver: 'v6.0'//表单设计器版本
         };
     },
     showview: function (int_data) {
         if (int_data == null) {
             layer.msg('对不起，没有任何数据~');
         } else {
-            $('#table').html('<div id="table_view" style="margin:10px"></div>');
-            for (x in int_data.list) {
-                if(int_data.list.hasOwnProperty(x)){
-                    let table = sfdp.table_build(int_data.list[x]['type'], int_data.list[x], 'show');
-                    $("#table_view").append(table);
+            if(s_type==1){
+                $('#table').html('<div id="table_view" style="margin:10px"><div id="sfdp_html2">'+int_data.tpfd_content+'</div></div>');
+                var html = sfdpEditor.convert_data_view(int_data);
+            }else{
+                $('#table').html('<div id="table_view" style="margin:10px"></div>');
+                for (x in int_data.list) {
+                    if(int_data.list.hasOwnProperty(x)){
+                        let table = sfdp.table_build(int_data.list[x]['type'], int_data.list[x], 'show');
+                        $("#table_view").append(table);
+                    }
                 }
-            }
-            var xh = 1;
-            //恢复子表布局
-            for (x in int_data.sublist) {
-                let table = sfdp.sublist_build(int_data.sublist[x]['type'], int_data.sublist[x], 'show', int_data.name_db + '_d' + xh, true);
-                $("#table_view").append(table);
-                xh++
-            }
-            for (x in int_data.sublists) {
-                for (y in int_data.sublists[x]) {
-                    let table = sfdp.sublist_r(int_data.sublists[x][y], true);
-                    $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table .title").after(table);
+                var xh = 1;
+                //恢复子表布局
+                for (x in int_data.sublist) {
+                    let table = sfdp.sublist_build(int_data.sublist[x]['type'], int_data.sublist[x], 'show', int_data.name_db + '_d' + xh, true);
+                    $("#table_view").append(table);
+                    xh++
+                }
+                for (x in int_data.sublists) {
+                    for (y in int_data.sublists[x]) {
+                        let table = sfdp.sublist_r(int_data.sublists[x][y], true);
+                        $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table .title").after(table);
+                    }
                 }
             }
             $(document).attr("title", int_data.name);//修改页面标题
@@ -80,39 +94,49 @@ var sfdp = {
         sfdp.setDate();
     },
     showadd: function (int_data, showtype = 'add') {
-        if (int_data == null) {
-            layer.msg('对不起，没有任何数据~');
-        } else {
-            $('#table').html('<form action="" method="post" name="form" id="form" class="'+ sfdp.ui.form +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"></div></form>');
-            //恢复主表单设计
-            for (x in int_data.list) {
-                let table = sfdp.table_build(int_data.list[x]['type'], int_data.list[x], showtype);//恢复表单布局设计
-                $("#table_view").append(table);
-            }
-            var xh = 1;
-            //恢复子表布局
-            for (x in int_data.sublist) {
-                let table = sfdp.sublist_build(int_data.sublist[x]['type'], int_data.sublist[x], showtype, int_data.name_db + '_d' + xh);
-                $("#table_view").append(table);
-                xh++
-            }
-            if (showtype === 'edit') {
-                for (x in int_data.sublists) {
-                    for (y in int_data.sublists[x]) {
-                        let htmls = sfdp.sublist_r(int_data.sublists[x][y]);
-                        var length= $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table tbody").children("tr").length;
-                        var str=new RegExp('dropdown_');
-                        if(str.test(htmls)){
-                            var reg = new RegExp("dropdown_","g");//g,表示全部替换。
-                            htmls = htmls.replace(reg,'Etr'+length+"_dropdown_");
+        if(s_type ==0 || s_type ==2){
+            if (int_data == null) {
+                layer.msg('对不起，没有任何数据~');
+            }else
+            {
+                $('#table').html('<form action="" method="post" name="form" id="form" class="'+ sfdp.ui.form +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"></div></form>');
+                //恢复主表单设计
+                for (x in int_data.list) {
+                    let table = sfdp.table_build(int_data.list[x]['type'], int_data.list[x], showtype);//恢复表单布局设计
+                    $("#table_view").append(table);
+                }
+                var xh = 1;
+                //恢复子表布局
+                for (x in int_data.sublist) {
+                    let table = sfdp.sublist_build(int_data.sublist[x]['type'], int_data.sublist[x], showtype, int_data.name_db + '_d' + xh);
+                    $("#table_view").append(table);
+                    xh++
+                }
+                if (showtype === 'edit') {
+                    for (x in int_data.sublists) {
+                        for (y in int_data.sublists[x]) {
+                            let htmls = sfdp.sublist_r(int_data.sublists[x][y]);
+                            var length= $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table tbody").children("tr").length;
+                            var str=new RegExp('dropdown_');
+                            if(str.test(htmls)){
+                                var reg = new RegExp("dropdown_","g");//g,表示全部替换。
+                                htmls = htmls.replace(reg,'Etr'+length+"_dropdown_");
+                            }
+                            $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table .title").after(htmls);
                         }
-                        $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table .title").after(htmls);
                     }
                 }
+                let btn = '<div class="' + sfdp.ui.rows + '" style="text-align: center;"><div class="layui-input-block"><a  class="'+sfdp.ui.btn_ok+' savedata" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</a><a class="'+sfdp.ui.btn_close+'" onclick=sfdp.layer_close()>&nbsp;&nbsp;取消&nbsp;&nbsp;</a></div></div>';
+                $("#table_view").append(btn);
+                $(document).attr("title", int_data.name);
             }
+        }
+        if(s_type ==1){
+            $('#table').html('<style>.layui-input, .layui-textarea {display: inline-block;}</style><form action="" method="post" name="form" id="form" class="'+ sfdp.ui.form +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"><div id="sfdp_html2">'+int_data.tpfd_content+'</div></div></form>');
             let btn = '<div class="' + sfdp.ui.rows + '" style="text-align: center;"> <div class="layui-input-block"><a  class="'+sfdp.ui.btn_ok+' savedata" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</a><a class="'+sfdp.ui.btn_close+'" onclick=sfdp.layer_close()>&nbsp;&nbsp;取消&nbsp;&nbsp;</a></div></div>';
+            var html = sfdpEditor.convert_data_html(int_data,showtype);
             $("#table_view").append(btn);
-            $(document).attr("title", int_data.name);
+
         }
         sfdp.setDate();//初始化日期选择器
     },
@@ -216,9 +240,7 @@ var sfdp = {
             });
             $(this).select2();
         })
-
         sfdp.setDate();
-
     },
     dl: function (obj) {
         var length= $(obj).parent().parent().parent().children("tr").length;
@@ -345,7 +367,7 @@ var sfdp = {
         });
     },
     openfullpage: function (title, url, opt) {
-        return sfdp.openpage(title, url, $.extend({w: "100%", h: "100%"}, opt))
+        return sfdp.openpage(title, url, $.extend({w: "98%", h: "98%"}, opt))
     },
     Askshow: function (url, msg) {
         layer.confirm(msg, function (index) {
@@ -488,6 +510,9 @@ var sfdp = {
     dataSave: function (data, key, type) {
         var json_data = JSON.parse(localStorage.getItem("json_data"));
         switch (type) {
+            case 'con':
+                json_data.tpfd_content = data;
+                break;
             case 'tr':
                 json_data.list[key] = data;
                 break;
@@ -836,7 +861,7 @@ var sfdp = {
         $("input[name='tpfd_dbcd']").val(mycars[tpfd_dblx]);
     },
     /*5.0.1 初始化系统配置*/
-    int_data: function (int_data) {
+    int_data: function (int_data,type=0) {
         if (int_data === 1) {
             var local_data = localStorage.getItem("json_data");
             if (local_data != null) {
@@ -846,17 +871,21 @@ var sfdp = {
             var desc_data = int_data;
         }
         if (int_data == null || int_data === 1) {
-            localStorage.setItem("json_data", JSON.stringify(sfdp.sfdp_int_data()));
+            localStorage.setItem("json_data", JSON.stringify(sfdp.sfdp_int_data(type)));
         } else {
             localStorage.setItem("json_data", JSON.stringify(int_data));
-            $('#fb_name').html(desc_data.name + '(DbTable:' + desc_data.name_db + ')');
-            for (x in desc_data.list) {
-                sfdp.build_view(desc_data.list[x]['type'], desc_data.list[x]);//恢复表单布局设计
-                sfdp.recovery_input(desc_data.list[x]);//用于恢复表单字段内容
-            }
-            for (y in desc_data.sublist) {
-                sfdp.recovery_ui(desc_data.sublist[y]['type'], desc_data.sublist[y]);//恢复表单布局设计
-                sfdp.recovery_sub(desc_data.sublist[y]);
+            if(type==0){
+                $('#fb_name').html(desc_data.name + '(DbTable:' + desc_data.name_db + ')');
+                for (x in desc_data.list) {
+                    sfdp.build_view(desc_data.list[x]['type'], desc_data.list[x]);//恢复表单布局设计
+                    sfdp.recovery_input(desc_data.list[x]);//用于恢复表单字段内容
+                }
+                for (y in desc_data.sublist) {
+                    sfdp.recovery_ui(desc_data.sublist[y]['type'], desc_data.sublist[y]);//恢复表单布局设计
+                    sfdp.recovery_sub(desc_data.sublist[y]);
+                }
+            }else{
+                editor.cmd.do('insertHTML', sfdpEditor.check_data_con(desc_data.tpfd_content))
             }
         }
         $('.move_field').draggable({
@@ -865,7 +894,6 @@ var sfdp = {
             revert: "invalid",
             cursor: "move"
         });
-
     },
     /*5.0.1 恢复UI布局*/
     recovery_ui: function (id, data) {
@@ -978,7 +1006,9 @@ var sfdp = {
             sfdp.ShowTip('　数据字段长度不能为空　');
             return;
         }
-        sfdp.fb_set_return(params);
+        if(s_type != 1){
+            sfdp.fb_set_return(params);
+        }
         var mode = $('#' + params.tr_id).attr('mode') || 'zhubiao';
 
         if (mode === 'zhubiao') {
@@ -1236,10 +1266,10 @@ $("#sfdp-main").on("click", "#del", function (event) {
 });
 /*5.0.5 监听删除点击事件*/
 $("#sfdp-main").on("click", "#del_con", function (event) {
-    $(this).parent().removeClass("fb-disabled ui-sortable-disabled");
-    $(this).parent().addClass("fb-fz ui-sortable");
-    $(this).parent().sortable("enable");
-    let parent_id = $(this).parent().parent().attr("id");//得到父元素的ID
+    $(this).parent().parent().removeClass("fb-disabled ui-sortable-disabled");
+    $(this).parent().parent().addClass("fb-fz ui-sortable");
+    $(this).parent().parent().sortable("enable");
+    let parent_id = $(this).parent().parent().parent().attr("id");//得到父元素的ID
     let id = $(this).parent().children("label").attr("data-id");
     var mode = $('#' + parent_id).attr('mode') || 'zhubiao';
     if (mode === 'zhubiao') {

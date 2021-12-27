@@ -56,11 +56,11 @@ class Control{
 		}
 		if($act =='desc'){
 			 $info = Design::find($sid);
-			// if($info['s_type']==0){
+			 if($info['s_type']==0 || $info['s_type']==2){
 				 return lib::desc($info['s_field'],$info['id'],$info['s_look']);
-			// }else{
-				 //return lib::desc2($info['s_field'],$info['id'],$info['s_look']);
-			// }
+			 }else{
+				 return lib::desc2($info['s_field'],$info['id'],$info['s_look']);
+			 }
 		}
 		if($act =='field'){
 		    
@@ -430,7 +430,8 @@ class Control{
 				'g_js'=>$g_js,
 				'fun' =>$viewdata['fun'],
 				'load_file' =>$viewdata['load_file'],
-				'upload_file'=>unit::gconfig('upload_file')
+				'upload_file'=>unit::gconfig('upload_file'),
+                's_type' =>$viewdata['info']['s_type']
 			];
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/edit.html',['showtype'=>'edit','config'=>$config,'data'=>$data['info']]);
@@ -456,7 +457,8 @@ class Control{
 				'g_js'=>$g_js,
 				'fun' =>$data['fun'],
 				'load_file' =>$data['load_file'],
-				'upload_file'=>unit::gconfig('upload_file')
+				'upload_file'=>unit::gconfig('upload_file'),
+                's_type' =>$data['info']['s_type']
 			];
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/edit.html',['showtype'=>'add','config'=>$config,'data'=>$data['info']['s_field']]);

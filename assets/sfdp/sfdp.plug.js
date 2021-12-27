@@ -22,12 +22,15 @@ var sfdpPlug = {
         if (typeof (data['tpfd_name']) == 'undefined') {
             return sfdpPlug.view_default(type, data);
         } else {
-            var lab = `<label class="${sfdp.ui.rows_label}" style="${maste_class}"><b>${data.tpfd_name}</b></label><div class="${sfdp.ui.rows_block}">`;
+            var lab = `<label title="${data.tpfd_name}" class="${sfdp.ui.rows_label}" style="${maste_class}"><b>${data.tpfd_name}</b></label><div class="${sfdp.ui.rows_block}">`;
             if (is_sub) {
                 lab = '';
             }
             if(type=='group'){
                 lab =`<fieldset class="layui-elem-field layui-field-title" style="margin: 0px;"><legend>${data.tpfd_name}</legend></fieldset>`;
+            }
+            if (s_type==1) {
+                lab = `<div>`;
             }
             var html = lab + sfdpPlug.common(type,data,field_att,Curd);
         }

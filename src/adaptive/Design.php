@@ -173,7 +173,6 @@ class Design{
             }
         }
         //字表数据
-
         if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
             foreach($field['sublist'] as $k=>$v){
                 foreach($v['data'] as $k2=>$v2) {

@@ -35,7 +35,7 @@ class AdapteeDesign{
 		return Db::name('sfdp_design')->where($map)->order($order)->select();
 	}
 	function findVer($sid){
-		$info = Db::name('sfdp_design_ver')->find($sid);
+		$info = Db::name('sfdp_design_ver')->alias('a')->leftjoin('sfdp_design d','d.id=a.sid')->field('a.*,d.s_type')->find($sid);
 		if($info){
 			return  $info;
 		}else{
