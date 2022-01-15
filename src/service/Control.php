@@ -112,6 +112,24 @@ class Control{
 		if($act =='fix'){
 			$info = Design::find($sid);
 			$json = Design::getDesignJson($sid);
+            $db_field_array=[];
+            foreach($json['list'] as $k=>$v){
+                foreach($v['data'] as $v2){
+                    if(!isset($v2['tpfd_db'])){
+                        return json(['code'=>1,'msg'=>unit::errMsg(3001)]);
+                    }
+                    $db_field_array[] = $v2['tpfd_db'];
+                    if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
+                        $ret = Data::getFun($v2['checkboxes_func']);;
+                        if(isset($ret['code'])){
+                            return json($ret);
+                        }
+                    }
+                }
+            }
+            if (count($db_field_array) != count(array_unique($db_field_array))) {
+                return json(['code'=>1,'msg'=>unit::errMsg(3002)]);
+            }
 			$ret =  BuildTable::hasDbbak($json['name_db']);
 			if($ret['code']==1){
 				 Design::saveDesc(['s_db_bak'=>1,'s_look'=>1,'id'=>$sid],'update');

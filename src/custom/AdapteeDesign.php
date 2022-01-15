@@ -101,7 +101,4 @@ class AdapteeDesign{
 			return  false;
 		}
 	}
-
-	
-	
 }

@@ -182,7 +182,6 @@ class Design{
                 }
             }
         }
-
         $sfdp_ver_info['s_field'] = json_encode($field);
         $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
         return ['info'=>$sfdp_ver_info,'fun'=>$fun,'load_file'=>$load_file];
@@ -192,26 +191,27 @@ class Design{
      */
     static function saveDesc($data,$type='save'){
         if($type=='save'){
-            $search = [];
-            $list = [];
             $data['s_field'] = htmlspecialchars_decode($data['ziduan']);
             $field = json_decode($data['s_field'],true);
+            $db_field_array = [];
             foreach($field['list'] as $k=>$v){
                 foreach($v['data'] as $v2){
-                    if(isset($v2['tpfd_chaxun'])&&($v2['tpfd_chaxun']=='yes')){
-                        $search[] = $v2;
-                    }
-                    if(isset($v2['tpfd_list'])&&($v2['tpfd_list']=='yes')){
-                        $list[] = $v2;
+                    $db_field_array[] = $v2['tpfd_db'];
+                    if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
+                        $ret = Data::getFun($v2['checkboxes_func']);;
+                        if(isset($ret['code'])){
+                            return $ret;
+                        }
                     }
                 }
+            }
+            if (count($db_field_array) != count(array_unique($db_field_array))) {
+                return ['code'=>1,'msg'=>unit::errMsg(3002)];
             }
             $ver = [
                 'id'=>$data['id'],
                 's_title'=>$field['name'],
                 's_db'=>$field['name_db'],
-                's_list'=>json_encode($list),
-                's_search'=>json_encode($search),
                 's_field'=>htmlspecialchars_decode($data['ziduan']),
                 's_design'=>1,
                 'add_time'=>time()

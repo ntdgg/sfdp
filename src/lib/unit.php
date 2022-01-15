@@ -98,5 +98,19 @@ class unit{
 	{
 		return "D" . date("Ymd").rand(1000,9999);;
 	}
+
+    static function errMsg($code){
+        $msg =  [
+            3001=>'Sorry,逻辑检查失败，[存在未设置字段信息]',
+            3002=>'Sorry,逻辑检查失败，[存在相同的字段信息]',
+            3003=>'Sorry，[未找到自定义类，请先配置]',
+            3004=>'Sorry，[函数不存在字段别名name/id]'
+
+
+
+        ];
+
+        return $msg[$code] ?? '对不起，未知错误！';
+    }
 }
 

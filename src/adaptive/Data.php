@@ -388,20 +388,20 @@ class Data{
         } else {
             $className = unit::gconfig('fun_namespace');
             if (!class_exists($className)) {
-                return 'Sorry,未找到自定函数，请先配置~';
+                return ['code'=>1,'msg'=>unit::errMsg(3003)];
             }
             $getData = (new $className())->func($checkboxes_func,$all);
         }
         if ($getData['code'] == -1) {
-            echo '<h2>系统级错误：' . $getData['msg'] . '</h2>';
-            exit;
-        } else {
-            $tpfd_data = [];
-            foreach ($getData['msg'] as $k3 => $v3) {
-                $tpfd_data[$v3['id']] = $v3['name'];
+            return $getData;
+        }
+        $tpfd_data = [];
+        foreach ($getData['msg'] as $k3 => $v3) {
+            if(!isset($v3['name']) || !isset($v3['id'])){
+                return ['code'=>1,'msg'=>unit::errMsg(3004)];
             }
+            $tpfd_data[$v3['id']] = $v3['name'];
         }
         return $tpfd_data;
-
     }
 }
