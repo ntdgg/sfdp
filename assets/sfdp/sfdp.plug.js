@@ -53,12 +53,12 @@ var sfdpPlug = {
             radio : (sfdpPlug.checkboxes_clss(item.id,'radio','',item.field,'',item.tpfd_data,data.tpfd_check)).replace(/<a>(.+?)<\/a>/g,''),
             checkboxes : sfdpPlug.checkboxes_clss(item.id,'checkboxes','',item.field,'',item.tpfd_data,data.tpfd_check).replace(/<a>(.+?)<\/a>/g,''),
             textarea  : '<textarea  name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input"></textarea>',
-            dropdown  : sfdpPlug.view_select(data, item.tpfd_db, '' , '', item.id),
+            dropdown  : sfdpPlug.view_select(data, item.tpfd_db, '' , '', item.id,'','',item.name),
             upload: sfdpPlug.view_upload(data, item.field, 0),
             date : '<input  type="text"  placeholder="'+item.name+'起" data-format="yyyy-MM-dd" data-type="date" class="datetime sfdp-input layui-input"  name="@' + item.field + '[]"></div><div class="layui-input-inline" style="width:90px"><input  type="text"  placeholder="'+item.name+'止" data-format="yyyy-MM-dd" data-type="date" class="datetime sfdp-input layui-input"  name="@' + item.field + '[]">',
             group : ''
         }
-        return fieldArray[type] || '';
+        return fieldArray[type] || '组件不支持列表查询';
     },
     common:function (type,data,att,Curd) {
         var name = data.tpfd_db,radios='',checkboxes='',view_selects='';
@@ -75,11 +75,14 @@ var sfdpPlug = {
             checkboxes = sfdpPlug.checkboxes_clss(data.tpfd_id,'checkboxes',att,name,value,data.tpfd_data,data.tpfd_check);
         }
         if(type=='dropdown'){
-            view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id);
+            view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,'','',data.tpfd_name);
         }
         if(type=='dropdowns'){
-            console.log(data);
-            view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,1,data.rvalue);
+            view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,1,data.rvalue,data.tpfd_name);
+        }
+        if(type=='cascade'){//级别联动
+            selectTree[data.tpfd_id] =data.tpfd_data;
+            view_selects = sfdpPlug.view_select2(data.tpfd_data, name, value , att, data.tpfd_id);
         }
         var fieldArray = {
             text : '<input type="text" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
@@ -89,6 +92,7 @@ var sfdpPlug = {
             textarea  : '<textarea id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea>',
             dropdown  : view_selects,
             dropdowns  : view_selects,
+            cascade  : view_selects,
             upload: sfdpPlug.view_upload(data, name, 0),
             date : '<input type="text" ' + att + ' data-type="' + data.tpfd_dblx + '" data-format="' + dataType[data.xx_type] + '" class="datetime  layui-input"  name="' + name + '"  id="' + data.tpfd_id + '" value="' + value + '">',
             time_range : '<input type="text" ' + att + ' data-type="' + data.tpfd_dblx + '" data-format="' + dateType_format[data.xx_type] + '" class="time_range layui-input"  name="' + name + '"  id="' + data.tpfd_id + '" value="' + value + '">',
@@ -102,16 +106,19 @@ var sfdpPlug = {
                 '$.getScript("/static/lib/wangEditor.min.js",function(){var html = $(\'#' + data.tpfd_id + '\').val();const E = window.wangEditor; const editor = new E(\'#div' + data.tpfd_id + '\');editor.config.zIndex = 500;const $text1 = $(\'#' + data.tpfd_id + '\');  editor.config.onchange = function (html) {$text1.val(html)};editor.config.uploadImgServer="/gadmin/common/eupload";editor.config.uploadFileName ="file";editor.create();$text1.val(editor.txt.html());}); </script>',
             group:'',
         }
-
         return fieldArray[type];
     },
-    view_select: function (data, field, value, attr, selectId,is_dx=0,rvalue='') {
-
+    view_select2: function (data, field, value, attr, selectId,is_dx=0,rvalue='') {
+        var tags = `<select name="${field}" ${attr} id="${selectId}" class="this-select222" data-widget="select2"  data-value="${value}" lay-search>`
+        tags += `</select>`
+        return tags
+    },
+    view_select: function (data, field, value, attr, selectId,is_dx=0,rvalue='',title='') {
         if(is_dx==1){
             var tags = `<input id="${selectId}_val" type="hidden" value="${rvalue}" name="${field}"><select  ${attr} id="${selectId}" class="this-select" data-widget="select2"  data-value="${value}" lay-search multiple="true">`
         }else{
             var tags = `<select name="${field}" ${attr} id="${selectId}" class="this-select" data-widget="select2"  data-value="${value}" lay-search>`
-            tags += ` <option value="">请选择</option>`;
+            tags += ` <option value="">${title}请选择</option>`;
         }
         if (value !== undefined ) {
             var strs = (value).split(",");
@@ -184,7 +191,7 @@ var sfdpPlug = {
         if (typeof (data['tpfd_name']) == 'undefined') {
             return sfdpPlug.view_default(type, data);
         } else {
-            var lab = '<div><label class="' + sfdp.ui.rows_label + '"><b>' + data.tpfd_name + '：</b></label><div class="' + sfdp.ui.rows_block + '">';
+            var lab = `<div><label class="${sfdp.ui.rows_label}" id="${data.tpfd_id}"><b>${data.tpfd_name}：</b></label><div class="${sfdp.ui.rows_block}" id="${data.value}">`;
             if (is_sub) {
                 lab = '';
             }

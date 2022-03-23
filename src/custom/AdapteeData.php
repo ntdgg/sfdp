@@ -62,7 +62,7 @@ class AdapteeData{
 	function selectAll($table,$map=[]){
 		return Db::name($table)->where($map)->withoutField('id,d_id,uid,status,create_time,update_time')->select()->toarray();
 	}
-	function select($table,$map=[],$field='',$page=1,$limit=10,$whereRaw=''){
+	function select($table,$map=[],$field='',$page=1,$limit=10,$whereRaw='',$order=''){
 		$offset = ($page-1)*$limit;
 		if($field!=''){
 			$field =','.$field.',';
@@ -73,7 +73,10 @@ class AdapteeData{
 		if($whereRaw !=''){
 			$list = $list->whereRaw($whereRaw);
 		}
-		$list = $list->limit($offset,$limit)->field('id'.$field.'status,"url"')->order('id desc')->select()->toarray();
+        if($order==''){
+            $order ='id desc';
+        }
+		$list = $list->limit($offset,$limit)->field('id'.$field.'status,"url"')->order($order)->select()->toarray();
         foreach($list as $k=>$v){
             if(isset($list[$k]['create_time'])){
                 $list[$k]['create_time'] = date('Y-m-d H:i:s',$list[$k]['create_time']);
@@ -89,6 +92,4 @@ class AdapteeData{
 		$count = $count->count();
 		return ['data'=>$list,'count'=>$count];
 	}
-	
-	
 }

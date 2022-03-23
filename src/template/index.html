@@ -15,7 +15,7 @@
 <link rel="stylesheet" type="text/css" href="__HUIADMIN__/css/style.css" />
 <link rel="stylesheet" type="text/css" href="__HUIADMIN__/common.css" />
 <script type="text/javascript" src="__LIB__/jquery/1.9.1/jquery.min.js"></script> 
-<script type="text/javascript" src="__LIB__/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="__LIB__/layer/3.1.1/layer.js"></script>
 <script type="text/javascript" src="__HUI__/js/H-ui.min.js"></script>
 <script type="text/javascript" src="__HUIADMIN__/js/H-ui.admin.js"></script>
 <script type="text/javascript" src="__SFDP__/lib/Validform/5.3.2/Validform.min.js"></script>
@@ -135,7 +135,7 @@ function edit(sid){
 		layer.msg('流程审批中，或者已被审批通过~~');
 		return  false;
 	}
-	layer_show("修改","{:url('index/sfdp/sfdpCurd',['act'=>'edit','sid'=>$config.sid])}&bid="+id,"850","500");
+	layer_show("修改","{:url('index/sfdp/sfdpCurd',['act'=>'edit','sid'=>$config.sid])}&bid="+id,"85","50");
 }
 
 function del(sid){

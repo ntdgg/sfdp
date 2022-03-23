@@ -185,7 +185,7 @@ php;
 	 * @param  array $field 所有字段数据
 	 * @param  array $modue 模块数据
 	 */
-	public static function custom($sid,$list,$listtrue,$field,$modue,$listcount){
+	public static function custom($sid,$field,$modue){
 		$patch = unit::gconfig('static_url');
 		$urls= unit::gconfig('url');
 		$url =$urls['api'];
@@ -194,6 +194,7 @@ php;
         $show_type=  $modue['show_type'];
         $show_fun=  $modue['show_fun'];
 		$show_field=  $modue['show_field'];
+        $fielcount = explode(",",$modue['count_field']);
 		$search ='';
 		$field_html ='';
 		$access_html ='';
@@ -210,68 +211,66 @@ php;
 		foreach((array)$access as $k=>$v){
 			$access_html .='<div id="access_id'.$v[0].'">控制字段：<select style="width:200px" name="accsee_ids"><option value="'.$v[0].'">'.$v[3].'</option></select> <select style="width:200px" name="accsee_eq"><option value="'.$v[1].'">'.$eq[$v[1]].'</option></select> <select style="width:200px" name="accsee_user"><option value="'.$v[2].'">'.$user[$v[2]].'</option></select> <select style="width:200px" name="accsee_fun"><option value="'.$v[4].'">'.$v[4].'</option></select> <span class="button" onclick=editaccess("_id'.$v[0].'")>del</span></div>';
 		}
+        $alltable ='';
+        $listfield = explode(',',$modue['field']);
+        foreach($field as $k=>$v){
+            if(!in_array($v['field'], ['id','status'])) {
+                $countchecked = '';
+                $checked = $v['is_list'] == 1 ? 'checked' : '';
+                if (in_array($v['field'], $fielcount)) {
+                    $countchecked = 'checked';
+                }
+                $alltable .= ' <tr><th><b>' . $v['name'] . '('.$v['field'].')<b> </th><th><input class="sfdp-input" placeholder="需显示填写序号" name="'.$v['field'].'[list]" value="' . array_search($v['field'],$listfield) . '" type="number" ></th><th><input name="'.$v['field'].'[count]" ' . $countchecked . ' type="checkbox" value="1"></th><th><input name="'.$v['field'].'[search]" class="sfdp-input" placeholder="如：=,>,LIKE"  value="' . $v['search_type'] . '"></th><th><input width="50px" name="'.$v['field'].'[width]" class="sfdp-input"  name="" value="' . $v['width'] . '" type="number"> <input type="hidden" name="'.$v['field'].'[id]"  value="' . $v['id'] . '"><input name="'.$v['field'].'[title]"  value="' . $v['name'] . '" type="hidden"></th></tr>';
+            }
+        }
+        $lenth = count($field);
 		return <<<php
   <link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" />
   <script src="{$patch}lib/jquery-1.12.4.js"></script>
   <script src="{$patch}lib/jquery-ui.js"></script>
-	<script src="{$patch}lib/layer/2.4/layer.js"></script>
+	<script src="{$patch}lib/layer/3.1.1/layer.js"></script>
 	<script src="{$patch}sfdp.5.0.js?v=5.0.1"></script>
-  <script>
-  $( function() {
-    $( "#sortable1, #sortable2" ).sortable({
-      connectWith: ".connectedSortable",
-	  cancel:".cancel_me"
-    }).disableSelection();
-  } );
-  	function save_list(){
-		var sortid = [];
-		var fieldid = [];
-		var fieldname = [];
-		$( "#sortable2 li" ).each( function (i){
-			sortid. push($(this).attr("data-id"));
-			fieldid. push($(this).attr("data-field"));
-			fieldname. push($(this).attr("data-name"));
-		});
-		var url = "{$fun_save}";
-		sfdp.sAjax(url,{sid:{$sid},data:sortid,field:fieldid,name:fieldname});
-	}
-  </script>
 </head>
-<body>
+<body style="padding:20px">
  <table>
- <tr><td  style='width: 8%;text-align: center;'><b>排序规则<b> </td><td style='width: 87%;'><input id="order" value='{$modue["order"]}'></td><td style='width: 5%'><a onclick='save_order()'  class='button'>保存</a></td></tr>
-  <tr><td style='text-align: center;'><b>布局设置<b> </td><td>
-	  <ul id="sortable1" class="connectedSortable">{$listtrue}</ul><hr/>
-	  <ul id="sortable2" class="connectedSortable">{$list}</ul>
-	  </td><td><a onclick='save_list()'  class='button'>保存</a></td>
-  </tr>
-  <tr><td style='text-align: center;'><b>列表统计<b> </td><td>
-	  {$listcount}
-	  </td><td><a onclick='save_count()'  class='button'>保存</a></td>
-  </tr>
-    <tr><td style='text-align: center;'><b>权限控制<b> </td><td>
-	{$access_html}
-	<div id="access1">控制字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select>
+        <tr><td colspan=5><input id="order" class="sfdp-input"  placeholder="排序规则如：id desc" value='{$modue["order"]}'></td><td style="text-align:center"><a onclick='save_order()'  class='button' >保存排序</a></td></tr>
+        <tr><td colspan=5>
+        {$access_html}
+	<div id="access1">字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select>
 	<select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="<>">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select>
 	<select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select>
 	<select style="width:200px" name="accsee_fun"><option value="and">and</option><option value="or">or</option></select>
-    <span class='button' onclick=addaccess(1)>Add</span></div>
-	</td><td><a onclick='save_access()'  class='button'>保存</a></td></tr>
-	<tr><td style='text-align: center;'><b>查询设置<b> </td><td>
-	{$field_html}
-	<div id="checkboxes1">查询字段：<select style="width:200px" name="search_ids"><option value="">请选择</option>{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,like     <span class='button' onclick=addoption(1)>Add</span></div>
-	</td><td><a onclick='save_search()'  class='button'>保存</a></td></tr>
-	<tr><td style='text-align: center;'><b>列表展示<b> </td><td>
-
-	<div id="checkboxes1">展示形式：<select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">树形列表</option></select> 关联字段：<input id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 80px;"> 树型函数：<input style="width: 80px;" id="show_fun" name="show_fun" type="text" value="{$show_fun}">注：函数符合Tree 建议层级>3级别;内置组织树：sys_role</div>
-	</td><td><a onclick='save_show()'  class='button'>保存</a></td></tr>
- </table>
+    <span class='button' onclick=addaccess(1)>Add</span></div></td><td style="text-align:center"><a onclick='save_access()'  class='button' >保存权限</a></td></tr>
+    <tr><td colspan=5><b>展示形式<b><select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">树形列表</option></select> 关联字段：<input id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 80px;"> 树型函数：<input style="width: 80px;" id="show_fun" name="show_fun" type="text" value="{$show_fun}">注：函数符合Tree 建议层级>3级别;内置组织树：sys_role</div>
+	</td><td style="text-align:center"><a onclick='save_show()'  class='button'>保存布局</a></td></tr>
+        <tr><th  style='width: 20%;text-align: center;'><b>字段<b> </th>
+            <th  style='width: 8%;text-align: center;'><b>列表<b> </th>
+            <th  style='width: 5%;text-align: center;'><b>统计<b> </th>
+            <th  style='width: 5%;text-align: center;'><b>查询<b> </th>
+            <th  style='width: 5%;text-align: center;'><b>宽度<b> </th>
+            <th rowspan={$lenth} style="width: 5%;text-align:center"><b><a onclick='update()' class='button'>保存属性</a></b> </th>
+        </tr>
+        <form id='form'>
+         {$alltable}
+         <input name='sid' value='{$sid}' type="hidden">
+        </form>    
+</table>
 <script type="text/javascript" language="javascript">
     $("#show_type").find("option[value='{$show_type}']").attr("selected",true);
+    function update(){
+    var searchdata = [];
+     var arr = $('#form').serializeArray();
+        $.each(arr, function(index,vars) {
+            var dbname = this.name;
+                searchdata[dbname] = vars.value || '';
+        });
+     sfdp.sAjax("{$url}?act=customSave",arr);
+    }
+    
 	function addaccess(id){
 		 $('#access'+id).children('span').attr("onclick","editaccess("+id+")");
 		 $('#access'+id).children('span').html('Del');
-		 var html ='<div id="access'+(id+1)+'">控制字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select> <select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="<>">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select> <select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select> <span class="button" onclick=addaccess('+(id+1)+')>Add</span></div>';
+		 var html ='<div id="access'+(id+1)+'">字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select> <select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="<>">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select> <select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select> <span class="button" onclick=addaccess('+(id+1)+')>Add</span></div>';
 		 $('#access'+id).after(html);
 	}
 	function addoption(id){
@@ -279,13 +278,6 @@ php;
 		 $('#checkboxes'+id).children('span').html('Del');
 		 var html ='<div id="checkboxes'+(id+1)+'">查询字段：<select style="width:200px" name="search_ids"><option value="">请选择</option>{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,LIKE     <span onclick=addoption('+(id+1)+') class="button">Add</span></div>';
 		 $('#checkboxes'+id).after(html);
-	}
-	function save_count(){
-	 var ids = '';
-       $('input[type="checkbox"]:checked').each(function(index,value) {
-                ids += $(this).val() + ',';
-       });
-       sfdp.sAjax("{$url}?act=customCount",{sid:{$sid},count_field:ids});
 	}
 	function editaccess(id){
 		$('#access'+id).remove();
@@ -309,17 +301,6 @@ php;
 		});
 		sfdp.sAjax("{$url}?act=customAccess",{sid:{$sid},ids_val:ids.join(','),value_val:value.join(','),user_val:user.join(','),fun_val:fun.join(',')});
 	}
-	function save_search(){
-		var ids = [] , value =[];
-		$("select[name='search_ids']").each(function () {
-			ids.push(this.value);
-		});
-		$("input[name='search_value']").each(function () {
-			value.push(this.value);
-		});
-		sfdp.sAjax("{$url}?act=customSearch",{sid:{$sid},ids_val:ids.join(','),value_val:value.join(',')});
-	}
-	save_show
 	function save_order(){
 		sfdp.sAjax("{$url}?act=customOrder",{sid:{$sid},order:$('#order').val()});
 	}
@@ -349,7 +330,7 @@ php;
 	<html>
 	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
 	<link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" /> 
-	<body><div class="sfdp-top">Sfdp超级表单开发平台 v5.0</div>
+	<body><div class="sfdp-top">Sfdp超级表单开发平台 v6.0</div>
 		<div>
 			<div id="ctlMenus" class="sfdp-con" style="float: left; width: 240px;">
 				<div class="sfdp-tool-title">设计控制区 Design control area</div>
@@ -377,6 +358,7 @@ php;
 					<div class="sfdp-tool-con"><a data="upload_img">&#8194;<b class='ico'>Ρ</b>&#8194;单图组件</a></div>
 					<div class="sfdp-tool-con"><a data="edit">&#8194;<b class='ico'>Ε</b>&#8194;富文本框</a></div>
 					<div class="sfdp-tool-con"><a data="dropdowns">&#8194;<b class='ico'>S</b>&#8194;下拉多选</a></div>
+					<div class="sfdp-tool-con"><a data="cascade">&#8194;<b class='ico'>§</b>&#8194;级联组件</a></div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">内置组件 System control library</div>
 					<div class="sfdp-tool-con" ><a data="system_user">&#8194;<b class='ico'>ρ</b>&#8194;系统用户</a></div>
@@ -388,18 +370,17 @@ php;
 				<div class="sfdp-cl"></div>
 			</div>
 			<div class="sfdp-con" style="float: left; width: calc(100% - 600px);">
-				<!-- <div><div class="button">配置</div><div class="button">保存</div><div class="button">预览</div><div class="button">帮助</div></div> -->
 				<div id="sfdp-main"></div>
 			</div>
 			<div class="sfdp-con" style="float: right; width: 360px;">
 				<div class="sfdp-att">
-				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><p> Sfdp V5.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © Guoguo <a href="https://www.cojz8.com/">Sfdp</a> 版权禁删！ ]</span></div>
+				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><p> Sfdp V6.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © Guoguo <a href="https://www.cojz8.com/">Sfdp</a> 版权禁删！ ]</span></div>
 				</div>
 			</div>
 			<div class="sfdp-cl"></div>
 		</div>
 		<script src="{$patch}lib/jquery-3.4.1.min.js"></script>
-		<script src="{$patch}lib/layer/2.4/layer.js"></script>
+		<script src="{$patch}lib/layer/3.1.1/layer.js"></script>
 		<script src="{$patch}lib/pingyin.js"></script>
 		<script type="text/javascript" src="{$patch}sfdp.5.0.js?v=5.0.322222"></script>
 		<script type="text/javascript" src="{$patch}sfdp.config.js?v=5.0.322222"></script>
@@ -478,6 +459,20 @@ php;
 		$script = $urls['api'].'?act=script&sid='.$fid;
 		return view(ROOT_PATH.'/desc.html',['patch'=>$patch,'script'=>$script,'save'=>$save,'urls'=>$urls,'json'=>$json,'fid'=>$fid,'look'=>$look]);
 	}
+    /**
+     * 设计器界面
+     *
+     * @param  json $json 设计数据
+     * @param  int   $fid 设计ID
+     * @param  int $look 是否锁定
+     */
+    public static function desc3($json,$fid,$look){
+        $patch = unit::gconfig('static_url');
+        $urls= unit::gconfig('url');
+        $save = $urls['api'].'?act=save';
+        $script = $urls['api'].'?act=script&sid='.$fid;
+        return view(ROOT_PATH.'/desc2.html',['patch'=>$patch,'script'=>$script,'save'=>$save,'urls'=>$urls,'json'=>$json,'fid'=>$fid,'look'=>$look]);
+    }
 	/**
 	 * 脚本函数
 	 *
@@ -669,14 +664,6 @@ php;
                         html += `<tr><td>`+value.FieldNote+`</td><td>`+value.Field+`</td><td>`+value.FieldType+`</td><td><select name="`+value.Field+`[t1]"><option value="text">输入框</option><option  value="dropdown">下拉框</option><option value="radio">单选框</option><option value="date">时间日期</option><option value="textarea">多行文本</option><option value="edit">富文本编辑器</option><option value="upload">上传组件</option><option value="upload_img">图片上传</option><option value="dropdowns">下拉多选</option></select></td><td><select name="`+value.Field+`[t2]"><option value="0">是</option><option value="1" selected="">否</option></select></td><td><select name="`+value.Field+`[t3]"><option value="0">是</option><option value="1" selected="">否</option></select></td></tr>`;
                  });
                  $('#field').append(html+'</tbale><form>');
-                 
-		        console.log(field);
-		        
-                
-
-
-		   
-		   
 		   }
 	</script>
 </body>
@@ -691,7 +678,7 @@ php;
 		$patch = unit::gconfig('static_url');
 		$css = '<link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.5.0.css?v=5.0.1" />';
 		$js = '<script src="'.$patch.'lib/jquery-1.12.4.js"></script>
-		<script src="'.$patch.'lib/layer/2.4/layer.js"></script>
+		<script src="'.$patch.'lib/layer/3.1.1/layer.js"></script>
 		<script src="'.$patch.'sfdp.5.0.js?v=5.0.1"></script>';
 		$head ='<title>'.$title.'</title><head>'.$css.'</head><body style="background-color: white;">';
 		return ['head'=>$head,'css'=>$css,'js'=>$js];

@@ -125,10 +125,7 @@ class Design{
         $searct_field =json_encode($list_field);
         $listid = ''; //变量赋值为空
         $listfield = []; //变量赋值为空
-        foreach($list_field as $key=>$vals){
-            $listid.=$vals['tpfd_db'].',';
-            $listfield[$vals['tpfd_db']]=$vals['tpfd_name'];
-        }
+
         $fieldArr = [];
         $fieldArrAll = [];
         $fieldSysUser = [];
@@ -139,20 +136,25 @@ class Design{
                 }
                 if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
                     //函数名转为数据信息
-                    $v2['tpfd_data'] = Data::getFun($v2['checkboxes_func'],'all');
+                    if($v2['td_type']=='cascade'){
+                        $temp = array_column(Data::getFun2($v2['checkboxes_func'],'all'), 'name', 'id');
+                        $v2['tpfd_data'] = $temp;
+                    }else{
+                        $v2['tpfd_data'] = Data::getFun($v2['checkboxes_func'],'all');
+                    }
                 }
                 if(isset($v2['tpfd_db']) and(isset($v2['tpfd_list']))){
-                    if(($v2['td_type']=='dropdowns'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
+                    if(($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
                         $fieldArr[$v2['tpfd_db']]=$v2['tpfd_data'];
                     }
-                    if($v2['td_type']=='dropdowns'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
+                    if($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
                         $fieldArrAll[$v2['tpfd_db']]=$v2['tpfd_data'];
                     }
                 }
             }
         }
         $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
-        return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'fieldname'=>$listfield,'search'=>$searct_field,'fun'=>$fun,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser];
+        return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'search'=>$searct_field,'fun'=>$fun,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser];
     }
     /**
      * 获取数据
@@ -167,11 +169,19 @@ class Design{
         $field = json_decode($sfdp_ver_info['s_field'],true);
         foreach($field['list'] as $k=>$v){
             foreach($v['data'] as $k2=>$v2){
+
                 if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
-                    $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun($v2['checkboxes_func']);;
+                    if($v2['td_type']=='cascade'){
+                        $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun2($v2['checkboxes_func']);
+                         }else{
+                        $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun($v2['checkboxes_func']);
+                    }
+
+
                 }
             }
         }
+        //dump($field);
         //字表数据
         if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
             foreach($field['sublist'] as $k=>$v){

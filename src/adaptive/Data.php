@@ -191,12 +191,11 @@ class Data{
             }
             $whereRaw .= $fi.' '. $link.' ';
         }
-
         if(unit::getuserinfo('uid')==1){
             $whereRaw ='';
         }
         /*权限系统组合过滤*/
-        $list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit,$whereRaw);
+        $list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit,$whereRaw,$Modue['order']);
         $json = $list['data'];
         foreach ($json as $k => $v) {
             foreach($jsondata['fieldArrAll'] as $k2=>$v2){
@@ -223,8 +222,6 @@ class Data{
         }
         return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
     }
-
-
     static function selectAll($table,$where=[]){
         return  (new Data())->mode->selectAll($table,$where);
     }
@@ -239,8 +236,14 @@ class Data{
         foreach($field['list'] as $k=>$v){
             foreach($v['data'] as $k2=>$v2){
                 if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
-                    $v2['tpfd_data'] = self::getFun($v2['checkboxes_func']);
+                    if($v2['td_type']=='cascade'){
+                        $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun2($v2['checkboxes_func']);
+                    }else{
+                        $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun($v2['checkboxes_func']);
+                    }
+
                 }
+
                 if($v2['td_type']=='dropdowns' || $v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
                     $value_arr = explode(",",$find[$v2['tpfd_db']]);
                     $fiedsver = '';
@@ -333,6 +336,9 @@ class Data{
                     $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
                     $sys_user = unit::gconfig('sys_user');
                     $field['list'][$k]['data'][$k2]['text'] = (new $sys_user())->value($v2['td_type'],$find[$v2['tpfd_db']]);
+                }elseif($v2['td_type']=='cascade'){
+                    $temp = array_column(self::getFun2($v2['checkboxes_func'],'all'), 'name', 'id');
+                    $field['list'][$k]['data'][$k2]['value'] = $temp[$find[$v2['tpfd_db']]] ? : '';;
                 }else{
                     $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
                 }
@@ -403,5 +409,33 @@ class Data{
             $tpfd_data[$v3['id']] = $v3['name'];
         }
         return $tpfd_data;
+    }
+    /*函数处理数据*/
+    static function getFun2($checkboxes_func,$all =''){
+        //函数名转为数据信息
+        $fun_mode = unit::gconfig('fun_mode') ?? 1;
+        if ($fun_mode == 1 || $fun_mode == '') {
+            $getFun = Functions::findWhere([['fun_name', '=', $checkboxes_func]]);
+            if (!$getFun) {
+                echo '<h2>系统级别错误(' . $checkboxes_func . ')：函数名无法找到~</h2>';
+                exit;
+            }
+            $getData = Common::query($getFun['function']);
+        } else {
+            $className = unit::gconfig('fun_namespace');
+            if (!class_exists($className)) {
+                return ['code'=>1,'msg'=>unit::errMsg(3003)];
+            }
+            $getData = (new $className())->func($checkboxes_func,$all);
+        }
+        if ($getData['code'] == -1) {
+            return $getData;
+        }
+        foreach ($getData['msg'] as $k3 => $v3) {
+            if(!isset($v3['name']) || !isset($v3['id'])){
+                return ['code'=>1,'msg'=>unit::errMsg(3004)];
+            }
+        }
+        return $getData['msg'];
     }
 }

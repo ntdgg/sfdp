@@ -40,15 +40,14 @@ class Control{
 	 * @param  str $act 调用方法
 	 * @param  Array $sid post数据，或者sid值
 	 */
-	static function api($act,$sid=''){
+	static function api($act,$sid='',$map=null){
 		$urls= unit::gconfig('url');
 		if($act =='list'){
 			$list = Design::select();
 			return lib::index($list);
 		}
         if($act =='listData'){
-            $list = Design::select();
-            return $list;
+            return Design::select($map);
         }
 		if($act =='fun'){
 			$list = Functions::select();
@@ -58,9 +57,13 @@ class Control{
 			 $info = Design::find($sid);
 			 if($info['s_type']==0 || $info['s_type']==2){
 				 return lib::desc($info['s_field'],$info['id'],$info['s_look']);
-			 }else{
+			 }
+            if($info['s_type']==1){
 				 return lib::desc2($info['s_field'],$info['id'],$info['s_look']);
 			 }
+            if($info['s_type']==3){
+                return lib::desc3($info['s_field'],$info['id'],$info['s_look']);
+            }
 		}
 		if($act =='field'){
 		    
@@ -156,7 +159,6 @@ class Control{
 			}
 			//更新设计表
 			Design::saveDesc(['s_db_bak'=>1,'s_look'=>1,'s_design'=>2,'id'=>$sid],'update');
-			
 			return json(['code'=>0]);
 		}
 		if($act=='fun_save'){
@@ -198,19 +200,6 @@ class Control{
 				return json(['code'=>1,'msg'=>'保存失败']);
 			}
 		}
-		if($act =='customSave'){
-			$field = implode(',',$sid['field']);
-			$field_name = implode(',',$sid['name']);
-			$json = View::ver($sid['sid']);
-			$modue = Modue::saveWhere([['sid','=',$json['ver']['id']]],['field'=>$field,'field_name'=>$field_name,'update_time'=>time()]);
-			$field = Field::saveWhere([['sid','=',$json['ver']['id']]],['is_list'=>0,'update_time'=>time()]);
-			$field = Field::saveWhere([['id','in',$sid['data']]],['is_list'=>1,'update_time'=>time()]);
-			if($field){
-				return json(['code'=>0,'msg'=>'保存成功']);
-			}else{
-				return json(['code'=>1,'msg'=>'保存失败']);
-			}
-		}
 		if($act =='custom'){
 			$info = Design::find($sid);
 			if($info['s_design']<>2){
@@ -220,34 +209,7 @@ class Control{
 			$json = View::ver($sid);
 			$field = Field::select([['sid','=',$json['ver']['id']]]);;//找出模型字段
 			$modue = Modue::findWhere([['sid','=',$json['ver']['id']]]);//找出模型字段
-			$fielselect = explode(",",$modue['field']);
-			$list = '';
-			foreach($fielselect as $k=>$v){
-				$find = Field::findWhere([['sid','=',$json['ver']['id']],['field','=',$v]]);//找出模型字段
-				if($find){
-					$list  .= '<li class="ui-state-highlight " data-name="'.$find['name'].'" data-id="'.$find['id'].'" data-field="'.$find['field'].'">'.$find['name'].'('.$find['field'].')</li>'; 
-				}
-			}
-			$listtrue ='';
-			foreach($field as $k=>$v){
-				if(!in_array($v['field'], ['id','status'])){
-					if($v['is_list']<>1){
-						  $listtrue  .= '<li class="ui-state-highlight " data-name="'.$v['name'].'" data-id="'.$v['id'].'" data-field="'.$v['field'].'">'.$v['name'].'('.$v['field'].')</li>';
-					  }
-				}
-			}
-            $fielcount = explode(",",$modue['count_field']);
-            $listcount ='';
-            foreach($field as $k=>$v){
-                if(!in_array($v['field'], ['id','status'])){
-                    if(in_array($v['field'], $fielcount)){
-                        $listcount  .= '<input id="listcount" type="checkbox" value="'.$v['field'].'" checked>'.$v['name'].'('.$v['field'].')</li>';
-                    }else{
-                        $listcount  .= '<input id="listcount" type="checkbox" value="'.$v['field'].'">'.$v['name'].'('.$v['field'].')</li>';
-                    }
-                }
-            }
-			return lib::custom($sid,$list,$listtrue,$field,$modue,$listcount);
+			return lib::custom($sid,$field,$modue);
 		}
 		if($act =='customOrder'){
 			$json = View::ver($sid['sid']);
@@ -258,14 +220,38 @@ class Control{
 				return json(['code'=>1,'msg'=>'保存失败']);
 			}
 		}
-        if($act =='customCount'){
+        if($act =='customSave'){
             $json = View::ver($sid['sid']);
-            $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['count_field'=>$sid['count_field'],'update_time'=>time()]);
-            if($ret){
-                return json(['code'=>0,'msg'=>'保存成功']);
-            }else{
-                return json(['code'=>1,'msg'=>'保存失败']);
+            unset($sid['sid']);
+            $count = [];
+            $list = [];
+            $list_name = [];
+            Field::saveWhere([['sid','=',$json['ver']['id']]],['is_list'=>0,'is_search'=>0,'search_type'=>'','update_time'=>time()]);//设置所有为未保存状态
+            foreach($sid as $k=>$v){
+                if(isset($v['count']) && $v['count']=='1'){
+                    $count[] = $k;
+                }
+                if(isset($v['list']) && $v['list']<>''){
+                    $list[$v['list']] = $k;
+                    $list_name[$v['list']] = $v['title'];
+                }
+                if(isset($v['search']) && $v['search'] <> ''){
+                    Field::saveWhere([['id','=',$v['id']]],['is_search'=>1,'search_type'=>$v['search'],'update_time'=>time()]);//更新查询条件
+                }
+                Field::saveWhere([['id','=',$v['id']]],['width'=>$v['width'],'update_time'=>time()]);//更新宽度
             }
+            ksort($list);ksort($list_name);
+            $list_field = implode(',',$list);
+            $field_name = implode(',',$list_name);
+            if($list_field !=''){
+                $modue = Modue::saveWhere([['sid','=',$json['ver']['id']]],['field'=>$list_field,'field_name'=>$field_name,'update_time'=>time()]);
+                $field = Field::saveWhere([['id','in',$list]],['is_list'=>1,'update_time'=>time()]);
+            }
+            $count_field = implode(',',$count);
+            if($count_field !=''){
+                $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['count_field'=>$count_field,'update_time'=>time()]);
+            }
+            return json(['code'=>0,'msg'=>'保存成功']);
         }
         if($act =='customShow'){
             $json = View::ver($sid['sid']);
@@ -324,7 +310,7 @@ class Control{
        $btns ='';
 	    if((in_array('add',$btnArray))){
 			$url = url('index/sfdp/sfdpCurd',['act'=>'add','sid'=>$sid]);
-			$btns .= '<a class="btn btn-primary radius" onclick=layer_show("新增","'.$url.'","850","500") ><i class="Hui-iconfont-add Hui-iconfont"></i> 新增</a> ';
+			$btns .= '<a class="btn btn-primary radius" onclick=layer_show("新增","'.$url.'","85","50") ><i class="Hui-iconfont-add Hui-iconfont"></i> 新增</a> ';
 		}
 	   if((in_array('Edit',$btnArray))){
 			$btns .= '<a onClick="edit('.$sid.')" class="btn btn-success radius"><i class="Hui-iconfont Hui-iconfont-edit"></i>修改</a> ';
@@ -350,6 +336,7 @@ class Control{
 		if($act =='index'){
 			$modueId = Modue::findWhere([['sid','=',$sid]]);//找出模型
 			$fieldId = Field::select([['sid','=',$sid]]);//找出模型字段
+            $sfdp_design = Design::find($sid_ver['sid']);
 			$search = [];
 			foreach($fieldId as $k=>$v){
 				if($v['is_search']==1){
@@ -380,6 +367,9 @@ class Control{
 					}
 					$search[] = $v;
 				}
+                if(in_array($v['field'],explode(',',$modueId['field']))){
+                    $field_lenth[$v['field']] = $v['width'] ?? '120';
+                }
 			}
 			$map = SfdpUnit::Bsearch($data,$sid);
 			$list = Data::getListData($sid,$map);
@@ -390,6 +380,7 @@ class Control{
 				'sid' =>$sid,
                 'table' => $sid_ver['s_db'],
 				'field'=>$field_name,
+                'field_lenth'=>$field_lenth ?? [],
                 'sql_field'=>$field_mysql_name,
                 'count_field'=>$modueId['count_field'],
 				'search' =>json_encode($search),
@@ -398,7 +389,8 @@ class Control{
 				'load_file' =>$list['field']['load_file'],
 				'show_field' =>$modueId['show_field'],
                 'show_type' =>$modueId['show_type'],
-                'show_fun' =>$modueId['show_fun']
+                'show_fun' =>$modueId['show_fun'],
+                'sfdp_design' =>$sfdp_design
 			];
 			$btns = explode(',',$modueId['btn']);
 			$btns_tohtml = self::btnArray($btns,$sid);
@@ -417,9 +409,7 @@ class Control{
 			$stv = [
 				-1=>'<span class="label label-danger radius" >退回修改</span>',0=>'<span class="label radius">保存中</span>',1=>'<span class="label radius" >流程中</span>',2=>'<span class="label label-success radius" >审核通过</span>'
 			];
-			foreach($list['list'] as $k=>$v){		
-				//$list['list'][$k]['id'] = '<input type="checkbox" value="'.$v['id'].'/'.$v['status'].'/'.$tablename.'" name="ids">';
-				//$list['list'][$k]['status'] =   $stv[$v['status']] ?? 'ERR';
+			foreach($list['list'] as $k=>$v){
 				$list['list'][$k]['url'] = '<a onClick=sfdp.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
 				$jsondata[$k] = array_values($list['list'][$k]);
 			}

@@ -21,6 +21,8 @@ use sfdp\fun\SfdpUnit;
 
 use sfdp\lib\unit;
 
+define('SFDP_Ver', '6.0.2' );
+
 define('BEASE_SFDPURL', realpath ( dirname ( __FILE__ ) ) );
 
 define('ROOT_PATH',dirname(dirname(__DIR__) . DIRECTORY_SEPARATOR, 1) . DIRECTORY_SEPARATOR . 'sfdp' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'template');
@@ -49,10 +51,14 @@ class Api
 	  * @param string $act 调用接口方法
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
-	 public function sfdpApi($act='list',$sid=''){
+	 public function sfdpApi($act='list',$sid='',$map = null){
 		if($act=='list' || $act=='fun' || $act=='create' || $act=='listData' ){
 			$s_type = input('s_type');
-			return Control::api($act,$s_type);
+            if ($act=='listData'){
+                return Control::api($act,$s_type,$map);
+            }else{
+                return Control::api($act,$s_type);
+            }
 		}
 		if($act=='node'){
 			$node = input('node');
@@ -91,7 +97,7 @@ class Api
 	  * @param string $act 调用接口方法
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
-	public function sfdpCurd($act='index',$sid='',$bid=''){
+	public function sfdpCurd($act='index',$sid='',$bid='',$search=[]){
 		if($act=='index2'){
 			$data = input('post.');
 			return Control::curd($act,$sid,$data,$this->topconfig);
@@ -108,6 +114,9 @@ class Api
                return Control::curd($act,$sid,'',$this->topconfig);
 			 }
 		}
+        if($act=='show'){
+           return Control::curd('add',$sid,'',$this->topconfig);
+        }
 		if($act=='edit'){
 			if (unit::is_post()) {
 				$data = input('post.');
@@ -123,7 +132,11 @@ class Api
              return Control::curd($act,$sid,'',$this->topconfig,$bid);
 		}
 		if($act=='GetData'){
-			$data = input('post.');
+            if(empty($search)){
+                $data = input('post.');
+            }else{
+                $data = $search;
+            }
 			return Control::curd($act,$sid,$data,$this->topconfig);
 		}
         if($act=='Data'){
