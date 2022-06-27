@@ -237,9 +237,9 @@ class Data{
             foreach($v['data'] as $k2=>$v2){
                 if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
                     if($v2['td_type']=='cascade'){
-                        $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun2($v2['checkboxes_func']);
+                        $v2['tpfd_data'] =  Data::getFun2($v2['checkboxes_func']);
                     }else{
-                        $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun($v2['checkboxes_func']);
+                        $v2['tpfd_data'] =  Data::getFun($v2['checkboxes_func']);
                     }
 
                 }
@@ -257,6 +257,9 @@ class Data{
                     $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
                     $sys_user = unit::gconfig('sys_user');
                     $field['list'][$k]['data'][$k2]['text'] = (new $sys_user())->value($v2['td_type'],$find[$v2['tpfd_db']]);
+                }elseif($v2['td_type']=='cascade'){
+                    $field['list'][$k]['data'][$k2]['tpfd_data'] = $v2['tpfd_data'];
+                    $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
                 }else{
                     $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
                 }
@@ -342,6 +345,7 @@ class Data{
                 }else{
                     $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
                 }
+                $field['list'][$k]['data'][$k2]['rvalue'] = $find[$v2['tpfd_db']];//增加真实值
             }
         }
         //字表数据
@@ -403,7 +407,7 @@ class Data{
         }
         $tpfd_data = [];
         foreach ($getData['msg'] as $k3 => $v3) {
-            if(!isset($v3['name']) || !isset($v3['id'])){
+            if(!array_key_exists('name',$v3) || !array_key_exists('id',$v3)){
                 return ['code'=>1,'msg'=>unit::errMsg(3004)];
             }
             $tpfd_data[$v3['id']] = $v3['name'];
@@ -431,8 +435,9 @@ class Data{
         if ($getData['code'] == -1) {
             return $getData;
         }
+
         foreach ($getData['msg'] as $k3 => $v3) {
-            if(!isset($v3['name']) || !isset($v3['id'])){
+            if(!array_key_exists('name',$v3) || !array_key_exists('id',$v3)){
                 return ['code'=>1,'msg'=>unit::errMsg(3004)];
             }
         }

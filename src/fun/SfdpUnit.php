@@ -36,7 +36,6 @@ class SfdpUnit{
 	public static function Bsearch($search,$sid){
 		$map =[];
 		$Modue = Modue::find($sid);
-		
 		if(isset($search['search']) && count($search)<>0){
 			$search_field = $search['search'];
 			$time_st = 0;
@@ -46,9 +45,7 @@ class SfdpUnit{
 					if(strpos($k,'@') !== false){
 						$time_st = 1;
 						$time_field = str_replace("@","",$k);
-						//var_dump(self::get_between($k, '@', '['));
 					}
-					
 					$info = Field::findWhere([['field','=',$k],['sid','=',$sid],['is_search','=',1]]);
 					if($info){
 						if($time_st ==1){
@@ -68,6 +65,9 @@ class SfdpUnit{
 					if($k=='uid'){
 						$map[] = ['uid','in',$v];
 					}
+                    if($k=='before_map' && !empty($v)){
+                        $map[] = $v;
+                    }
 				}
 				/*模块树过滤*/
 				if($Modue['show_type']==1 && $k==$Modue['show_field'] && $v != ''){
@@ -75,7 +75,6 @@ class SfdpUnit{
 				}
 			}
 		}
-		//var_dump($map);
 		return $map;
 	}
 	

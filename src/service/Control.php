@@ -250,6 +250,8 @@ class Control{
             $count_field = implode(',',$count);
             if($count_field !=''){
                 $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['count_field'=>$count_field,'update_time'=>time()]);
+            }else{
+                $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['count_field'=>'','update_time'=>time()]);
             }
             return json(['code'=>0,'msg'=>'保存成功']);
         }
@@ -353,7 +355,7 @@ class Control{
                             if(!class_exists($className)){
                                 return 'Sorry,未找到自定函数，请先配置~';
                             }
-                            $getData = (new $className())->func($v['function'],'all');
+                            $getData = (new $className())->func($v['function']);
                         }
 						if($getData['code']==-1){
 							echo '<h2>系统级错误：'.$getData['msg'].'</h2>';exit;

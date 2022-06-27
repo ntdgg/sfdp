@@ -49,6 +49,7 @@ var sfdpPlug = {
         }
         var fieldArray = {
             text : '<input  type="text"  name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input">',
+            money : '<input  type="text"  name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input">',
             number :'<input  type="number" name="' + item.field + '"  placeholder="'+item.name+'" class="layui-input">',
             radio : (sfdpPlug.checkboxes_clss(item.id,'radio','',item.field,'',item.tpfd_data,data.tpfd_check)).replace(/<a>(.+?)<\/a>/g,''),
             checkboxes : sfdpPlug.checkboxes_clss(item.id,'checkboxes','',item.field,'',item.tpfd_data,data.tpfd_check).replace(/<a>(.+?)<\/a>/g,''),
@@ -75,7 +76,7 @@ var sfdpPlug = {
             checkboxes = sfdpPlug.checkboxes_clss(data.tpfd_id,'checkboxes',att,name,value,data.tpfd_data,data.tpfd_check);
         }
         if(type=='dropdown'){
-            view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,'','',data.tpfd_name);
+            view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,'',data.rvalue,data.tpfd_name);
         }
         if(type=='dropdowns'){
             view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,1,data.rvalue,data.tpfd_name);
@@ -84,11 +85,19 @@ var sfdpPlug = {
             selectTree[data.tpfd_id] =data.tpfd_data;
             view_selects = sfdpPlug.view_select2(data.tpfd_data, name, value , att, data.tpfd_id);
         }
+        if(type=='money'){
+            var max_num= [1,10,100,1000,10000,100000,1000000,10000000,10000000,10000000];
+            var szcd = ((data.tpfd_dbcd).split(','))[0] || 0
+            var xscd = ((data.tpfd_dbcd).split(','))[1] || 0
+            var max_number = max_num[szcd-2] || 10;
+        }
+
         var fieldArray = {
             text : '<input type="text" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
             number :'<input type="number" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
+            money :'<input type="text" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '" onkeyup="this.value=/^[0-9]*\\.?[0-9]{0,'+(xscd || 0)+'}$/.test(this.value) ? this.value : this.value.substring(0,this.value.length-1)" onblur="if(this.value>'+(max_number || 0)+'){layer.msg(\'不符合，最大值为'+(max_number || 0)+'。\');this.value='+(max_number-1 || 0)+';}">',
             radio : radios,
-            checkboxes : checkboxes,
+        checkboxes : checkboxes,
             textarea  : '<textarea id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea>',
             dropdown  : view_selects,
             dropdowns  : view_selects,
@@ -115,10 +124,10 @@ var sfdpPlug = {
     },
     view_select: function (data, field, value, attr, selectId,is_dx=0,rvalue='',title='') {
         if(is_dx==1){
-            var tags = `<input id="${selectId}_val" type="hidden" value="${rvalue}" name="${field}"><select  ${attr} id="${selectId}" class="this-select" data-widget="select2"  data-value="${value}" lay-search multiple="true">`
+            var tags = `<input id="${selectId}_val" type="hidden" value="${rvalue}" name="${field}"><select  ${attr} id="${selectId}" class="this-select" data-widget="select2"   data-rvalue="${rvalue}" data-value="${value}" lay-search multiple="true">`
         }else{
-            var tags = `<select name="${field}" ${attr} id="${selectId}" class="this-select" data-widget="select2"  data-value="${value}" lay-search>`
-            tags += ` <option value="">${title}请选择</option>`;
+            var tags = `<select name="${field}" ${attr} id="${selectId}" class="this-select" data-widget="select2" data-rvalue="${rvalue}"   data-value="${value}" lay-search>`
+            tags += ` <option value="">请选择${title}</option>`;
         }
         if (value !== undefined ) {
             var strs = (value).split(",");

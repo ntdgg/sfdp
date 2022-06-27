@@ -1,12 +1,11 @@
 /*!
- * SFDP 表单设计器---公用方法库
- * http://cojz8.com
- *
+ * SFDP 表单设计器---核心设计器
  *
  * Released under the MIT license
- * http://cojz8.com
+ * https://cojz8.com
  *
- * Date: 2020年3月4日23:34:39
+ * Date: 2022年4月01日
+ * 使用声明：本版权不可删除，删除将承担侵权责任
  */
 var Debug = false;//是否开启打印模式
 var NameExp = /^[\u4e00-\u9fa5]{0,}$/; //中文名称正则运算
@@ -148,7 +147,7 @@ var sfdp = {
                         }
                     }
                 }
-                let btn = '<div class="' + sfdp.ui.rows + '" style="text-align: center;"><div class="layui-input-block"><a  class="'+sfdp.ui.btn_ok+' savedata" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</a><a class="'+sfdp.ui.btn_close+'" onclick=sfdp.layer_close()>&nbsp;&nbsp;取消&nbsp;&nbsp;</a></div></div>';
+                let btn = '<div class="' + sfdp.ui.rows + '" style="text-align: center;"><div class="layui-input-block"><a is_post="0"  class="'+sfdp.ui.btn_ok+' savedata" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</a><a class="'+sfdp.ui.btn_close+'" onclick=sfdp.layer_close()>&nbsp;&nbsp;取消&nbsp;&nbsp;</a></div></div>';
                 $("#table_view").append(btn);
                 $(document).attr("title", int_data.name);
             }
@@ -260,7 +259,7 @@ var sfdp = {
             htmls = htmls.replace(reg,'Atr'+length+"_dropdown_");
         }
         $('#'+id+'_table tbody').append(htmls+'<td> <a onclick="sfdp.dl(this)" class="layui-btn layui-btn-xs">删</a></td>');
-        $('.this-select').select2();
+        $('.this-select').select2({width:'100%'});
         sfdp.setDate();
     },
     fz: function (obj) {
@@ -316,7 +315,7 @@ var sfdp = {
         }
         var show ='';
         if(old_data.show === '0'){
-             show = `style='display:none'`;
+            show = `style='display:none'`;
         }
         html = `<div id="${code}" class='${sfdp.ui.rows}'  ${show}>${htmls}</div>`;
         return html;
@@ -327,7 +326,13 @@ var sfdp = {
     common_return: function (data) {
         if (data.code === 0) {
             layer.msg(data.msg, {icon: 1, time: 1500}, function () {
-                parent.location.reload(); // 父页面刷新
+                var index = parent.layer.getFrameIndex(window.name);
+                try {
+                    parent.layui.table.reload('tabledata');
+                    parent.layer.close(index);
+                }catch (exc) {
+                    parent.location.reload();
+                }
             });
         } else {
             layer.alert(data.msg || data.responseJSON.message, {title: "错误信息", icon: 2});
@@ -653,7 +658,7 @@ var sfdp = {
     },
     /*5.0.1 默认组件*/
     tpfd_moren: function (data) {
-        return '<div class="sfdp-form-item"><label class="sfdp-label">占位内容</label><div class="sfdp-input-block"><input type="text" name="tpfd_zanwei" value="' + data.tpfd_zanwei + '" class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">默认内容</label><div class="sfdp-input-block"><input name="tpfd_moren" type="text" value="' + data.tpfd_moren + '" class="sfdp-input"></div></div>';
+        return '<div class="sfdp-form-item"><label class="sfdp-label">默认内容</label><div class="sfdp-input-block"><input type="text" name="tpfd_zanwei" value="' + data.tpfd_zanwei + '" class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">占位内容</label><div class="sfdp-input-block"><input name="tpfd_moren" type="text" value="' + data.tpfd_moren + '" class="sfdp-input"></div></div>';
     },
     /*5.0.1 列表组件*/
     tpfd_list: function (data) {
@@ -690,7 +695,7 @@ var sfdp = {
     },
     /*5.0.1 通用设置组件*/
     tpfd_common: function (data) {
-        var default_field = [{cid: 'int', clab: 'int', checked: ''}, {cid: 'time', clab: 'time', checked: ''}, {cid: 'varchar', clab: 'varchar', checked: 'checked'}, {cid: 'datetime', clab: 'datetime',checked: ''}, {cid: 'date', clab: 'date',checked: ''}, {cid: 'longtext', clab: 'longtext', checked: ''}];
+        var default_field = [{cid: 'int', clab: 'int', checked: ''}, {cid: 'time', clab: 'time', checked: ''}, {cid: 'varchar', clab: 'varchar', checked: 'checked'}, {cid: 'decimal', clab: 'decimal', checked: 'checked'}, {cid: 'datetime', clab: 'datetime',checked: ''}, {cid: 'date', clab: 'date',checked: ''}, {cid: 'longtext', clab: 'longtext', checked: ''}];
         return '<input name="tpfd_id" type="hidden" value="' + data.tpfd_id + '"><input name="tr_id" type="hidden" value="' + data.tr_id + '"><div  style="margin: 5px;"><div class="sfdp-title">字段设置</div></div><div class="sfdp-form-item"><label class="sfdp-label">唯一标识</label><div class="sfdp-input-block"><input type="text"  autocomplete="off" value="' + data.tpfd_id + '" readonly class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">字段标题</label><div class="sfdp-input-block"> <input id="tpfd_name"  name="tpfd_name" type="text"  value="' + data.tpfd_name + '"  class="sfdp-input"> </div></div><div class="sfdp-form-item"><label class="sfdp-label">字段名称</label><div class="sfdp-input-block"> <input id="tpfd_db" name="tpfd_db" type="text" value="' + data.tpfd_db + '"  class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段类型</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_field, 'tpfd_dblx', (data.tpfd_dblx || 'varchar')) + ' </div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段长度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_dbcd" type="text" value="' + (data.tpfd_dbcd || '255')  + '" class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">组件宽度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_width" type="text" value="' + (data.tpfd_width || '120')  + '" class="sfdp-input"></div></div>' + sfdp.tpfd_list(data);
     },
     /*5.0.1 上传控制组件*/
@@ -738,6 +743,9 @@ var sfdp = {
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + '</div>';
                 break;
             case 'number':
+                var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + sfdp.tpfd_gaoji(data)+ sfdp.tpfd_moren(data) + '</div>';
+                break;
+            case 'money':
                 var html = '<form id="fieldform"><div>' + sfdp.tpfd_common(data)  + sfdp.tpfd_gaoji(data)+ sfdp.tpfd_moren(data) + '</div>';
                 break;
             case 'checkboxes':
@@ -813,6 +821,9 @@ var sfdp = {
             case 'number':
                 var html = '<label ' + labid + ' class="sfdp-label">数字控件</label><div class="sfdp-input-block"><input  type="number"  placeholder="" disabled class="sfdp-input"></div><b class="ico red" id="del_con">㊀</b>';
                 break;
+            case 'money':
+                var html = '<label ' + labid + ' class="sfdp-label">金额控件</label><div class="sfdp-input-block"><input  type="money"  placeholder="" disabled class="sfdp-input"></div><b class="ico red" id="del_con">㊀</b>';
+                break;
             case 'upload':
                 var html = '<label ' + labid + ' class="sfdp-label">上传控件</label>上传 <b class="ico red" id="del_con">㊀</b>';
                 break;
@@ -873,7 +884,7 @@ var sfdp = {
     /*5.0.1 数据库设计自动带数据*/
     sys_config: function () {
         var json_data = JSON.parse(localStorage.getItem("json_data"));
-        var xEdit = '', xDel = '', xStatus = '', xWorkFlow = '';
+        var xEdit = '', xDel = '', xStatus = '', xWorkFlow = '', XImport = '';
         if (json_data.tpfd_btn === 'undefined') {
             json_data.tpfd_btn = {};
         }
@@ -910,6 +921,7 @@ var sfdp = {
         var mycars = []
         mycars['int'] = 11
         mycars['varchar'] = 255
+        mycars['decimal'] = '5,2'
         mycars['time'] = 0
         mycars['datetime'] = 0
         mycars['longtext'] = 0
@@ -1384,18 +1396,24 @@ $("#sfdp-main").on("click", "#del", function (event) {
     }
     event.stopPropagation();
 });
-/*5.0.5 监听删除点击事件*/
+/*6.0.0*/
 $("#sfdp-main").on("click", "#del_con", function (event) {
-    $(this).parent().parent().removeClass("fb-disabled ui-sortable-disabled");
-    $(this).parent().parent().addClass("fb-fz ui-sortable");
-    $(this).parent().parent().sortable("enable");
-    let parent_id = $(this).parent().parent().parent().attr("id");//得到父元素的ID
-    let id = $(this).parent().children("label").attr("data-id");
-    var mode = $('#' + parent_id).attr('mode') || 'zhubiao';
-    if (mode === 'zhubiao') {
-        sfdp.dataSave({tpfd_id: id}, parent_id, 'td_del');
-    } else {
+    var mode = 'zhubiao';
+    var parent_id = $(this).parent().parent().parent().attr("id");//得到父元素的ID
+    //判断是否是子表
+    if(parent_id.indexOf("_field") >= 0 ) {
+        $(this).parent().removeClass("fb-disabled ui-sortable-disabled");
+        $(this).parent().addClass("fb-fz ui-sortable");
+        $(this).parent().sortable("enable");
+        var parent_id = $(this).parent().parent().attr("id");//得到父元素的ID
+        var id = $(this).parent().children("label").attr("data-id");
         sfdp.dataSave({tpfd_id: id}, parent_id, 'sublist_td_del');
+    }else{
+        $(this).parent().parent().removeClass("fb-disabled ui-sortable-disabled");
+        $(this).parent().parent().addClass("fb-fz ui-sortable");
+        $(this).parent().parent().sortable("enable");
+        var id = $(this).parent().children("label").attr("data-id");
+        sfdp.dataSave({tpfd_id: id}, parent_id, 'td_del');
     }
     $(this).parent().empty();
     event.stopPropagation();
@@ -1409,33 +1427,64 @@ $("#sfdp-main").on("click", ".sfdp-label", function (event) {
     $('.sfdp-att').html(html);
     event.stopPropagation();
 });
-/*5.0.1 监听栅格变化设计*/
+/*6.0.0 监听栅格变化设计 优化处理*/
 $(document).on("input propertychange", "#row-num", function (e) {
     var p_id = $('#row-id').val();
     var num = $(this).val();
+    if(num==0){
+        layer.msg('Tip:栅格不能为空。');
+        return;
+    }
     if (num < 0 || num > 12) {
         $(this).val(12);
         num = 12;
         layer.msg('Tip:栅格布局只能在1~12区间。');
         return;
     }
-    var sl = num;
+    var nowcd = $('#' + p_id + ' .sfdp-field-con').length;
     var lan = parseInt(12 / num);
-    var html = '';
-    for (var i = 1; i <= sl; i++) {
-        html += '<div class="col-' + lan + ' sfdp-field-con fb-fz" id=' + i + '></div>';
-    }
+    var old_lan = parseInt(12 / nowcd);
     var mode = $('#' + p_id).attr('mode') || 'zhubiao';
+    if(num>nowcd){
+        $('#' + p_id + ' .sfdp-field-con').removeClass('col-'+old_lan);
+        $('#' + p_id + ' .sfdp-field-con').addClass('col-'+lan);
+        $('#' + p_id).append(`<div class="col-${lan} sfdp-field-con fb-fz" id=${num}></div>`);
+    }else{
+        $('#' + p_id + ' .sfdp-field-con').removeClass('col-'+old_lan);
+        $('#' + p_id + ' .sfdp-field-con').addClass('col-'+lan);
+        var removeid = $('#' + p_id + ' .sfdp-field-con:last label').attr("data-id");
+        $('#' + p_id + ' .sfdp-field-con').eq(-1).remove();
 
-    $('#' + p_id + ' .sfdp-field-con').remove();
-    $('#' + p_id + ' .view-action').after(html);
-    if (mode === 'zhubiao') {
-        var show = $("select[name='show']").find("option:selected").val();
-        sfdp.dataSave({tr: p_id, data: {}, type: sl, show: show}, p_id, 'tr');
-    } else {
-        sfdp.dataSave({id: p_id, title: '', data: {}, type: sl}, p_id, 'sublist');
     }
     sfdp.setSortable();
+
+    var json_data = JSON.parse(localStorage.getItem("json_data"));
+
+    if (mode === 'zhubiao') {
+        var show = $("select[name='show']").find("option:selected").val();
+        var trdata = json_data.list[p_id].data;//Json数据
+        if(num>nowcd){
+            sfdp.dataSave({tr: p_id, data: trdata, type: num, show: show}, p_id, 'tr');
+        }else{
+            var datacd = Object.keys(trdata).length;//数据长度
+            if(num<datacd){
+                delete trdata[removeid];
+            }
+            sfdp.dataSave({tr: p_id, data: trdata, type: num, show: show}, p_id, 'tr');
+        }
+    } else {
+        //处理子表的栅格增加和删除
+        var trdata = json_data.sublist[p_id];//Json数据
+        if(num>nowcd){
+            sfdp.dataSave({id: p_id, title: trdata.title, data: trdata.data, type: num}, p_id, 'sublist');
+        }else{
+            var datacd = Object.keys(trdata.data).length;//数据长度
+            if(num<datacd){
+                delete trdata.data[removeid];
+            }
+            sfdp.dataSave({id: p_id, title: trdata.title, data: trdata.data, type: num}, p_id, 'sublist');
+        }
+    }
 });
 /*5.0.1 监听子表标题设置*/
 $(document).on('input propertychange', "select[name='show']", function(event) {
@@ -1443,7 +1492,7 @@ $(document).on('input propertychange', "select[name='show']", function(event) {
     var show = $(this).val();
     var json_data = JSON.parse(localStorage.getItem("json_data"));
     var trdata = json_data.list[p_id];
-        trdata['show'] = show;
+    trdata['show'] = show;
     sfdp.dataSave(trdata, p_id, 'tr');
 });
 

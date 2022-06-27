@@ -339,12 +339,12 @@ php;
 				<div class="sfdp-cl" ></div>
 				<div class="sfdp-tool-title sfdp-mt10">页面布局 Form control library</div>
 				<div class='sfdp-tool-fix'onclick='sfdp.build_bj()'><a>&#8194;<b class='ico'>↭</b>&#8194;栅格布局 </a></div>
-				<div class='sfdp-tool-fix'onclick='sfdp.openfullpage("脚本","{$script}")'><a>&#8194;<b class='ico'>∮</b>&#8194;脚本开发 </a></div>
 				<div class='sfdp-tool-fix'onclick='sfdp.openfullpage("构建助手","{$mysql}")'><a>&#8194;<b class='ico'>ς</b>&#8194;构建助手 </a></div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">表单控件库 Form control library</div>
 					<div class="sfdp-tool-con" ><a data="text">&#8194;<b class='ico'>Α</b>&#8194;文本</a></div>
 					<div class="sfdp-tool-con" ><a data="number">&#8194;<b class='ico'>½</b>&#8194;数字</a></div>
+					<div class="sfdp-tool-con" ><a data="money">&#8194;<b class='ico'>￥</b>&#8194;金额</a></div>
 					<div class="sfdp-tool-con"><a data="checkboxes">&#8194;<b class='ico'>☑</b>&#8194;多选框</a></div>
 					<div class="sfdp-tool-con"><a data="radio">&#8194;<b class='ico'>◉</b>&#8194;单选框</a></div>
 					<div class="sfdp-tool-con"><a data="dropdown">&#8194;<b class='ico'>≡</b>&#8194;下拉组件 </a></div>
@@ -491,21 +491,23 @@ php;
 		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/dracula.css" />
 		<script src="{$patch}lib/codemirror/codemirror.js"></script>
 		<script src="{$patch}lib/codemirror/javascript.js"></script>
+		
 			<form action="{$action}" method="post" name="form" id="form">
 			<input type="hidden" name="sid" value="{$sid}">
 		<table class="table">
 			<tr valign="center">
-			<td style='width:35px;text-align:center'>脚本说明</td>
+			<td style='width:35px;text-align:center'>脚本助手</td>
 			<td style='width:330px;text-align: left;'>
-			脚本说明：<br/>
-			load_satr_fun();//前置函数在表单构建器之前会执行，比如插入必要的组件代码。<br/>
-			</bq>load_end_fun();//后置代码用于页面加载完成后的代码执行<br/>
-			</pre>
+                <a class="button" onclick="install(load_satr_fun)">编辑前事件脚本<a/> 
+                <a class="button" onclick="install(load_end_fun)">页面加载后脚本<a/> 
+                <a class="button" onclick="install(load_form_check)">提交验证脚本<a/> 
+                <a class="button" onclick="install(load_end_view)">查看页面脚本<a/> 
+                <a class="button" onclick="install(load_list_fun)">列表页面脚本<a/>
 			</td>
 			</tr>
 			<tr valign="center">
 			<td style='width:35px;text-align:center'>单据脚本</td><td style='width:330px' >
-			<textarea placeholder="请填写JQ脚本代码！" name='function' type="text/plain" style="width:100%;height:450px;display:inline-block;" id='code'>{$info['s_fun']}</textarea> </td>
+			<textarea placeholder="请填写JQ脚本代码！" name='function'  type="text/plain" style="width:100%;height:450px;display:inline-block;" id='code'>{$info['s_fun']}</textarea> </td>
 			</tr>
 			<tr valign="center">
 			<td style='text-align:center' colspan='2'><button  class="button" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
@@ -525,6 +527,7 @@ php;
 		  });
 		   editor.setSize('auto',document.body.clientHeight - 140 +"px");
 	</script>
+	<script src="{$patch}sfdp.tpl.js"></script>
 </body>
 </html>
 php;
@@ -547,6 +550,7 @@ php;
 		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/dracula.css" />
 		<script src="{$patch}lib/codemirror/codemirror.js"></script>
 		<script src="{$patch}lib/codemirror/javascript.js"></script>
+		
 		<table class="table">
 			<tr valign="center">
 			<td style='width:35px;text-align:center'>构建助手说明</td>
