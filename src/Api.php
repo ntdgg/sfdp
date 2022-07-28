@@ -21,7 +21,7 @@ use sfdp\fun\SfdpUnit;
 
 use sfdp\lib\unit;
 
-define('SFDP_Ver', '6.0.4' );
+define('SFDP_Ver', '6.0.5' );
 
 define('BEASE_SFDPURL', realpath ( dirname ( __FILE__ ) ) );
 
@@ -42,6 +42,7 @@ class Api
 		'<script>
 		var g_uid='.$ginfo['uid'].';
 		var g_role='.$ginfo['role'].';
+		var g_saas='.$ginfo['saas_id'].';
 		var g_username="'.$ginfo['username'].'";
 		var g_sid='.$sid.';
 		</script>';

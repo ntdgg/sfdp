@@ -110,7 +110,7 @@ var sfdp = {
                 layer.msg('对不起，没有任何数据~');
             }else
             {
-                $('#table').html('<form action="" method="post" name="form" id="form" class="'+ sfdp.ui.form +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"></div></form>');
+                $('#table').html('<form action="" method="post" name="form" id="form" class="'+ sfdp.ui.form +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><input type="hidden" readonly name="@saas_id" value="' + int_data.tpfd_saas + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"></div></form>');
                 //恢复主表单设计
                 for (x in int_data.list) {
                     let table = sfdp.table_build(int_data.list[x]['type'], int_data.list[x], showtype);//恢复表单布局设计
@@ -153,7 +153,7 @@ var sfdp = {
             }
         }
         if(s_type ==1){
-            $('#table').html('<style>.layui-input, .layui-textarea {display: inline-block;}</style><form action="" method="post" name="form" id="form" class="'+ sfdp.ui.form +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"><div id="sfdp_html2">'+int_data.tpfd_content+'</div></div></form>');
+            $('#table').html('<style>.layui-input, .layui-textarea {display: inline-block;}</style><form action="" method="post" name="form" id="form" class="'+ sfdp.ui.form +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"><input type="hidden" readonly name="@saas_id" value="' + int_data.tpfd_saas + '"><div id="sfdp_html2">'+int_data.tpfd_content+'</div></div></form>');
             let btn = '<div class="' + sfdp.ui.rows + '" style="text-align: center;"> <div class="layui-input-block"><a  class="'+sfdp.ui.btn_ok+' savedata" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</a><a class="'+sfdp.ui.btn_close+'" onclick=sfdp.layer_close()>&nbsp;&nbsp;取消&nbsp;&nbsp;</a></div></div>';
             var html = sfdpEditor.convert_data_html(int_data,showtype);
             $("#table_view").append(btn);
@@ -483,6 +483,8 @@ var sfdp = {
         $(".datetime").click(function () {
             var type = $(this).attr('data-type');
             var format = $(this).attr('data-format');
+            var keyid = $(this).attr('id');
+            
             $(this).removeAttr("lay-key");
             laydate.render({
                 elem: this,
@@ -490,19 +492,30 @@ var sfdp = {
                 show: true,
                 type: type,
                 zIndex: 99999999,
-                trigger: 'click'
+                trigger: 'click',
+                done: function(value, date, endDate){
+                    if($.isFunction(window.load_end_time_done)){
+					    load_end_time_done(keyid,value); 
+    				}
+                  }
             });
         });
         $(".time_range").click(function () {
             var format = $(this).attr('data-format');
             $(this).removeAttr("lay-key");
+            var keyid = $(this).attr('id');
             laydate.render({
                 elem: this,
                 show: true,
                 type: format,
                 range: true,
                 zIndex: 99999999,
-                trigger: 'click'
+                trigger: 'click',
+                done: function(value, date, endDate){
+                    if($.isFunction(window.load_end_time_done)){
+					    load_end_time_done(keyid,value); 
+    				}
+                  }
             });
         });
     },
@@ -550,8 +563,11 @@ var sfdp = {
             type: 'post',
             dataType: 'json',
             success: function (ret) {
-                layer.msg('请求成功！');
-                setActive(ret);
+                if($.isFunction(setActive)){
+                    setActive(ret);
+                }else{
+                    layer.msg('请求成功！');
+                }
                 return ret;
             },
             error: function () {
@@ -844,6 +860,7 @@ var sfdp = {
                 break;
             case 'dropdown':
                 var html = '<label ' + labid + ' class="sfdp-label">下拉选择</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> <b class="ico red" id="del_con">㊀</b>';
+                break;
             case 'dropdowns':
                 var html = '<label ' + labid + ' class="sfdp-label">下拉多选</label><div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> <b class="ico red" id="del_con">㊀</b>';
                 break;
@@ -904,9 +921,28 @@ var sfdp = {
         if (isInArray(btnArray, 'Import')) {
             XImport = 'checked';
         }
+        if (json_data.tpfd_del=='0') {
+           var s_del = 'checked';
+        }else{
+            var s_del2 = 'checked';
+        }
+        if (json_data.tpfd_saas=='0') {
+            var s_saas = 'checked';
+        }else{
+            var s_saas2 = 'checked';
+        }
+        if (isInArray(btnArray, 'Import')) {
+            XImport = 'checked';
+        }
         var html = '<form id="configform"> <div class="sfdp-form-item"><label class="sfdp-label">表单标题</label><div class="sfdp-input-block"><input name="name" type="text" value="' + json_data.name + '" class="sfdp-input"></div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">数据表名</label><div class="sfdp-input-block"><input name="name_db" type="text" value="' + (json_data.name_db) + '"' + ((look_db) == '1' ? 'readonly' : '') + ' class="sfdp-input"></div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">列表控件</label><div class="sfdp-input-block"><input  name="tpfd_btn" value=add type="checkbox" checked  onclick="return false;">Add <input  name="tpfd_btn" value=Edit type="checkbox" ' + xEdit + ' >Edit <input  name="tpfd_btn" value=Del type="checkbox" ' + xDel + ' >Del <input  name="tpfd_btn" value=View type="checkbox" checked  onclick="return false;">View <input  name="tpfd_btn" value=Status ' + xStatus + ' type="checkbox">Status <input  name="tpfd_btn" value=WorkFlow type="checkbox" ' + xWorkFlow + '>WorkFlow <input  name="tpfd_btn" value=Import type="checkbox" ' + XImport + '>Import<br/>控件说明：status Workflow同时选中优先使用workflow</div></div>' +
+            '<div class="sfdp-form-item"><label class="sfdp-label">数据软删</label><div class="sfdp-input-block">' +
+            '<input  name="tpfd_del" value=0 type="radio" ' + (s_del || '') + '>是' +
+            '<input  name="tpfd_del" value=1 type="radio" ' + (s_del2 || '') + '>否</div></div>' +
+            '<div class="sfdp-form-item"><label class="sfdp-label">租户模式</label><div class="sfdp-input-block">' +
+            '<input  name="tpfd_saas" value=0 type="radio" ' + (s_saas || '') + '>是' +
+            '<input  name="tpfd_saas" value=1 type="radio" ' + (s_saas2 || '') + '>否</div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">表单样式</label><div class="sfdp-input-block"><textarea id="tpfd_class" name="tpfd_class">' + json_data.tpfd_class + '</textarea><a onclick=sfdp.insFgf("tpfd_class")>分割</a></div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">脚本控件</label><div class="sfdp-input-block"><tr><td><div><textarea id="tpfd_script" name="tpfd_script">' + json_data.tpfd_script + '</textarea><a onclick=sfdp.insFgf("tpfd_script")>分割</a></div></div>(一个脚本文件，后面需要加一个分隔符@@)</div></td></tr><tr><td><div style="margin-left: 15%;" class="button" onclick="sfdp.save_data()">保存</div></td></tr></table></form> ';
         layer.open({
@@ -1104,9 +1140,12 @@ var sfdp = {
             json_data['tpfd_btn'] = params.tpfd_btn;
             json_data['tpfd_class'] = params.tpfd_class;
             json_data['tpfd_script'] = params.tpfd_script;
+            json_data['tpfd_del'] = params.tpfd_del;
+            json_data['tpfd_saas'] = params.tpfd_saas;
             localStorage.setItem("json_data", JSON.stringify(json_data));
             sfdp.ShowTip(' 设置成功 ！');
             setTimeout(function () {
+                $("#up_save").trigger("click");
                 layer.closeAll();
             }, 2000);
             logout('初始化配置成功！');

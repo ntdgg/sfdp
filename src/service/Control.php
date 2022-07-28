@@ -146,13 +146,13 @@ class Control{
 			//版本字段写入字段数据库
 			$fieldId = Field::add($varInfo['ver']['id'],$varInfo['db']);
 			//创建数据表
-			$BuildTable = BuildTable::Btable($json['name_db'],$varInfo['db'],$all['tpfd_btn'],$all['name']);
+			$BuildTable = BuildTable::Btable($json['name_db'],$varInfo['db'],$all['tpfd_btn'],$all['name'],$all);
 			if($BuildTable['code']==-1){
 				return json($BuildTable);
 			}
 			//判断是否有附表
 			if(isset($json['sublist']) && $json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
-				$Stable = BuildStable::Btable($json['name_db'],$json['sublist']);
+				$Stable = BuildStable::Btable($json['name_db'],$json['sublist'],$all);
 				if($Stable['code']==-1){
 					return json($Stable);
 				}

@@ -36,10 +36,13 @@ class Modue{
 	 * 添加
 	 */
 	static function add($varInfo,$btn){
+        $ver = json_decode($varInfo['ver']['s_field'],true);
 		$data = [
 			'sid'=>$varInfo['ver']['id'],
 			'title'=>$varInfo['ver']['s_name'],
 			'dbtable'=>$varInfo['ver']['s_db'],
+            'is_delete'=>$ver['tpfd_del'] ?? 1,
+            'is_saas'=>$ver['tpfd_saas'] ?? 1,
 			'btn'=> implode(',',$btn)
 		];
 		return (new Modue())->mode->add($data);		

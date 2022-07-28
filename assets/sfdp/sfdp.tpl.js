@@ -60,3 +60,11 @@ var load_list_fun='\n\rfunction load_list_fun(){'+
     '//Eg:插入一个按钮:$(\'.addbtn\').after(\'<a>按钮</a>\');\r' +
     '' +
     '}';
+
+/*列表事件*/
+var load_end_time_done='\n\rfunction load_end_time_done(id,val){'+
+    '\r' +
+    '//Eg:id 日期组件回调id;\r' +
+    '//Eg:val 日期组件回调值;\r' +
+    '' +
+    '}';

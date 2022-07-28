@@ -25,6 +25,9 @@ class Script{
 		}
 		$this->mode = new $className();
     }
+    public static function getVer($id){
+        return (new Script())->mode->getVer($id);
+    }
 	/**
 	 * 脚本查询
 	 */
@@ -48,7 +51,7 @@ class Script{
 			$bill = $ver['s_bill'];
 		}else{
 			$id = $info['id'];
-			(new Script())->mode->update(['id'=>$info['id'],'s_fun'=>$data['function']]);
+			(new Script())->mode->update(['id'=>$info['id'],'s_fun'=>$data['function'],'add_time'=>time()]);
 			$bill=$info['s_bill'];
 		}
 		$map[] = ['sid','=',$data['sid']];

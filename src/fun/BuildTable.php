@@ -22,7 +22,7 @@ class BuildTable{
 	/**
      * 创建数据表
      */
-    static function Btable($table,$data,$btn,$name)
+    static function Btable($table,$data,$btn,$name,$all='')
     {
 		if (in_array($table, unit::gconfig('black_table'))) {
 			return ['msg'=>'该数据表不允许创建','code'=>1];
@@ -36,7 +36,14 @@ class BuildTable{
             $tableExist = true;
         }
 		//内置字段
+        //tpfd_del  tpfd_saas
         $auto_create_field = ['id','uid','status', 'create_time', 'update_time'];
+        if(isset($all['tpfd_del']) && $all['tpfd_del']==0){
+            array_push($auto_create_field,"is_delete");
+        }
+        if(isset($all['tpfd_saas']) && $all['tpfd_saas']==0){
+            array_push($auto_create_field,"saas_id");
+        }
         $fieldAttr = [];
 		$fieldAttr[] = unit::tab(1) . "`id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键'";
         $key = [];
@@ -50,15 +57,20 @@ class BuildTable{
             }
         }
 		$fieldAttr[] = unit::tab(1) . "`uid` int(10) DEFAULT '0' COMMENT '用户id'";
-		$fieldAttr[] = unit::tab(1) . "`status` int(10)  DEFAULT '0' COMMENT '审核状态'";
+		$fieldAttr[] = unit::tab(1) . "`status` int(10)  DEFAULT '0' COMMENT '审核状态[-1:退回修改 0:正常 1:流程中 2:审批完成]'";
 		$fieldAttr[] = unit::tab(1) . "`create_time` int(10)  DEFAULT '0' COMMENT '新增时间'";
 		$fieldAttr[] = unit::tab(1) . "`update_time` int(10)  DEFAULT '0' COMMENT '更新时间'";
 		if((in_array('WorkFlow',$btn)) || (in_array('Status',$btn))){
 			$fieldAttr[] = unit::tab(1) . "`uptime` int(10)  DEFAULT '0' COMMENT '工作流调用更新时间'";
 		}
+        if(in_array('saas_id',$auto_create_field)){
+            $fieldAttr[] = unit::tab(1) . "`saas_id` varchar(255) DEFAULT NULL COMMENT '关联租户id'";
+        }
+        if(in_array('is_delete',$auto_create_field)){
+            $fieldAttr[] = unit::tab(1) . "`is_delete` int(11) DEFAULT '0' COMMENT '关联软删除字段[0:正常 1:删除]'";
+        }
 		$fieldAttr[] = unit::tab(1) . "PRIMARY KEY (`id`)";
         $sql_drop = "DROP TABLE IF EXISTS `{$tableName}`";//删除数据表
-		
 		if((in_array('WorkFlow',$btn))){
 			$sql_create = "CREATE TABLE `{$tableName}` (\n"
 				. implode(",\n", array_merge($fieldAttr, $key))

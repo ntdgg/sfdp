@@ -162,7 +162,8 @@ class Design{
     static function getAddData($sid){
         $sfdp_ver_info = (new Design())->mode->findVer($sid);
         if($sfdp_ver_info['s_fun_id']>0){
-            $fun = '<script src="/static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js"></script>';
+            $sfdp_script_ver = Script::getVer($sfdp_ver_info['s_fun_id']);
+            $fun = '<script src="/static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js?ver='.$sfdp_script_ver.'"></script>';
         }else{
             $fun = '';
         }

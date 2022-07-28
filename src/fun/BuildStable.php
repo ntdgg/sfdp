@@ -23,7 +23,7 @@ class BuildStable{
 	/**
      * 创建数据表
      */
-    static function Btable($table,$data)
+    static function Btable($table,$data,$all='')
     {
 		$fieldAttr = [];
 		$key = [];
@@ -54,6 +54,9 @@ class BuildStable{
 				$fieldAttr[] = unit::tab(1) . "`status` int(10)  DEFAULT '0' COMMENT '审核状态'";
 				$fieldAttr[] = unit::tab(1) . "`create_time` int(10)  DEFAULT '0' COMMENT '新增时间'";
 				$fieldAttr[] = unit::tab(1) . "`update_time` int(10)  DEFAULT '0' COMMENT '更新时间'";
+                if(isset($all['tpfd_del']) && $all['tpfd_del']==0){
+                    $fieldAttr[] = unit::tab(1) . "`is_delete` int(11) DEFAULT '0' COMMENT '关联软删除字段[0:正常 1:删除]'";
+                }
 				$fieldAttr[] = unit::tab(1) . "PRIMARY KEY (`id`)";
 				$sql_drop = "DROP TABLE IF EXISTS `{$buile_table}`";//删除数据表
 				$sql_create = "CREATE TABLE `{$buile_table}` (\n"

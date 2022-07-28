@@ -22,7 +22,16 @@ use sfdp\lib\unit;
 
 
 class AdapteeScript{
-	
+
+    function getVer($id){
+        $info = Db::name('sfdp_script')->where('id',$id)->value('add_time');
+        if($info){
+            return  $info;
+        }else{
+            return  false;
+        }
+    }
+
 	function findWhere($map){
 		$info = Db::name('sfdp_script')->where($map)->find();
 		if($info){

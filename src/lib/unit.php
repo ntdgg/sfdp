@@ -48,6 +48,7 @@ class unit{
 				'uid'=>session(self::gconfig('int_user_id')),
 				'username'=>session(self::gconfig('int_user_name')),
 				'role'=>session(self::gconfig('int_user_role')),
+                'saas_id'=>session(self::gconfig('int_saas_id')),
 			];
 		}else{
 			$className = unit::gconfig('gateway_action');

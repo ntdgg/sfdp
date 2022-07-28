@@ -32,8 +32,12 @@ class AdapteeData{
 			return  false;
 		}
 	}
-	function del($table,$id){
-		$info = Db::name($table)->delete($id);
+	function del($table,$id,$is_delete){
+        if($is_delete==0){
+            $info = Db::name($table)->where('id',$id)->update(['is_delete'=>1,'update_time'=>time()]);
+            }else{
+            $info = Db::name($table)->delete($id);
+        }
 		if($info){
 			return  $info;
 		}else{
@@ -48,11 +52,15 @@ class AdapteeData{
 			return  false;
 		}
 	}
-	function delSub($table,$id){
+	function delSub($table,$id,$is_delete){
         if(Db::name($table)->where('d_id',$id)->count()<=0){
             return  true;
         }
-		$info = Db::name($table)->where('d_id',$id)->delete();
+        if($is_delete==0){
+            $info = Db::name($table)->where('d_id',$id)->update(['is_delete'=>1,'update_time'=>time()]);
+        }else{
+            $info = Db::name($table)->where('d_id',$id)->delete();
+        }
 		if($info){
 			return  $info;
 		}else{
@@ -62,7 +70,7 @@ class AdapteeData{
 	function selectAll($table,$map=[]){
 		return Db::name($table)->where($map)->withoutField('id,d_id,uid,status,create_time,update_time')->select()->toarray();
 	}
-	function select($table,$map=[],$field='',$page=1,$limit=10,$whereRaw='',$order=''){
+	function select($table,$map=[],$field='',$page=1,$limit=10,$whereRaw='',$order='',$is_saas=''){
 		$offset = ($page-1)*$limit;
 		if($field!=''){
 			$field =','.$field.',';
@@ -73,6 +81,9 @@ class AdapteeData{
 		if($whereRaw !=''){
 			$list = $list->whereRaw($whereRaw);
 		}
+        if($is_saas !=''){
+           $list = $list->whereRaw($is_saas);
+        }
         if($order==''){
             $order ='id desc';
         }

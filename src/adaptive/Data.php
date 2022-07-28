@@ -86,26 +86,27 @@ class Data{
      */
     static function del($sid,$id){
         $sfdp_ver_info = Design::findVer($sid);
+
         $field = json_decode($sfdp_ver_info['s_field'],true);
+        $is_delete = $field['tpfd_del'] ?? 1;
         $sublist =[];
         if($field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
             $Stable = self::getSubData($field['name_db'],$field['sublist']);
             foreach($Stable as $k=>$v){
-                $ret = self::delSub($v[0],$id);
+                $ret = self::delSub($v[0],$id,$is_delete);
                 if(!$ret){
                     return $ret;
                 }
             }
         }
-
         $table = $sfdp_ver_info['s_db'];
-        return (new Data())->mode->del($table,$id);
+        return (new Data())->mode->del($table,$id,$is_delete);
     }
     /**
      * 删除
      */
-    static function delSub($table,$id){
-        return (new Data())->mode->delSub($table,$id);
+    static function delSub($table,$id,$is_delete){
+        return (new Data())->mode->delSub($table,$id,$is_delete);
     }
     /**
      * 编辑修改
@@ -194,8 +195,18 @@ class Data{
         if(unit::getuserinfo('uid')==1){
             $whereRaw ='';
         }
+        //增加强制软删除过滤
+        if($Modue['is_delete']==0){
+            $map[]=['is_delete','=',0];
+        }
+        $is_saas ='';
+        /*超级管理员不受权限控制*/
+        if($Modue['is_saas']==0 && unit::getuserinfo('uid')!=1){
+            $is_saas = "concat(',',saas_id,',') regexp concat('".str_ireplace(',', ',|,', unit::getuserinfo('saas_id'))."')";
+        }
+        //saas_id
         /*权限系统组合过滤*/
-        $list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit,$whereRaw,$Modue['order']);
+        $list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit,$whereRaw,$Modue['order'],$is_saas);
         $json = $list['data'];
         foreach ($json as $k => $v) {
             foreach($jsondata['fieldArrAll'] as $k2=>$v2){

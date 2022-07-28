@@ -503,6 +503,7 @@ php;
                 <a class="button" onclick="install(load_form_check)">提交验证脚本<a/> 
                 <a class="button" onclick="install(load_end_view)">查看页面脚本<a/> 
                 <a class="button" onclick="install(load_list_fun)">列表页面脚本<a/>
+				<a class="button" onclick="install(load_end_time_done)">日期回调函数<a/>
 			</td>
 			</tr>
 			<tr valign="center">
