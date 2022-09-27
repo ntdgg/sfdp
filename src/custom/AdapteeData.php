@@ -68,7 +68,7 @@ class AdapteeData{
 		}
 	}
 	function selectAll($table,$map=[]){
-		return Db::name($table)->where($map)->withoutField('id,d_id,uid,status,create_time,update_time')->select()->toarray();
+		return Db::name($table)->where($map)->withoutField('d_id,uid,status,create_time,update_time,is_delete')->select()->toarray();
 	}
 	function select($table,$map=[],$field='',$page=1,$limit=10,$whereRaw='',$order='',$is_saas=''){
 		$offset = ($page-1)*$limit;
@@ -95,6 +95,8 @@ class AdapteeData{
             if(isset($list[$k]['update_time'])){
                 $list[$k]['update_time'] = date('Y-m-d H:i:s',$list[$k]['update_time']);
             }
+            $list[$k]['g_sys_id'] = $v['id'];
+
         }
 		$count = Db::name($table)->where($map);
 		if($whereRaw !=''){

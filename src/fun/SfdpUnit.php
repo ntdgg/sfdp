@@ -73,6 +73,9 @@ class SfdpUnit{
 				if($Modue['show_type']==1 && $k==$Modue['show_field'] && $v != ''){
 					$map[] = [$Modue['show_field'],'in',$v];
 				}
+                if($Modue['show_type']==2 && $k==$Modue['show_field'] && $v != ''){
+                    $map[] = [$Modue['show_field'],'=',$v];
+                }
 			}
 		}
 		return $map;

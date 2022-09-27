@@ -1,0 +1,95 @@
+<html>
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
+<link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" />
+<body><div class="sfdp-top">Sfdp超级表单开发平台 v6.0 开发中心</div>
+<style>
+  .btn-list-group {
+    position: relative;
+  }
+  .btn-list-area {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+  .btn-list-group:hover .btn-list-area {
+    display: block;
+  }
+  .btn {
+    display: inline-block;
+    padding: .4em .7em;
+    font-size: 14px;
+    font-weight: 400;
+    color: #6c757d;
+    text-align: center;
+    line-height: 1.5;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    outline: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  #div1 .sfdp-input{
+    text-align: left;
+    width: 150px;
+  }
+  .sfdp-input, .sfdp-textarea {
+    display: inline-block;
+    padding-left: 10px;
+  }
+</style>
+<html>
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
+<link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" />
+<body>
+<div style="float: left; width: 108px;">
+  <div class="sfdp-tool-title">开发中心 Dc</div>
+  <div class="sfdp-cl"></div>
+  <style>
+    .item{
+      padding-left: 5px;height: 48px;line-height: 48px;border: 1px #E6E6E6 solid;margin: 2px;cursor: move;cursor: -webkit-grabbing;float: left;width: 80%;margin-left: 10px;
+    }
+  </style>
+  <div class="item" onclick="set_url(`{$urls['api']}?act=desc&sid={$sid}`,0)"><a data="text">&#8194;<b class='ico'>☂</b>&#8194;表单设计</a></div>
+  <div class="item" onclick="set_url(`{$urls['api']}?act=custom&sid={$sid}`)"><a data="text">&#8194;<b class='ico'>♫</b>&#8194;列表定义</a></div>
+  <div class="item" onclick="set_url(`{$urls['api']}?act=script&sid={$sid}`)"><a data="text">&#8194;<b class='ico'>✯</b>&#8194;脚本设计</a></div>
+  <div class="item" onclick="set_url(`/gadmin/Sfdp/event.html?sid={$sid}`)"><a data="text">&#8194;<b class='ico'>♔</b>&#8194;事件开发</a></div>
+  <div class="item" onclick=sfdp.Askshow("{$urls['api']}?act=fix&sid={$sid}","【部署】删除所有数据，并生成最新的版本,确定是否执行?")><a data="text">&#8194;<b class='ico'>☀</b>&#8194;部署生成</a></div>
+  <div class="item" onclick="set_url(`//cojz8.com?type=sfdp`,0)"><a data="text">&#8194;<b class='ico'>♧</b>&#8194;系统帮助</a></div>
+  <div class="item" onclick="sfdp.layer_close()"><a data="text">&#8194;<b class='ico'>X</b>&#8194;退出设计</a></div>
+</div>
+<div style="float: left; width: calc(100% - 108px);">
+  <div style='width:100%;overflow-y:scroll; height:100%;'>
+    <iframe src="{$urls['api']}?act=desc&sid={$sid}" id="iframepage" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" onLoad="SetHeight()"></iframe>
+  </div>
+</div>
+<script type="text/javascript" src="{$patch}lib/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="{$patch}lib/layer/3.1.1/layer.js"></script>
+<script type="text/javascript" src="{$patch}lib/pingyin.js"></script>
+<script type="text/javascript" src="{$patch}sfdp.5.0.js?v=5.0.322222"></script>
+<script type="text/javascript" src="{$patch}sfdp.editor.js?v=5.0.322222"></script>
+<script type="text/javascript" src="{$patch}sfdp.config.js?v=5.0.322222"></script>
+<script type="text/javascript" src="{$patch}lib/jquery-ui.js"></script>
+<script>
+  function set_url(url,type=1){
+    //s_design
+    var is = `{$info.s_design}`
+    if(type==1 && is!=2){
+      layer.msg(`请先生成部署！`);
+      return;
+    }
+
+    $("#iframepage").attr("src", url);
+  }
+  function SetHeight(){
+    var ifm= document.getElementById("iframepage");
+    var subWeb = document.frames ? document.frames["iframepage"].document : ifm.contentDocument;
+    if(ifm != null && subWeb != null) {
+      ifm.height = '101%';
+      ifm.width = '100%';
+    }
+  }
+</script>

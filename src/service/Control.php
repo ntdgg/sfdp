@@ -65,8 +65,8 @@ class Control{
                 return lib::desc3($info['s_field'],$info['id'],$info['s_look']);
             }
 		}
-		if($act =='field'){
-		    
+		if($act =='center'){
+            return lib::center($sid);
         }
         if($act =='mysql'){
             if($sid !='' && is_array($sid)){
@@ -203,7 +203,7 @@ class Control{
 		if($act =='custom'){
 			$info = Design::find($sid);
 			if($info['s_design']<>2){
-				echo "<script language='javascript'>alert('Err,请先设计并部署！！'); </script>";
+                echo '<script>var index = parent.layer.getFrameIndex(window.name);parent.layer.msg("Err,校验错误,请先设计并部署！");setTimeout("parent.layer.close(index)",2000);</script>';
 				exit;
 			}
 			$json = View::ver($sid);
@@ -241,12 +241,15 @@ class Control{
                 Field::saveWhere([['id','=',$v['id']]],['width'=>$v['width'],'update_time'=>time()]);//更新宽度
             }
             ksort($list);ksort($list_name);
+
             $list_field = implode(',',$list);
             $field_name = implode(',',$list_name);
+
             if($list_field !=''){
                 $modue = Modue::saveWhere([['sid','=',$json['ver']['id']]],['field'=>$list_field,'field_name'=>$field_name,'update_time'=>time()]);
-                $field = Field::saveWhere([['id','in',$list]],['is_list'=>1,'update_time'=>time()]);
+                $field = Field::saveWhere([['field','in',$list],['sid','=',$json['ver']['id']]],['is_list'=>1,'update_time'=>time()]);
             }
+
             $count_field = implode(',',$count);
             if($count_field !=''){
                 $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['count_field'=>$count_field,'update_time'=>time()]);
@@ -257,6 +260,16 @@ class Control{
         }
         if($act =='customShow'){
             $json = View::ver($sid['sid']);
+            if($sid['show_type']==1||$sid['show_type']==2){
+                if($sid['show_fun']!='sys_role'){
+                    $ret = Data::getFun($sid['show_fun']);;
+                    if((!isset($ret['errCode']) || (isset($ret['code']) && $ret['errCode']!=3004))){
+                        return $ret;
+                    }
+                }
+            }
+
+
             $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['show_field'=>$sid['show_field'],'show_fun'=>$sid['show_fun'],'show_type'=>$sid['show_type'],'update_time'=>time()]);
             if($ret){
                 return json(['code'=>0,'msg'=>'保存成功']);
@@ -446,7 +459,7 @@ class Control{
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/edit.html',['showtype'=>'edit','config'=>$config,'data'=>$data['info']]);
 				}else{
-				return ['config'=>$config,'data'=>$data['info']];
+				return ['config'=>$config,'data'=>$data['info'],'bill_info'=>$data['bill_info']];
 			}
 		}
 		if($act =='del'){	
@@ -476,10 +489,20 @@ class Control{
 				return ['config'=>$config,'data'=>$data['info']['s_field']];
 			}
 		}
+        if($act =='info'){
+            $data = Design::getAddData($sid);
+            $config = [
+                'g_js'=>$g_js,
+                'fun' =>$data['fun'],
+                'load_file' =>$data['load_file'],
+                'upload_file'=>unit::gconfig('upload_file'),
+                's_type' =>$data['info']['s_type']
+            ];
+            return ['config'=>$config,'data'=>$data['info']['s_field']];
+        }
         if($act=='Data'){
             return M::Save($data);
         }
-
 	}
 	static function fapi($post){
 		$key_name = [];

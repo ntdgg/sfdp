@@ -42,7 +42,7 @@ class Api
 		'<script>
 		var g_uid='.$ginfo['uid'].';
 		var g_role='.$ginfo['role'].';
-		var g_saas='.$ginfo['saas_id'].';
+		var g_saas="'.$ginfo['saas_id'].'";
 		var g_username="'.$ginfo['username'].'";
 		var g_sid='.$sid.';
 		</script>';
@@ -66,7 +66,7 @@ class Api
 			$data = ['sid'=>$sid,'node'=>$node];
 			return Control::api($act,$data);
 		}
-		if(in_array($act,['desc','script','mysql','ui','fix','fix2','deldb','custom','customCount','customSave','customSearch','customSearch','customAccess','customOrder','customShow'])){
+		if(in_array($act,['desc','center','script','mysql','ui','fix','fix2','deldb','custom','customCount','customSave','customSearch','customSearch','customAccess','customOrder','customShow'])){
 			if (unit::is_post()) {
 				$data = input('post.');
 				return Control::api($act,$data);
@@ -99,6 +99,9 @@ class Api
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
 	public function sfdpCurd($act='index',$sid='',$bid='',$search=[]){
+        if($act=='info'){
+            return Control::curd($act,$sid,'',$this->topconfig);
+        }
 		if($act=='index2'){
 			$data = input('post.');
 			return Control::curd($act,$sid,$data,$this->topconfig);

@@ -42,7 +42,9 @@ class M{
                 'source'=>$data['source'],
                 'route'=>$data['route'],
                 'type'=>$data['type'],
-                'act'=>$data['act'],
+                'numb'=>$data['numb'],
+                'pass'=>$data['pass'],
+                'act'=>$data['act'],'content'=>$data['content'],
                 'id'=>$find['id'],
                 'add_time'=>date('Y-m-d H:i:s')
             ];
@@ -61,6 +63,8 @@ class M{
                 'route'=>$data['route'],
                 'type'=>$data['type'],
                 'act'=>$data['act'],
+                'numb'=>$data['numb'],
+                'pass'=>$data['pass'],'content'=>$data['content'],
                 'uid'=>session('softId'),
                 'add_time'=>date('Y-m-d H:i:s')
             ];

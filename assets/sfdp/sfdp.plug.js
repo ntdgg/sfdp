@@ -93,6 +93,7 @@ var sfdpPlug = {
         }
 
         var fieldArray = {
+            process : `<div id="${data.tpfd_id}" class="${data.tpfd_id} scrollBar"></div><input type="hidden" ${att} value="${value}"  name="${name}"  ${placeholder} id="${data.tpfd_id}_input" class="${sfdp.ui.input_input}">`,
             text : '<input type="text" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
             number :'<input type="number" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
             money :'<input type="text" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '" onkeyup="this.value=/^[0-9]*\\.?[0-9]{0,'+(xscd || 0)+'}$/.test(this.value) ? this.value : this.value.substring(0,this.value.length-1)" onblur="if(this.value>'+(max_number || 0)+'){layer.msg(\'不符合，最大值为'+(max_number || 0)+'。\');this.value='+(max_number-1 || 0)+';}">',
@@ -206,18 +207,32 @@ var sfdpPlug = {
             }
             if(type==='upload'){
                 if (data.tpfd_upload_type == 1) {
-                    html = lab + '<label id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + data.tpfd_upload_action + '?act=view&id=' + data.tpfd_id + '&value=' + data.value + '",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-download-circle" style="font-size: 30px; color: #1E9FFF;"></i>  </label>';
+                    if(data.value==null || data.value==''){
+                        html = lab + `<div style="min-height: 38px;line-height: 38px;">未上传</div>`;
+                    }else{
+                    html = lab + `<label id="label_${data.tpfd_id}" onclick=sfdp.openpage("多文件上传","${data.tpfd_upload_action}?act=view&id=${data.tpfd_id}&value=${data.value}",{w:"50%",h:"60%"})><i class="layui-icon layui-icon-download-circle" style="font-size: 30px; color: #1E9FFF;"><span style="color: #f00;font-size: 16px;position: absolute;left: 27px;top: -8px;">${data.value.split(',').length}</span></i></label>`;
+                    }
                 }else{
-                    html = lab + '<a target="_blank" href="/' + data.value + '" >' + sfdp.Ico(1) + '</a>';
+                    if(data.value==null || data.value==''){
+                        html = lab + `<div style="min-height: 38px;line-height: 38px;">未上传</div>`;
+                    }else {
+                        html = lab + '<a target="_blank" href="/' + data.value + '" >' + sfdp.Ico(1) + '</a>';
+                    }
                 }
             }else if(type==='links'){
                 html = lab + `<div style="min-height: 38px;line-height: 38px;"><a href="//${data.tpfd_moren}" target="${data.tpfd_zanwei}" class="layui-btn layui-btn-primary layui-border-blue">${data.tpfd_name}</a></div>`;
             }else if(type==='upload_img'){
-                html = lab + `<div style="min-height: 38px;line-height: 38px;"><img src="/${data.value}" width="100px" onclick="window.open($(this).attr('src'))">'</div>`;
+                if(data.value==null || data.value==''){
+                    html = lab + `<div style="min-height: 38px;line-height: 38px;">未上传</div>`;
+                }else{
+                    html = lab + `<div style="min-height: 38px;line-height: 38px;"><img src="/${data.value}" width="100px" onclick="window.open($(this).attr('src'))">'</div>`;
+                }
             }else if(type==='system_user' || type==='system_role'){
                 html = lab + `<div style="min-height: 38px;line-height: 38px;">${data.text}</div>`;
             }else if(type==='group'){
                 html = `<fieldset class="layui-elem-field layui-field-title" style="margin: 0px;"><legend>${data.tpfd_name}</legend></fieldset>`;
+            }else if(type==='process'){
+                html = lab +`<div id="progressBar"><div id="progressBar_Track" style="width: ${data.value}%;"></div><a class="action-value" style="left: ${data.value-2}%">${data.value}</a></div>`;
             }else{
                 var data_value = sfdpPlug.htmlEncode(data.value);
                 html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data_value}">${data.value}</div>`;
@@ -241,4 +256,98 @@ var sfdpPlug = {
         temp = null;
         return output;
     },
+    sliderSet:function(){
+        var obj = $(".scrollBar");
+        $.each(obj,function(){
+            sfdpPlug.slider($(this).attr('id'));
+        })
+    },
+    slider: function (self_id) {
+        /**
+         * 特别鸣谢作者，根据作者代码进行细节优化，重新封装
+         * @Author 无趣
+         */
+        var self = $('#'+self_id);
+        var value = $('#'+self_id+'_input').val();
+        var conf = {
+            active: false, mousedownEvent: {}, sliderRange: null,
+            slider: null, sliderActive: null,
+            sliderValue: null,
+            sliderRangeWidth: 0,
+            sliderHalfWidth: 0,
+            minValue: 0,
+            maxValue: 100,
+            diffValue: 0,
+            initValue: value || 0
+        };
+        self.html(`<div class="slider-range"><span class="slider"></span><span class="line"></span><span class="active-line"></span><span class="action-value"></span></div>`);
+        conf.sliderRange = self.find('.slider-range');
+        conf.slider = conf.sliderRange.find('.slider');
+        conf.mousedownEvent = {};
+        conf.sliderActive = conf.sliderRange.find('.active-line');
+        conf.sliderValue = conf.sliderRange.find('.action-value');
+        conf.sliderRangeWidth = conf.sliderRange.find('.line').width();
+        conf.sliderHalfWidth = conf.slider.outerWidth(true)/2;
+        conf.diffValue = conf.maxValue - conf.minValue;
+        conf.sliderValue.text(conf.minValue);
+        conf.sliderValue.text(conf.minValue).css({
+            left: parseInt(conf.slider.css('left')) - (conf.sliderValue.outerWidth(true)/2) + conf.sliderHalfWidth
+        });
+        if (conf.initValue >= conf.minValue && conf.initValue <= conf.maxValue){
+            var x = parseInt( (conf.initValue/conf.maxValue * conf.sliderRangeWidth - conf.sliderHalfWidth)*100) / 100;
+            conf.sliderValue.text(conf.initValue).css({
+                left: x - (conf.sliderValue.outerWidth(true)/2) + conf.sliderHalfWidth
+            });
+            conf.sliderValue.text(conf.initValue);
+            self.data('sliderValue',conf.initValue);
+            conf.sliderActive.css({
+                width: x + conf.sliderHalfWidth
+            });
+            conf.slider.css({
+                left: x
+            });
+        }
+        conf.slider.bind('mousedown',function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            conf.active = true;
+            conf.mousedownEvent.x = e.clientX;
+            conf.mousedownEvent.y = e.clientY;
+            conf.mousedownEvent.left = parseInt($(this).css('left'));
+            conf.mousedownEvent.top = parseInt($(this).css('top'));
+        });
+        $(document).bind('mousemove',function (ev) {
+            if(conf.active === false){
+                return conf.active;
+            }
+            var x = ev.clientX - conf.mousedownEvent.x + conf.mousedownEvent.left;
+            if (x < -conf.sliderHalfWidth){
+                x = -conf.sliderHalfWidth;
+            }
+            if (x > conf.sliderRangeWidth - conf.sliderHalfWidth){
+                x = conf.sliderRangeWidth - conf.sliderHalfWidth;
+            }
+            var value = parseInt(conf.minValue + ( x + conf.sliderHalfWidth) / conf.sliderRangeWidth * conf.diffValue);
+            if (value < conf.minValue) {
+                value = conf.minValue;
+            }
+            if (value > conf.maxValue){
+                value = conf.maxValue;
+            }
+            $('#'+self_id+'_input').val(value);
+            conf.sliderValue.text(value).css({
+                left: x - (conf.sliderValue.outerWidth(true)/2) + conf.sliderHalfWidth
+            });
+            conf.sliderActive.css({
+                width: x + conf.sliderHalfWidth
+            });
+            conf.slider.css({
+                left: x
+            });
+        });
+        $(document).bind('mouseup',function () {
+            conf.active = false;
+        });
+        return this;
+    }
 }

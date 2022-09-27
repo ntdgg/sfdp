@@ -119,18 +119,23 @@ class Design{
         }
         $field = json_decode($sfdp_ver_info['s_field'],true);
         $list_field = json_decode($sfdp_ver_info['s_list'],true);
-
         $searct_array = json_decode($sfdp_ver_info['s_search'],true);
-
         $searct_field =json_encode($list_field);
         $listid = ''; //变量赋值为空
         $listfield = []; //变量赋值为空
-
         $fieldArr = [];
         $fieldArrAll = [];
         $fieldSysUser = [];
+        $fieldSysProcess = [];
+        $fieldSysImg = [];
         foreach($field['list'] as $k=>$v){
             foreach($v['data'] as $k2=>$v2){
+                if($v2['td_type']=='process'){
+                    $fieldSysProcess[]=$v2['tpfd_db'];
+                }
+                if($v2['td_type']=='upload_img'){
+                    $fieldSysImg[]=$v2['tpfd_db'];
+                }
                 if($v2['td_type']=='system_user'||$v2['td_type']=='system_role'){
                     $fieldSysUser[$v2['tpfd_db']]=$v2['td_type'];
                 }
@@ -154,7 +159,7 @@ class Design{
             }
         }
         $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
-        return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'search'=>$searct_field,'fun'=>$fun,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser];
+        return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'search'=>$searct_field,'fun'=>$fun,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser,'fieldSysProcess'=>$fieldSysProcess,'fieldSysImg'=>$fieldSysImg];
     }
     /**
      * 获取数据

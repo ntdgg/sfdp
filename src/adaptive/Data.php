@@ -208,6 +208,7 @@ class Data{
         /*权限系统组合过滤*/
         $list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit,$whereRaw,$Modue['order'],$is_saas);
         $json = $list['data'];
+        //dump($jsondata['fieldSysProcess']);
         foreach ($json as $k => $v) {
             foreach($jsondata['fieldArrAll'] as $k2=>$v2){
                 if(in_array($k2,explode(',',$Modue['field']))){
@@ -221,6 +222,7 @@ class Data{
                     }else{
                         $json[$k][$k2] = $jsondata['fieldArrAll'][$k2][$v[$k2]] ?? '<font color="red">未选择</font>';
                     }
+                    $json[$k]['g_sys_'.$k2] = $v[$k2] ?? '';
                 }
             }
             $sys_user = unit::gconfig('sys_user');
@@ -229,7 +231,16 @@ class Data{
                     $json[$k][$k3] = (new $sys_user())->value($v3,$v[$k3]);
                 }
             }
-
+            foreach($jsondata['fieldSysProcess'] as $v4) {
+                if(isset($v[$v4])){
+                    $json[$k][$v4] = '<div id="progressBar" title="'.$v[$v4].'"><div id="progressBar_Track" style="width: '.$v[$v4].'%;"></div></div>';
+                }
+            }
+            foreach($jsondata['fieldSysImg'] as $v4) {
+                if(isset($v[$v4])){
+                    $json[$k][$v4] = '<img src="/'.$v[$v4].'"  width="100px" onclick=sfdp.openpage("看图",$(this).attr("src"))>';
+                }
+            }
         }
         return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
     }
@@ -252,9 +263,7 @@ class Data{
                     }else{
                         $v2['tpfd_data'] =  Data::getFun($v2['checkboxes_func']);
                     }
-
                 }
-
                 if($v2['td_type']=='dropdowns' || $v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
                     $value_arr = explode(",",$find[$v2['tpfd_db']]);
                     $fiedsver = '';
@@ -296,8 +305,12 @@ class Data{
                 $sublist[$k]= self::selectAll($v[0],['d_id'=>$bid]);
                 $datas = self::selectAll($v[0],['d_id'=>$bid]);
                 foreach($datas as $kk=>$vv){
+                    unset($v[1]['id']);
                     $mkey = array_keys($v[1]);
+                    $vvid =$vv['id'];
+                    unset($vv['id']);
                     $mkey2 = array_keys($vv);
+                    //dump($mkey2);
                     foreach($mkey as $kkk=>$vvv){
                         if($v2['td_type']=='dropdowns' || $v[1][$vvv]['td_type']=='dropdown'||$v[1][$vvv]['td_type']=='radio'||$v[1][$vvv]['td_type']=='checkboxes'){
                             $v[1][$vvv]['value'] =$v[1][$vvv]['tpfd_data'][$vv[$mkey2[$kkk]]] ?? '未匹配';
@@ -305,12 +318,13 @@ class Data{
                             $v[1][$vvv]['value'] =$vv[$mkey2[$kkk]];
                         }
                     }
+                    $v[1]['id'] =$vvid;
                     $sublist[$k][$kk] = $v[1];
                 }
             }
         }
         $field['sublists'] = $sublist;
-        return ['info'=>json_encode($field),'sublist'=>json_encode($sublist),'data'=>$data];
+        return ['info'=>json_encode($field),'sublist'=>json_encode($sublist),'data'=>$data,'bill_info'=>$find];
     }
     /**
      * 子表数据
@@ -379,7 +393,10 @@ class Data{
                 $datas = self::selectAll($v[0],['d_id'=>$bid]);
                 $find['sublist_data'][$v[0]] = $datas;
                 foreach($datas as $kk=>$vv){
+                    unset($v[1]['id']);
                     $mkey = array_keys($v[1]);
+                    $vvid =$vv['id'];
+                    unset($vv['id']);
                     $mkey2 = array_keys($vv);
                     foreach($mkey as $kkk=>$vvv){
                         if($v[1][$vvv]['td_type']=='dropdown'||$v[1][$vvv]['td_type']=='radio'||$v[1][$vvv]['td_type']=='checkboxes'){
@@ -409,7 +426,7 @@ class Data{
         } else {
             $className = unit::gconfig('fun_namespace');
             if (!class_exists($className)) {
-                return ['code'=>1,'msg'=>unit::errMsg(3003)];
+                return ['code'=>1,'msg'=>unit::errMsg(3003),'errCode'=>3003];
             }
             $getData = (new $className())->func($checkboxes_func,$all);
         }
@@ -419,7 +436,7 @@ class Data{
         $tpfd_data = [];
         foreach ($getData['msg'] as $k3 => $v3) {
             if(!array_key_exists('name',$v3) || !array_key_exists('id',$v3)){
-                return ['code'=>1,'msg'=>unit::errMsg(3004)];
+                return ['code'=>1,'msg'=>unit::errMsg(3004),'errCode'=>3004];
             }
             $tpfd_data[$v3['id']] = $v3['name'];
         }
@@ -439,7 +456,7 @@ class Data{
         } else {
             $className = unit::gconfig('fun_namespace');
             if (!class_exists($className)) {
-                return ['code'=>1,'msg'=>unit::errMsg(3003)];
+                return ['code'=>1,'msg'=>unit::errMsg(3003),'errCode'=>3003];
             }
             $getData = (new $className())->func($checkboxes_func,$all);
         }
@@ -449,7 +466,7 @@ class Data{
 
         foreach ($getData['msg'] as $k3 => $v3) {
             if(!array_key_exists('name',$v3) || !array_key_exists('id',$v3)){
-                return ['code'=>1,'msg'=>unit::errMsg(3004)];
+                return ['code'=>1,'msg'=>unit::errMsg(3004),'errCode'=>3004];
             }
         }
         return $getData['msg'];

@@ -22,12 +22,22 @@ select{
     border-color: #dadada;
 }
 table {width: 100%;empty-cells: show;background-color: transparent;border-collapse: collapse;border-spacing: 0;border: 1px solid #ddd;border-collapse: separate;border-bottom: 0;border-left: 0;}
-th,td {border-left: 1px solid #ddd;padding: 8px;line-height: 20px;border-bottom: 1px solid #ddd;word-break: break-all;text-align: left;}
+th,td {border-left: 1px solid #ddd;padding: 4px;line-height: 20px;border-bottom: 1px solid #ddd;word-break: break-all;text-align: left;}
 tr{height: 40px;}
 ul{margin: 0;}
 li{margin: 0;padding: 0;}
 #table input, #table select{padding: 5px 5px;display: inline-block;box-sizing: border-box;}
+fieldset{
+	border-width: 1px;
+	border-style: inherit;
+	border-color: rgb(192, 192, 192);
+	border-image: initial;
 
+}
+legend{
+	font-weight: 600;
+	font-size: 14px;
+}
 .sfdp-field-con-view{
 	min-height: 35px;
 	background-color: #FFFFFF;
@@ -40,7 +50,7 @@ li{margin: 0;padding: 0;}
 .ico{
 	font-weight: 700;
     font-size: 12px;
-    color: #2d6dcc;
+    color: #3963bc;
 }
 .red{
 	margin-left: 5px;
@@ -54,7 +64,7 @@ li{margin: 0;padding: 0;}
 	margin-top: 10px;
 }
 .sfdp-top {
-	background-color: #2d6dcc;
+	background-color: #3963bc;
 	height: 50px;
 	line-height: 50px;
 	padding-left: 15px;
@@ -85,7 +95,7 @@ li{margin: 0;padding: 0;}
 	transition: background-color .1s linear;
 	line-height: 18px;
 	color: #fff;
-	background-color: #2b85e4;
+	background-color: #3963bc;
 	padding: 4px 12px;
 	border-radius: 4px;
 }
@@ -143,7 +153,7 @@ li{margin: 0;padding: 0;}
 	margin-top:3px;
 }
 .sfdp-tool-con:hover{
-	border: 1px #2d6dcc dashed;
+	border: 1px #3963bc dashed;
 }
 .view-action {
 	position: absolute;
@@ -154,7 +164,7 @@ li{margin: 0;padding: 0;}
 }
 .sfdp-ctrl-active {
 	position: relative;
-	border: 1px solid #ff0000;
+	border: 2px solid #3963bc;
 }
 .sfdp-rows{
 	position: relative;
@@ -162,10 +172,10 @@ li{margin: 0;padding: 0;}
 
 }
 .sfdp-rows:hover {
-	border: 1px dashed #2d6dcc;
+	border: 1px dashed #3963bc;
 }
 .sfdp-field-con {
-	min-height: 38px;
+	height: 38px;
 	background-color: #FFFFFF;
 	border: 1px dashed #999;
 }
@@ -192,12 +202,13 @@ li{margin: 0;padding: 0;}
 	height: 38px;
 	float: left;
 	display: block;
-	padding: 9px 15px;
+	padding: 7px 10px;
 	font-weight: 400;
 	line-height: 20px;
 	text-align: right;
-	color: #2d6dcc;
+	color: #3963bc;
 	font-weight: 800;
+	min-width: 100px;
 }
 .sfdp-input-block {
 	float: left;
@@ -252,4 +263,114 @@ li{margin: 0;padding: 0;}
 	overflow: hidden;
 	text-overflow:ellipsis;
 	white-space: nowrap;
+}
+
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar {
+	width: 1px;
+	height: 2px;
+	background-color: #f5f5f5;
+}
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.3);
+	-webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.3);
+	border-radius: 1px;
+	background-color: #f5f5f5;
+}
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+	border-radius: 1px;
+	box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.1);
+	background-color: #c8c8c8;
+}
+
+
+
+
+.scrollBar {
+	width: 100%;
+	padding-left: 20px;
+}
+
+#progressBar {
+	width: 100%;
+	height: 10px;
+	background-color: #ccc;
+	margin: 0 auto;
+	margin-top: 10px;
+	-webkit-border-radius: 2em;
+	-moz-border-radius: 2em;
+	border-radius: 2em;
+	min-width: 160px;
+}
+
+#progressBar_Track {
+	width: 80%;
+	height: 10px;
+	background-color: #3963bc;
+	-webkit-border-radius: 2em;
+	-moz-border-radius: 2em;
+	border-radius: 2em;
+}
+
+.slider-range{
+	width: 100%;
+	position: relative;
+	height: 30px;
+	box-sizing: border-box;
+	line-height: 30px;
+}
+
+.slider-range span.slider{
+	width: 15px;
+	height: 15px;
+	display: inline-block;
+	border-radius: 50%;
+	background-color: #3963bc;
+	left: -15px;
+	border: 1px solid #eee;
+	box-sizing: border-box;
+	box-shadow: 0 0 2px #7d7776;
+	position: absolute;
+	z-index: 3;
+	margin-top: 10px;
+}
+
+.slider-range span.line,.slider-range span.active-line{
+	width: 100%;
+	display: block;
+	vertical-align: middle;
+	height: 13px;
+	background-color: #fff;
+	border-radius: 30px;
+	box-sizing: border-box;
+	border: 1px solid #eee;
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	top: 12px;
+}
+
+.slider-range span.active-line{
+	width: 0;
+	left: 0;
+	z-index: 2;
+	background-color: #3963bc;
+}
+
+.slider-range .action-value,#progressBar .action-value{
+	display: inline-block;
+	padding: 2px 15px;
+	line-height: 30px;
+	box-sizing: border-box;
+	vertical-align: middle;
+	border-radius: 5px;
+	font-size: 14px;
+	position: absolute;
+	height: 30px;
+	left: -18px;
+	top: -15px;
 }

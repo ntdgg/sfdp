@@ -12,6 +12,7 @@
  */
 namespace sfdp\lib;
 
+use sfdp\adaptive\Design;
 
 class lib{
 	/**
@@ -220,7 +221,7 @@ php;
                 if (in_array($v['field'], $fielcount)) {
                     $countchecked = 'checked';
                 }
-                $alltable .= ' <tr><th><b>' . $v['name'] . '('.$v['field'].')<b> </th><th><input class="sfdp-input" placeholder="需显示填写序号" name="'.$v['field'].'[list]" value="' . array_search($v['field'],$listfield) . '" type="number" ></th><th><input name="'.$v['field'].'[count]" ' . $countchecked . ' type="checkbox" value="1"></th><th><input name="'.$v['field'].'[search]" class="sfdp-input" placeholder="如：=,>,LIKE"  value="' . $v['search_type'] . '"></th><th><input width="50px" name="'.$v['field'].'[width]" class="sfdp-input"  name="" value="' . $v['width'] . '" type="number"> <input type="hidden" name="'.$v['field'].'[id]"  value="' . $v['id'] . '"><input name="'.$v['field'].'[title]"  value="' . $v['name'] . '" type="hidden"></th></tr>';
+                $alltable .= ' <tr><th><b>' . $v['name'] . '('.$v['field'].')<b> </th><th><input class="sfdp-input" placeholder="需显示填写序号" name="'.$v['field'].'[list]" value="' . array_search($v['field'],$listfield) . '" type="number" ></th><th><input name="'.$v['field'].'[count]" ' . $countchecked . ' type="checkbox" value="1"></th><th><input name="'.$v['field'].'[search]" class="sfdp-input" placeholder="如：=,>,like"  value="' . $v['search_type'] . '"></th><th><input width="50px" name="'.$v['field'].'[width]" class="sfdp-input"  name="" value="' . $v['width'] . '" type="number"> <input type="hidden" name="'.$v['field'].'[id]"  value="' . $v['id'] . '"><input name="'.$v['field'].'[title]"  value="' . $v['name'] . '" type="hidden"></th></tr>';
             }
         }
         $lenth = count($field);
@@ -236,12 +237,12 @@ php;
         <tr><td colspan=5><input id="order" class="sfdp-input"  placeholder="排序规则如：id desc" value='{$modue["order"]}'></td><td style="text-align:center"><a onclick='save_order()'  class='button' >保存排序</a></td></tr>
         <tr><td colspan=5>
         {$access_html}
-	<div id="access1">字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select>
+	<div id="access1">权限字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select>
 	<select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="<>">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select>
 	<select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select>
 	<select style="width:200px" name="accsee_fun"><option value="and">and</option><option value="or">or</option></select>
     <span class='button' onclick=addaccess(1)>Add</span></div></td><td style="text-align:center"><a onclick='save_access()'  class='button' >保存权限</a></td></tr>
-    <tr><td colspan=5><b>展示形式<b><select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">树形列表</option></select> 关联字段：<input id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 80px;"> 树型函数：<input style="width: 80px;" id="show_fun" name="show_fun" type="text" value="{$show_fun}">注：函数符合Tree 建议层级>3级别;内置组织树：sys_role</div>
+    <tr><td colspan=5>列表形式：<select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">树形列表</option><option value="2">Tab列表</option><option value="3">商品列表</option><option value="4">分级列表</option></select><input class="sfdp-input" placeholder="关联字段信息" id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 220px;display: inline;"><input class="sfdp-input" placeholder="元素信息：用来额外展示相关的树或者Tab数据" style="width: 40%;display: inline;" id="show_fun" name="show_fun" type="text" value="{$show_fun}"></div>
 	</td><td style="text-align:center"><a onclick='save_show()'  class='button'>保存布局</a></td></tr>
         <tr><th  style='width: 20%;text-align: center;'><b>字段<b> </th>
             <th  style='width: 8%;text-align: center;'><b>列表<b> </th>
@@ -276,7 +277,7 @@ php;
 	function addoption(id){
 		 $('#checkboxes'+id).children('span').attr("onclick","editoption("+id+")");
 		 $('#checkboxes'+id).children('span').html('Del');
-		 var html ='<div id="checkboxes'+(id+1)+'">查询字段：<select style="width:200px" name="search_ids"><option value="">请选择</option>{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,LIKE     <span onclick=addoption('+(id+1)+') class="button">Add</span></div>';
+		 var html ='<div id="checkboxes'+(id+1)+'">查询字段：<select style="width:200px" name="search_ids"><option value="">请选择</option>{$search}</select> 查询条件：<input name="search_value" type="text" value="">如：=,>,like     <span onclick=addoption('+(id+1)+') class="button">Add</span></div>';
 		 $('#checkboxes'+id).after(html);
 	}
 	function editaccess(id){
@@ -326,25 +327,26 @@ php;
 		$server_save = $urls['api'].'?act=field&sid='.$fid;
 		$script = $urls['api'].'?act=script&sid='.$fid;
         $mysql = $urls['api'].'?act=mysql&sid='.$fid;
+        $fix = $urls['api'].'?act=fix2&sid='.$fid;
 		return <<<php
 	<html>
 	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
 	<link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" /> 
-	<body><div class="sfdp-top">Sfdp超级表单开发平台 v6.0</div>
-		<div>
+	<body>
+        <div>
 			<div id="ctlMenus" class="sfdp-con" style="float: left; width: 240px;">
-				<div class="sfdp-tool-title">设计控制区 Design control area</div>
+				<div class="sfdp-tool-title">容器中枢 Design control area</div>
 				&#8194;&#8194;
-				<div class="button" onclick='sfdp.sys_config()'>配置</div><div class="button" id='up_save'>保存</div><div onclick='window.location.reload()' class="button">刷新</div><div class="button" onClick="sfdp.openfullpage('官网','//cojz8.com')">帮助</div>
+				<div class="button" onclick='sfdp.sys_config()'>配置</div><div class="button" id='up_save'>保存</div><div onclick='window.location.reload()' class="button">刷新</div><div class="button" onClick=sfdp.Askshow("{$fix}","【更新】对布局或字段进行细微调整,确定是否执行?【不支持子表调整！】")>更新</div>
 				<div class="sfdp-cl" ></div>
 				<div class="sfdp-tool-title sfdp-mt10">页面布局 Form control library</div>
 				<div class='sfdp-tool-fix'onclick='sfdp.build_bj()'><a>&#8194;<b class='ico'>↭</b>&#8194;栅格布局 </a></div>
 				<div class='sfdp-tool-fix'onclick='sfdp.openfullpage("构建助手","{$mysql}")'><a>&#8194;<b class='ico'>ς</b>&#8194;构建助手 </a></div>
 				<div class="sfdp-cl"></div>
-				<div class="sfdp-tool-title sfdp-mt10">表单控件库 Form control library</div>
-					<div class="sfdp-tool-con" ><a data="text">&#8194;<b class='ico'>Α</b>&#8194;文本</a></div>
-					<div class="sfdp-tool-con" ><a data="number">&#8194;<b class='ico'>½</b>&#8194;数字</a></div>
-					<div class="sfdp-tool-con" ><a data="money">&#8194;<b class='ico'>￥</b>&#8194;金额</a></div>
+				<div class="sfdp-tool-title sfdp-mt10">表单控件 Form control library</div>
+					<div class="sfdp-tool-con" ><a data="text">&#8194;<b class='ico'>Α</b>&#8194;文本组件</a></div>
+					<div class="sfdp-tool-con" ><a data="number">&#8194;<b class='ico'>½</b>&#8194;数字组件</a></div>
+					<div class="sfdp-tool-con" ><a data="money">&#8194;<b class='ico'>￥</b>&#8194;金额组件</a></div>
 					<div class="sfdp-tool-con"><a data="checkboxes">&#8194;<b class='ico'>☑</b>&#8194;多选框</a></div>
 					<div class="sfdp-tool-con"><a data="radio">&#8194;<b class='ico'>◉</b>&#8194;单选框</a></div>
 					<div class="sfdp-tool-con"><a data="dropdown">&#8194;<b class='ico'>≡</b>&#8194;下拉组件 </a></div>
@@ -359,6 +361,7 @@ php;
 					<div class="sfdp-tool-con"><a data="edit">&#8194;<b class='ico'>Ε</b>&#8194;富文本框</a></div>
 					<div class="sfdp-tool-con"><a data="dropdowns">&#8194;<b class='ico'>S</b>&#8194;下拉多选</a></div>
 					<div class="sfdp-tool-con"><a data="cascade">&#8194;<b class='ico'>§</b>&#8194;级联组件</a></div>
+					<div class="sfdp-tool-con"><a data="process">&#8194;<b class='ico'>～</b>&#8194;进度组件</a></div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">内置组件 System control library</div>
 					<div class="sfdp-tool-con" ><a data="system_user">&#8194;<b class='ico'>ρ</b>&#8194;系统用户</a></div>
@@ -374,7 +377,7 @@ php;
 			</div>
 			<div class="sfdp-con" style="float: right; width: 360px;">
 				<div class="sfdp-att">
-				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><p> Sfdp V6.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © Guoguo <a href="https://www.cojz8.com/">Sfdp</a> 版权禁删！ ]</span></div>
+				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><p> Sfdp V6.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © 流之云 <a href="https://www.cojz8.com/">Sfdp</a> 版权所有 ]</span></div>
 				</div>
 			</div>
 			<div class="sfdp-cl"></div>
@@ -420,9 +423,9 @@ php;
 			$( "#fb-fz" ).sortable({
 			  cancel: ".fb-disabled"
 			});
-			
             $(document).on("input propertychange", "#tpfd_name", function (e) {
-                $("#tpfd_db").val($("#tpfd_name").toPinyin().toLowerCase());
+                var formclass = $(this).parent().parent().parent().attr('class');
+                $("."+formclass+" #tpfd_db").val($("."+formclass+" #tpfd_name").toPinyin().toLowerCase());
             });
 			$("#up_save").click(function(){
 				var int_data = localStorage.getItem("json_data");
@@ -445,6 +448,12 @@ php;
   </script>
 php;
 	}
+    public static function center($sid){
+        $patch = unit::gconfig('static_url');
+        $urls= unit::gconfig('url');
+        $info = Design::find($sid);
+        return view(ROOT_PATH.'/center.html',['patch'=>$patch,'urls'=>$urls,'sid'=>$sid,'info'=>$info]);
+    }
 	/**
 	 * 设计器界面
 	 *
@@ -492,7 +501,7 @@ php;
 		<script src="{$patch}lib/codemirror/codemirror.js"></script>
 		<script src="{$patch}lib/codemirror/javascript.js"></script>
 		
-			<form action="{$action}" method="post" name="form" id="form">
+			<form action="{$action}" method="post" name="form" id="form" style="padding: 10px;">
 			<input type="hidden" name="sid" value="{$sid}">
 		<table class="table">
 			<tr valign="center">

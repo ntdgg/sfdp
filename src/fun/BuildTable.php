@@ -44,6 +44,10 @@ class BuildTable{
         if(isset($all['tpfd_saas']) && $all['tpfd_saas']==0){
             array_push($auto_create_field,"saas_id");
         }
+        if(isset($all['s_sys_check']) && $all['s_sys_check']==1){
+            array_push($auto_create_field,"create_ip");
+            array_push($auto_create_field,"create_os");
+        }
         $fieldAttr = [];
 		$fieldAttr[] = unit::tab(1) . "`id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键'";
         $key = [];
@@ -65,6 +69,10 @@ class BuildTable{
 		}
         if(in_array('saas_id',$auto_create_field)){
             $fieldAttr[] = unit::tab(1) . "`saas_id` varchar(255) DEFAULT NULL COMMENT '关联租户id'";
+        }
+        if(in_array('create_ip',$auto_create_field)){
+            $fieldAttr[] = unit::tab(1) . "`create_ip` varchar(50) DEFAULT NULL COMMENT '创建ip地址'";
+            $fieldAttr[] = unit::tab(1) . "`create_os` varchar(100) DEFAULT NULL COMMENT '创建客户端信息'";
         }
         if(in_array('is_delete',$auto_create_field)){
             $fieldAttr[] = unit::tab(1) . "`is_delete` int(11) DEFAULT '0' COMMENT '关联软删除字段[0:正常 1:删除]'";
