@@ -22,7 +22,12 @@ var sfdpPlug = {
         if (typeof (data['tpfd_name']) == 'undefined') {
             return sfdpPlug.view_default(type, data);
         } else {
-            var lab = `<label title="${data.tpfd_name}" class="${sfdp.ui.rows_label}" style="${maste_class}"><b>${data.tpfd_name}</b></label><div class="${sfdp.ui.rows_block}">`;
+            if (data.tpfd_help == '' || data.tpfd_help == undefined) {
+                var tpfd_help = '"';
+            }else{
+                var tpfd_help = `sfdp_tips" sfdp-tip-data="${data.tpfd_help}"`;
+            }
+            var lab = `<label title="${data.tpfd_name}" class="${sfdp.ui.rows_label} ${tpfd_help} style="${maste_class}"><b>${data.tpfd_name}</b></label><div class="${sfdp.ui.rows_block}">`;
             if (is_sub) {
                 lab = '';
             }
@@ -37,6 +42,10 @@ var sfdpPlug = {
         return html + '</div>';
     },
     PlugList:function (type,item) {
+        if(item.field =='status'){
+            type ='dropdown';
+            item.type_data =  '{"-1": "退回修改", "0": "保存中", "1": "流程中", "2": "审核通过"}';
+        }
         var data ='';
         if(type==='radio'||type==='checkboxes'){
             item.tpfd_db = item.field;
@@ -128,7 +137,7 @@ var sfdpPlug = {
             var tags = `<input id="${selectId}_val" type="hidden" value="${rvalue}" name="${field}"><select  ${attr} id="${selectId}" class="this-select" data-widget="select2"   data-rvalue="${rvalue}" data-value="${value}" lay-search multiple="true">`
         }else{
             var tags = `<select name="${field}" ${attr} id="${selectId}" class="this-select" data-widget="select2" data-rvalue="${rvalue}"   data-value="${value}" lay-search>`
-            tags += ` <option value="">请选择${title}</option>`;
+            tags += ` <option value="">选择${title}</option>`;
         }
         if (value !== undefined ) {
             var strs = (value).split(",");
@@ -201,7 +210,12 @@ var sfdpPlug = {
         if (typeof (data['tpfd_name']) == 'undefined') {
             return sfdpPlug.view_default(type, data);
         } else {
-            var lab = `<div><label class="${sfdp.ui.rows_label}" id="${data.tpfd_id}"><b>${data.tpfd_name}：</b></label><div class="${sfdp.ui.rows_block}" id="${data.value}">`;
+            if (data.tpfd_help == '' || data.tpfd_help == undefined) {
+                var tpfd_help = '"';
+            }else{
+                var tpfd_help = `sfdp_tips" sfdp-tip-data="${data.tpfd_help}"`;
+            }
+            var lab = `<div><label class="${sfdp.ui.rows_label} ${tpfd_help} id="label_${data.tpfd_id}"><b>${data.tpfd_name}：</b></label><div class="${sfdp.ui.rows_block}" id="${data.value}">`;
             if (is_sub) {
                 lab = '';
             }

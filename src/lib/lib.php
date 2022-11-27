@@ -215,7 +215,7 @@ php;
         $alltable ='';
         $listfield = explode(',',$modue['field']);
         foreach($field as $k=>$v){
-            if(!in_array($v['field'], ['id','status'])) {
+            if(!in_array($v['field'], ['id'])) {
                 $countchecked = '';
                 $checked = $v['is_list'] == 1 ? 'checked' : '';
                 if (in_array($v['field'], $fielcount)) {
