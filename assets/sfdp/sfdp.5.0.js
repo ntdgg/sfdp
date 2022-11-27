@@ -82,6 +82,7 @@ var sfdp = {
                 }
             }
             $(document).attr("title", int_data.name);//修改页面标题
+            sfdp.setTips();
         }
     },
     // 生成过滤条件组
@@ -89,7 +90,7 @@ var sfdp = {
         let htmlTags = ``
         for (const item of list) {
             let type = item.type || 'text'
-            htmlTags += `<div class='layui-input-inline' style="min-width:90px">` +sfdpPlug.PlugList(type,item) + `</div>`;
+            htmlTags += `<div class='layui-input-inline' style="min-width:90px;max-width: 110px;">` +sfdpPlug.PlugList(type,item) + `</div>`;
         }
         $('#search').html(htmlTags);
         sfdp.setDate();
@@ -168,6 +169,19 @@ var sfdp = {
         sfdp.Treefun(selectTree);//设置日期格式
         sfdp.setDate();//初始化日期选择器
         sfdpPlug.sliderSet();
+        sfdp.setTips();
+    },
+    setTips:function(){
+        $(".sfdp_tips").mouseover(function(){
+            var con = $(this).attr('sfdp-tip-data');
+            layer.tips(con, this,{
+                tips: [2, '#3d3b3b']
+            });
+        });
+        //监听鼠标移入事件
+        $(".sfdp_tips").mouseout(function(){
+            layer.close(layer.tips());
+        });
     },
     Treefun: function (data){
         for (x in data) {
@@ -776,6 +790,7 @@ var sfdp = {
                  html =   sfdp.tpfd_moren(data);
                 break;
         }
+        html = html + `<div class="sfdp-form-item"><label class="sfdp-label ">帮助信息</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_help" type="text" value="` + (data.tpfd_help || '')  + `" class="sfdp-input"></div></div>`;
         return `<form id="fieldform" class="${data.tpfd_id}">${sfdp.tpfd_common(data)+html}</div><div class="sfdp-form-item"><div style="margin-left: 5%;" class="button" onclick=sfdp.save_field("${data.tpfd_id}")>保存</div></div></form>`;
     },
     /*5.0.1 拖拽进去设计容器的时候改变为响应的控件样式*/
