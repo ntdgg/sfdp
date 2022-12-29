@@ -1,14 +1,12 @@
 <?php
 /**
   *+------------------
-  * SFDP-超级表单开发平台V5.0
+  * SFDP-超级表单开发平台V7.0
   *+------------------
   * Sfdp Api接口类
   *+------------------
-  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  * Copyright (c) 2018~2023 www.liuzhiyun.com All rights reserved.
   *+------------------
-  * Author: guoguo(1838188896@qq.com)
-  *+------------------ 
   */
 namespace sfdp;
 
@@ -21,7 +19,7 @@ use sfdp\fun\SfdpUnit;
 
 use sfdp\lib\unit;
 
-define('SFDP_Ver', '6.0.5' );
+define('SFDP_Ver', '7.0.0' );
 
 define('BEASE_SFDPURL', realpath ( dirname ( __FILE__ ) ) );
 
@@ -29,7 +27,6 @@ define('ROOT_PATH',dirname(dirname(__DIR__) . DIRECTORY_SEPARATOR, 1) . DIRECTOR
 
 class Api
 {
-	public $topconfig = '';
 	function __construct($sid='') {
 		$ginfo = unit::getuserinfo();
 		if($ginfo==-1){
@@ -38,14 +35,6 @@ class Api
 		if($sid==''){
 			$sid = input('sid');
 		}
-		$this->topconfig = 
-		'<script>
-		var g_uid='.$ginfo['uid'].';
-		var g_role='.$ginfo['role'].';
-		var g_saas="'.$ginfo['saas_id'].'";
-		var g_username="'.$ginfo['username'].'";
-		var g_sid='.$sid.';
-		</script>';
    }
    /**
 	  * Sfdp 5.0统一接口流程审批接口
@@ -53,6 +42,9 @@ class Api
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
 	 public function sfdpApi($act='list',$sid='',$map = null){
+         if($act=='field'){
+             return Control::api($act,$sid);
+         }
 		if($act=='list' || $act=='fun' || $act=='create' || $act=='listData' ){
 			$s_type = input('s_type');
             if ($act=='listData'){
@@ -100,40 +92,40 @@ class Api
 	  */
 	public function sfdpCurd($act='index',$sid='',$bid='',$search=[]){
         if($act=='info'){
-            return Control::curd($act,$sid,'',$this->topconfig);
+            return Control::curd($act,$sid,'');
         }
 		if($act=='index2'){
 			$data = input('post.');
-			return Control::curd($act,$sid,$data,$this->topconfig);
+			return Control::curd($act,$sid,$data);
 		}
 		if($act=='index'){
 			$data = input('post.');
-			return Control::curd($act,$sid,$data,$this->topconfig);
+			return Control::curd($act,$sid,$data);
 		}
 		if($act=='add'){
 			if (unit::is_post()) {
 				$data = input('post.');
-				return Control::curd($act,$sid,$data,$this->topconfig);
+				return Control::curd($act,$sid,$data);
 			 }else{
-               return Control::curd($act,$sid,'',$this->topconfig);
+               return Control::curd($act,$sid,'');
 			 }
 		}
         if($act=='show'){
-           return Control::curd('add',$sid,'',$this->topconfig);
+           return Control::curd('add',$sid,'');
         }
 		if($act=='edit'){
 			if (unit::is_post()) {
 				$data = input('post.');
-				return Control::curd($act,$sid,$data,$this->topconfig,$bid);
+				return Control::curd($act,$sid,$data,$bid);
 			 }else{
-               return Control::curd($act,$sid,'',$this->topconfig,$bid);
+               return Control::curd($act,$sid,'',$bid);
 			 }
 		}
 		if($act=='view'){
 			return Control::curd($act,$sid,$bid);
 		}
 		if($act=='del'){		
-             return Control::curd($act,$sid,'',$this->topconfig,$bid);
+             return Control::curd($act,$sid,'',$bid);
 		}
 		if($act=='GetData'){
             if(empty($search)){
@@ -141,7 +133,7 @@ class Api
             }else{
                 $data = $search;
             }
-			return Control::curd($act,$sid,$data,$this->topconfig);
+			return Control::curd($act,$sid,$data);
 		}
         if($act=='Data'){
             return Control::curd($act,$sid,$bid);

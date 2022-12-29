@@ -1,20 +1,66 @@
 <?php
 /**
   *+------------------
-  * SFDP-超级表单开发平台V5.0
+  * SFDP-超级表单开发平台V7.0
   *+------------------
   * Sfdp 工具类
   *+------------------
-  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  * Copyright (c) 2018~2023 www.liuzhiyun.com All rights reserved.
   *+------------------
-  * Author: guoguo(1838188896@qq.com)
-  *+------------------ 
   */
 namespace sfdp\lib;
 
 
+use sfdp\adaptive\Script;
+
 class unit{
-	
+
+    public static function sConfig($sfdp_ver_info,$load_file,$sid){
+        $fun = self::uJs($sfdp_ver_info);
+        $config = [
+            'g_js'=>self::sJs($sid),
+            'fun' =>$fun,
+            'load_file' =>$load_file,
+            'upload_file'=>unit::gconfig('upload_file'),
+            's_type' =>$sfdp_ver_info['s_type']
+        ];
+        return [$fun,$config];
+    }
+    /**
+     *优化用户自定义脚本用法
+     */
+    public static  function uJs($info){
+        $fun = '';
+        if($info['s_fun_id']>0){
+            $sfdp_script_ver = Script::getVer($info['s_fun_id']);
+            $fun = '<script src="/static/sfdp/user-defined/'.$info['s_fun_ver'].'.js?ver='.$sfdp_script_ver.'"></script>';
+        }
+        return $fun;
+    }
+    /**
+     *全局变量用法
+     */
+    public static function sJs($sid){
+        $ginfo = unit::getuserinfo();
+        $g_js ='<script>
+            var g_uid='.$ginfo['uid'].';
+            var g_role='.$ginfo['role'].';
+            var g_saas="'.$ginfo['saas_id'].'";
+            var g_username="'.$ginfo['username'].'";
+            var g_sid='.$sid.';
+            </script>';
+        return $g_js;
+    }
+    /**
+     *返回错误得JS消息提示
+     */
+    public static function errJSMsg($msg,$url='',$relod=false){
+        if($url <> ''){
+            echo "<script language='javascript'>alert('".$msg."'); location.assign('".$url."');</script>";exit;
+        }else{
+            echo '<script>var index = parent.layer.getFrameIndex(window.name);parent.layer.msg("'.$msg.'");setTimeout("parent.layer.close(index)",2000);</script>';exit;
+        }
+    }
 	/**
 	 * 判断是否是POST
 	 *

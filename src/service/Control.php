@@ -1,14 +1,12 @@
 <?php
 /**
   *+------------------
-  * SFDP-超级表单开发平台V5.0
+  * SFDP-超级表单开发平台V7.0
   *+------------------
   * Sfdp 核心驱动类
   *+------------------
-  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  * Copyright (c) 2018~2023 www.liuzhiyun.com All rights reserved.
   *+------------------
-  * Author: guoguo(1838188896@qq.com)
-  *+------------------ 
   */
 namespace sfdp\service;
 
@@ -53,6 +51,18 @@ class Control{
 			$list = Functions::select();
 			return lib::fun($list);
 		}
+        if($act =='field'){
+            $sid_ver = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
+            if(!$sid_ver){
+                echo '<style type="text/css"> a{color:#2E5CD5;cursor: pointer;text-decoration: none} 
+	body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;padding: 50px;} 
+	h1{ font-size: 50px; font-weight: normal; margin-bottom: 12px; } 
+	p{ line-height: 1.2em; font-size: 36px }
+	li {font-size: x-large;margin: 10px;}
+	</style><h2><h1>d(╯﹏╰)b</h1>您好，部署后方可进行使用！</h2>';exit;
+            }
+            return Field::select(['sid'=>$sid_ver['id']]);
+        }
 		if($act =='desc'){
 			 $info = Design::find($sid);
 			 if($info['s_type']==0 || $info['s_type']==2){
@@ -72,8 +82,7 @@ class Control{
             if($sid !='' && is_array($sid)){
                 $bill = Script::scriptSave($sid);
                 BuildFun::Bfun($sid['function'],$bill);
-                $action = $urls['api'].'?act=script&sid='.$sid['sid'];
-                echo "<script language='javascript'>alert('Success,脚本生成成功！'); location.assign('".$action."');</script>";exit;
+                unit::errJSMsg('Success,脚本生成成功！',$urls['api'].'?act=script&sid='.$sid['sid']);
             }
             return lib::mysql(Script::script($sid),$sid);
         }
@@ -81,8 +90,7 @@ class Control{
 			if($sid !='' && is_array($sid)){
 				$bill = Script::scriptSave($sid);
 				BuildFun::Bfun($sid['function'],$bill);
-				$action = $urls['api'].'?act=script&sid='.$sid['sid'];
-				echo "<script language='javascript'>alert('Success,脚本生成成功！'); location.assign('".$action."');</script>";exit;
+                unit::errJSMsg('Success,脚本生成成功！',$urls['api'].'?act=script&sid='.$sid['sid']);
 			}
 			return lib::script(Script::script($sid),$sid);
 		}
@@ -152,6 +160,7 @@ class Control{
 			}
 			//判断是否有附表
 			if(isset($json['sublist']) && $json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
+                $fieldId2 = Field::sadd($varInfo['ver']['id'],$varInfo['db2']);//子表加入版本库
 				$Stable = BuildStable::Btable($json['name_db'],$json['sublist'],$all);
 				if($Stable['code']==-1){
 					return json($Stable);
@@ -203,11 +212,10 @@ class Control{
 		if($act =='custom'){
 			$info = Design::find($sid);
 			if($info['s_design']<>2){
-                echo '<script>var index = parent.layer.getFrameIndex(window.name);parent.layer.msg("Err,校验错误,请先设计并部署！");setTimeout("parent.layer.close(index)",2000);</script>';
-				exit;
+                unit::errJSMsg('Err,校验错误,请先设计并部署！');
 			}
 			$json = View::ver($sid);
-			$field = Field::select([['sid','=',$json['ver']['id']]]);;//找出模型字段
+			$field = Field::select([['sid','=',$json['ver']['id']],['table_type','=',0]]);;//找出模型字段
 			$modue = Modue::findWhere([['sid','=',$json['ver']['id']]]);//找出模型字段
 			return lib::custom($sid,$field,$modue);
 		}
@@ -241,15 +249,12 @@ class Control{
                 Field::saveWhere([['id','=',$v['id']]],['width'=>$v['width'],'update_time'=>time()]);//更新宽度
             }
             ksort($list);ksort($list_name);
-
             $list_field = implode(',',$list);
             $field_name = implode(',',$list_name);
-
             if($list_field !=''){
                 $modue = Modue::saveWhere([['sid','=',$json['ver']['id']]],['field'=>$list_field,'field_name'=>$field_name,'update_time'=>time()]);
                 $field = Field::saveWhere([['field','in',$list],['sid','=',$json['ver']['id']]],['is_list'=>1,'update_time'=>time()]);
             }
-
             $count_field = implode(',',$count);
             if($count_field !=''){
                 $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['count_field'=>$count_field,'update_time'=>time()]);
@@ -268,8 +273,6 @@ class Control{
                     }
                 }
             }
-
-
             $ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['show_field'=>$sid['show_field'],'show_fun'=>$sid['show_fun'],'show_type'=>$sid['show_type'],'update_time'=>time()]);
             if($ret){
                 return json(['code'=>0,'msg'=>'保存成功']);
@@ -341,16 +344,21 @@ class Control{
 	 * @param  str $act 调用方法
 	 * @param  Array $sid sid值
 	 */
-	static function curd($act,$sid,$data='',$g_js='',$bid=''){
+	static function curd($act,$sid,$data='',$bid=''){
 	    //使用sid找出当前的版本sid_ver; 2021年5月3日22:58:33
         $sid_ver = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
         if(!$sid_ver){
-            echo '未发现发行版本';exit;
+            echo '<style type="text/css"> a{color:#2E5CD5;cursor: pointer;text-decoration: none} 
+	body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;padding: 50px;} 
+	h1{ font-size: 50px; font-weight: normal; margin-bottom: 12px; } 
+	p{ line-height: 1.2em; font-size: 36px }
+	li {font-size: x-large;margin: 10px;}
+	</style><h2><h1>d(╯﹏╰)b</h1>您好，请前往业务平台进行业务开发，部署后方可进行使用！</h2>';exit;
         }
         $sid = $sid_ver['id'];
 		if($act =='index'){
 			$modueId = Modue::findWhere([['sid','=',$sid]]);//找出模型
-			$fieldId = Field::select([['sid','=',$sid]]);//找出模型字段
+			$fieldId = Field::select([['sid','=',$sid],['table_type','=',0]]);//找出模型字段
             $sfdp_design = Design::find($sid_ver['sid']);
 			$search = [];
 			foreach($fieldId as $k=>$v){
@@ -382,16 +390,16 @@ class Control{
 					}
 					$search[] = $v;
 				}
-                if(in_array($v['field'],explode(',',$modueId['field']))){
+                if(in_array($v['field'],explode(',',$modueId['field'] ?? ''))){
                     $field_lenth[$v['field']] = $v['width'] ?? '120';
                 }
 			}
 			$map = SfdpUnit::Bsearch($data,$sid);
 			$list = Data::getListData($sid,$map);
-			$field_name = explode(',',$modueId['field_name']);
-            $field_mysql_name = explode(',',$modueId['field']);
+			$field_name = explode(',',$modueId['field_name'] ?? '');
+            $field_mysql_name = explode(',',$modueId['field'] ?? '');
 			$config = [
-				'g_js'=>$g_js,
+				'g_js'=>unit::sJs($sid),
 				'sid' =>$sid,
                 'table' => $sid_ver['s_db'],
 				'field'=>$field_name,
@@ -417,13 +425,10 @@ class Control{
 		}
 		if($act =='GetData'){
 			$map = SfdpUnit::Bsearch($data,$sid);
-			$list = Data::getListData($sid,$map,$data['page'],$data['limit']);
+			$list = Data::getListData($sid,$map,$data['page'],$data['limit'],$data['whereRaw']);
 			$jsondata = [];
 			$btnArray = $list['field']['btn'];
 			$tablename = $list['field']['db_name'];
-			$stv = [
-				-1=>'<span class="label label-danger radius" >退回修改</span>',0=>'<span class="label radius">保存中</span>',1=>'<span class="label radius" >流程中</span>',2=>'<span class="label label-success radius" >审核通过</span>'
-			];
 			foreach($list['list'] as $k=>$v){
 				$list['list'][$k]['url'] = '<a onClick=sfdp.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
 				$jsondata[$k] = array_values($list['list'][$k]);
@@ -439,7 +444,7 @@ class Control{
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/view.html',['info'=>$info['info'],'row'=>$info['row']]);
 				}else{
-				return ['info'=>$info['info'],'row'=>$info['row']];
+				return ['info'=>$info['info'],'row'=>$info['row'],'config'=>$info['config']];
 			}
 		}
 		if($act =='edit'){
@@ -448,18 +453,10 @@ class Control{
 				return json(['code'=>0,'msg'=>'保存成功']);
 			}
 			$data = Data::getEditData($sid,$bid);
-			$viewdata = $data['data'];
-			$config = [
-				'g_js'=>$g_js,
-				'fun' =>$viewdata['fun'],
-				'load_file' =>$viewdata['load_file'],
-				'upload_file'=>unit::gconfig('upload_file'),
-                's_type' =>$viewdata['info']['s_type']
-			];
 			if(unit::gconfig('return_mode')==1){
-				return view(ROOT_PATH.'/edit.html',['showtype'=>'edit','config'=>$config,'data'=>$data['info']]);
+				return view(ROOT_PATH.'/edit.html',['showtype'=>'edit','config'=>$data['data']['config'],'data'=>$data['info']]);
 				}else{
-				return ['config'=>$config,'data'=>$data['info'],'bill_info'=>$data['bill_info']];
+				return ['config'=>$data['data']['config'],'data'=>$data['info'],'bill_info'=>$data['bill_info']];
 			}
 		}
 		if($act =='del'){	
@@ -476,29 +473,15 @@ class Control{
 				}
 			}
 			$data = Design::getAddData($sid);
-			$config = [
-				'g_js'=>$g_js,
-				'fun' =>$data['fun'],
-				'load_file' =>$data['load_file'],
-				'upload_file'=>unit::gconfig('upload_file'),
-                's_type' =>$data['info']['s_type']
-			];
 			if(unit::gconfig('return_mode')==1){
-				return view(ROOT_PATH.'/edit.html',['showtype'=>'add','config'=>$config,'data'=>$data['info']['s_field']]);
+				return view(ROOT_PATH.'/edit.html',['showtype'=>'add','config'=>$data['config'],'data'=>$data['info']['s_field']]);
 				}else{
-				return ['config'=>$config,'data'=>$data['info']['s_field']];
+				return ['config'=>$data['config'],'data'=>$data['info']['s_field']];
 			}
 		}
         if($act =='info'){
             $data = Design::getAddData($sid);
-            $config = [
-                'g_js'=>$g_js,
-                'fun' =>$data['fun'],
-                'load_file' =>$data['load_file'],
-                'upload_file'=>unit::gconfig('upload_file'),
-                's_type' =>$data['info']['s_type']
-            ];
-            return ['config'=>$config,'data'=>$data['info']['s_field']];
+            return ['config'=>$data['config'],'data'=>$data['info']['s_field']];
         }
         if($act=='Data'){
             return M::Save($data);

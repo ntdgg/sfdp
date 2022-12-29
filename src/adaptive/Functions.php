@@ -1,14 +1,12 @@
 <?php
 /**
   *+------------------
-  * SFDP-超级表单开发平台V5.0
+  * SFDP-超级表单开发平台V7.0
   *+------------------
   * Sfdp 方法类
   *+------------------
-  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  * Copyright (c) 2018~2023 www.liuzhiyun.com All rights reserved.
   *+------------------
-  * Author: guoguo(1838188896@qq.com)
-  *+------------------ 
   */
 namespace sfdp\adaptive;
 

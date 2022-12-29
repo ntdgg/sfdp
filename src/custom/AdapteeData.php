@@ -1,13 +1,11 @@
 <?php
 /**
  *+------------------
- * SFDP-超级表单开发平台V5.0
+ * SFDP-超级表单开发平台V7.0
  *+------------------
  * Sfdp 适配器基础数据类
  *+------------------
  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
- *+------------------
- * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
 namespace sfdp\custom;
@@ -70,7 +68,7 @@ class AdapteeData{
 	function selectAll($table,$map=[]){
 		return Db::name($table)->where($map)->withoutField('d_id,uid,status,create_time,update_time,is_delete')->select()->toarray();
 	}
-	function select($table,$map=[],$field='',$page=1,$limit=10,$whereRaw='',$order='',$is_saas=''){
+	function select($table,$map=[],$field='',$page=1,$limit=10,$whereRaw='',$order='',$is_saas='',$ewhereRaw=''){
 		$offset = ($page-1)*$limit;
 		if($field!=''){
 			$field =','.$field.',';
@@ -83,6 +81,9 @@ class AdapteeData{
 		}
         if($is_saas !=''){
            $list = $list->whereRaw($is_saas);
+        }
+        if($ewhereRaw !=''){
+            $list = $list->whereRaw($ewhereRaw);
         }
         if($order==''){
             $order ='id desc';
@@ -102,6 +103,9 @@ class AdapteeData{
 		if($whereRaw !=''){
 			$count = $count->whereRaw($whereRaw);
 		}
+        if($ewhereRaw !=''){
+            $count = $count->whereRaw($ewhereRaw);
+        }
 		$count = $count->count();
 		return ['data'=>$list,'count'=>$count];
 	}

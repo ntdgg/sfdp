@@ -1,14 +1,12 @@
 <?php
 /**
   *+------------------
-  * SFDP-超级表单开发平台V5.0
+  * SFDP-超级表单开发平台V7.0
   *+------------------
   * Sfdp 数据类
   *+------------------
-  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  * Copyright (c) 2018~2023 www.liuzhiyun.com All rights reserved.
   *+------------------
-  * Author: guoguo(1838188896@qq.com)
-  *+------------------ 
   */
 namespace sfdp\adaptive;
 
@@ -48,11 +46,11 @@ class Field{
 	 */
 	static function add($varId,$varInfo){
 		$field = [
-				['sid'=>$varId,'field'=>'id','name'=>'主键','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>''],
-				['sid'=>$varId,'field'=>'uid','name'=>'用户id','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>''],
-				['sid'=>$varId,'field'=>'status','name'=>'审核状态','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>''],
-				['sid'=>$varId,'field'=>'create_time','name'=>'新增时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>''],
-				['sid'=>$varId,'field'=>'update_time','name'=>'更新时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'']
+				['sid'=>$varId,'field'=>'id','name'=>'主键','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
+				['sid'=>$varId,'field'=>'uid','name'=>'用户id','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
+				['sid'=>$varId,'field'=>'status','name'=>'审核状态','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
+				['sid'=>$varId,'field'=>'create_time','name'=>'新增时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
+				['sid'=>$varId,'field'=>'update_time','name'=>'更新时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>'']
 			];
 			foreach($varInfo as $k=>$v){
 				$type_lx = intval($v['xx_type'] ?? 0);
@@ -63,7 +61,7 @@ class Field{
 					'name_type'=>$v['tpfd_dblx'],
 					'zanwei'=>$v['tpfd_zanwei'] ?? '',//占位标识
 					'moren'=>$v['tpfd_moren'] ?? '',//默认标识
-                    'width'=>$v['tpfd_width'] ?? 120,//组件长度
+                    'width'=>intval($v['tpfd_width'] ?? 120),//组件长度
 					'is_request'=>$v['tpfd_must'] ?? '',
 					'is_read'=>$v['tpfd_read'] ?? '',
 					'length'=>$v['tpfd_dbcd'],
@@ -75,13 +73,51 @@ class Field{
 					'is_list'=>$v['tpfd_list']=='yes'?1:0,
 					'is_search'=>$v['tpfd_chaxun']=='yes'?1:0,
                     'fid'=>$v['tpfd_id'],
-					'search_type'=>''
-
+					'search_type'=>'','table_type'=>0,'table_id'=>''
 				];
 			}
-			
 		return (new Field())->mode->add_all($field);
 	}
+    /**
+     * 添加
+     */
+    static function sadd($varId,$varInfo){
+        foreach($varInfo as $k=>$v){
+            $field = [
+                ['sid'=>$varId,'field'=>'id','name'=>'主键','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>1,'table_id'=>$k],
+                ['sid'=>$varId,'field'=>'uid','name'=>'用户id','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>1,'table_id'=>$k],
+                ['sid'=>$varId,'field'=>'status','name'=>'审核状态','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>1,'table_id'=>$k],
+                ['sid'=>$varId,'field'=>'create_time','name'=>'新增时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>1,'table_id'=>$k],
+                ['sid'=>$varId,'field'=>'update_time','name'=>'更新时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>1,'table_id'=>$k]
+            ];
+            foreach($v as $k2=>$v2){
+                $type_lx = intval($v2['xx_type'] ?? 0);
+                $field[] = [
+                    'sid'=>$varId,
+                    'field'=>$v2['tpfd_db'],
+                    'name'=>$v2['tpfd_name'],//字段名
+                    'name_type'=>$v2['tpfd_dblx'],
+                    'zanwei'=>$v2['tpfd_zanwei'] ?? '',//占位标识
+                    'moren'=>$v2['tpfd_moren'] ?? '',//默认标识
+                    'width'=>intval($v2['tpfd_width'] ?? 120),//组件长度
+                    'is_request'=>$v['tpfd_must'] ?? '',
+                    'is_read'=>$v2['tpfd_read'] ?? '',
+                    'length'=>$v2['tpfd_dbcd'],
+                    'type_data'=>json_encode($v2['tpfd_data'] ?? '',true),
+                    'type'=>$v2['td_type'],//输入类型
+                    'data'=>$v2['xx_type'] ?? '',
+                    'function'=>$v2['checkboxes_func'] ??'',
+                    'type_lx'=>1,
+                    'is_list'=>$v2['tpfd_list']=='yes'?1:0,
+                    'is_search'=>$v2['tpfd_chaxun']=='yes'?1:0,
+                    'fid'=>$v2['tpfd_id'],
+                    'search_type'=>'','table_type'=>1,'table_id'=>$k
+                ];
+            }
+             (new Field())->mode->add_all($field);
+            unset($field);
+        }
+    }
 	/**
 	 * 添加
 	 */

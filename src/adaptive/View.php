@@ -1,14 +1,12 @@
 <?php
 /**
   *+------------------
-  * SFDP-超级表单开发平台V5.0
+  * SFDP-超级表单开发平台V7.0
   *+------------------
   * Sfdp 视图类
   *+------------------
-  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
+  * Copyright (c) 2018~2023 www.liuzhiyun.com All rights reserved.
   *+------------------
-  * Author: guoguo(1838188896@qq.com)
-  *+------------------ 
   */
 namespace sfdp\adaptive;
 
@@ -30,7 +28,15 @@ class View{
 				}
 			}
 		}
-		return ['db'=>$data_ver_db,'all'=>$json['s_field'],'ver'=>$json];
+        $data_ver_db2 = [];
+        foreach((array)$field['sublist'] as $k=>$v){
+                foreach ($v['data'] as $v3) {
+                    if (isset($v3['tpfd_db'])) {
+                        $data_ver_db2[$k][] = $v3;
+                    }
+            }
+        }
+		return ['db'=>$data_ver_db,'db2'=>$data_ver_db2,'all'=>$json['s_field'],'ver'=>$json];
 	}
 	/**
 	 * 保存版本
@@ -58,7 +64,6 @@ class View{
 	 */
 	public static function verAdd($sid,$info,$json){
 		$json_ver = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);//2021年5月12日 重新部署更新脚本方法
-		
 		$ver = [
 			'sid'=>$sid,
 			's_bill'=>unit::OrderNumber(),

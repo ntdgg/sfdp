@@ -1,13 +1,11 @@
 <?php
 /**
  *+------------------
- * SFDP-超级表单开发平台V5.0
+ * SFDP-超级表单开发平台V7.0
  *+------------------
  * Sfdp 工具类
  *+------------------
  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
- *+------------------
- * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
 namespace sfdp\lib;
@@ -191,11 +189,11 @@ php;
 		$urls= unit::gconfig('url');
 		$url =$urls['api'];
 		$fun_save = $urls['api'].'?act=customSave&sid='.$sid;
-		$access = json_decode($modue['access'],true);
+		$access = json_decode($modue['access'] ?? '',true);
         $show_type=  $modue['show_type'];
         $show_fun=  $modue['show_fun'];
 		$show_field=  $modue['show_field'];
-        $fielcount = explode(",",$modue['count_field']);
+        $fielcount = explode(",",$modue['count_field'] ?? '');
 		$search ='';
 		$field_html ='';
 		$access_html ='';
@@ -213,7 +211,7 @@ php;
 			$access_html .='<div id="access_id'.$v[0].'">控制字段：<select style="width:200px" name="accsee_ids"><option value="'.$v[0].'">'.$v[3].'</option></select> <select style="width:200px" name="accsee_eq"><option value="'.$v[1].'">'.$eq[$v[1]].'</option></select> <select style="width:200px" name="accsee_user"><option value="'.$v[2].'">'.$user[$v[2]].'</option></select> <select style="width:200px" name="accsee_fun"><option value="'.$v[4].'">'.$v[4].'</option></select> <span class="button" onclick=editaccess("_id'.$v[0].'")>del</span></div>';
 		}
         $alltable ='';
-        $listfield = explode(',',$modue['field']);
+        $listfield = explode(',',$modue['field'] ?? '');
         foreach($field as $k=>$v){
             if(!in_array($v['field'], ['id'])) {
                 $countchecked = '';
@@ -226,11 +224,11 @@ php;
         }
         $lenth = count($field);
 		return <<<php
-  <link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" />
+  <link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.0" />
   <script src="{$patch}lib/jquery-1.12.4.js"></script>
   <script src="{$patch}lib/jquery-ui.js"></script>
 	<script src="{$patch}lib/layer/3.1.1/layer.js"></script>
-	<script src="{$patch}sfdp.5.0.js?v=5.0.1"></script>
+	<script src="{$patch}sfdp.7.0.js?v=7.0.0"></script>
 </head>
 <body style="padding:20px">
  <table>
@@ -331,7 +329,7 @@ php;
 		return <<<php
 	<html>
 	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
-	<link rel="stylesheet" href="{$patch}sfdp.5.0.css?v=5.0.1" /> 
+	<link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.0" /> 
 	<body>
         <div>
 			<div id="ctlMenus" class="sfdp-con" style="float: left; width: 240px;">
@@ -377,18 +375,18 @@ php;
 			</div>
 			<div class="sfdp-con" style="float: right; width: 360px;">
 				<div class="sfdp-att">
-				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><p> Sfdp V6.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © 流之云 <a href="https://www.cojz8.com/">Sfdp</a> 版权所有 ]</span></div>
+				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><p> Sfdp V7.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © 流之云 <a href="https://www.cojz8.com/">Sfdp</a> 版权所有 ]</span></div>
 				</div>
 			</div>
 			<div class="sfdp-cl"></div>
 		</div>
-		<script src="{$patch}lib/jquery-3.4.1.min.js"></script>
-		<script src="{$patch}lib/layer/3.1.1/layer.js"></script>
-		<script src="{$patch}lib/pingyin.js"></script>
-		<script type="text/javascript" src="{$patch}sfdp.5.0.js?v=5.0.322222"></script>
-		<script type="text/javascript" src="{$patch}sfdp.config.js?v=5.0.322222"></script>
+		<script type="text/javascript" src="{$patch}lib/jquery-3.4.1.min.js"></script>
+		<script type="text/javascript" src="{$patch}lib/layer/3.1.1/layer.js"></script>
+		<script type="text/javascript" src="{$patch}lib/pingyin.js"></script>
+		<script type="text/javascript" src="{$patch}sfdp.7.0.js?v=7.0.0"></script>
+		<script type="text/javascript" src="{$patch}sfdp.config.js?v=7.0.0"></script>
 		<script type="text/javascript" src="{$patch}lib/jquery-ui.js"></script>
-		<script type="text/javascript" language="javascript">
+		<script type="text/javascript">
 			var look_db = {$look};
 			var s_type = 0;
 			const server_url ='{$server_save}';
@@ -406,10 +404,12 @@ php;
 			    stop: function( event, ui ) {
 			        let obj = {}
 			        let obj2 = []
+			        //alert(111);
 			        const json_data = JSON.parse(localStorage.getItem("json_data"));
 			        const sortedList = $("#sfdp-main div.sfdp-rows ")
 			        for(let i= 0; i< sortedList.length ;i++){
 			            let item = sortedList[i]
+			            //alert(item.id);
 			            //删除TR数据
 			            sfdp.dataSave('', item.id , 'tr_del');
 			            //重新写入数据库
@@ -491,7 +491,7 @@ php;
 	public static function script($info,$sid){
 		$tmp = self::commontmp('Sfdp超级表单设计器');
 		$urls= unit::gconfig('url');
-		$info['s_fun'] = $info['s_fun'] ?? '';
+		$s_fun = $info['s_fun'] ?? '';
 		$action = $urls['api'].'?act=script&sid='.$sid;
 		$patch = unit::gconfig('static_url');
 		return <<<php
@@ -517,7 +517,7 @@ php;
 			</tr>
 			<tr valign="center">
 			<td style='width:35px;text-align:center'>单据脚本</td><td style='width:330px' >
-			<textarea placeholder="请填写JQ脚本代码！" name='function'  type="text/plain" style="width:100%;height:450px;display:inline-block;" id='code'>{$info['s_fun']}</textarea> </td>
+			<textarea placeholder="请填写JQ脚本代码！" name='function'  type="text/plain" style="width:100%;height:450px;display:inline-block;" id='code'>{$s_fun}</textarea> </td>
 			</tr>
 			<tr valign="center">
 			<td style='text-align:center' colspan='2'><button  class="button" type="submit">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
@@ -690,10 +690,10 @@ php;
 	 **/
 	static function commontmp($title){
 		$patch = unit::gconfig('static_url');
-		$css = '<link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.5.0.css?v=5.0.1" />';
+		$css = '<link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.7.0.css?v=7.0.0" />';
 		$js = '<script src="'.$patch.'lib/jquery-1.12.4.js"></script>
 		<script src="'.$patch.'lib/layer/3.1.1/layer.js"></script>
-		<script src="'.$patch.'sfdp.5.0.js?v=5.0.1"></script>';
+		<script src="'.$patch.'sfdp.7.0.js?v=7.0.0"></script>';
 		$head ='<title>'.$title.'</title><head>'.$css.'</head><body style="background-color: white;">';
 		return ['head'=>$head,'css'=>$css,'js'=>$js];
 	}

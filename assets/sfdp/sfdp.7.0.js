@@ -126,7 +126,19 @@ var sfdp = {
                 var xh = 1;
                 //恢复子表布局
                 if( Object.keys(int_data.sublist).length>0){
-                    $("#table_view").append(`<div class="table_card"><ul class="tab" id="tab"></ul><div class="tabCon" id="tabCon"></div>`);
+                    $("#table_view").append(`<div class="table_card"><ul class="tab" id="tab"></ul><span style="float: right;margin-top: -20px;font-size: 13px" ><input type="checkbox" id="kslr">↓快速录入</span><div class="tabCon" id="tabCon"></div>`);
+                    $(document).keydown(function(event){
+                        if($('#kslr').is(":checked")){
+                            if(event.keyCode==40){
+                                $('#tabCon div').each(function (i){
+                                    if($(this).css("display")=="block"){
+
+                                        $(this).find("a").filter(".layui-btn").click();
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
                 for (x in int_data.sublist) {
                     var divclass='';
@@ -139,6 +151,7 @@ var sfdp = {
                     let table = sfdp.sublist_build(int_data.sublist[x]['type'], int_data.sublist[x], showtype, int_data.name_db + '_d' + xh);
                     $("#tabCon").append(`<div class="${divclass}">${table}</div>`);
                     xh++
+
                 }
                 if (showtype === 'edit') {
                     for (x in int_data.sublists) {
@@ -231,7 +244,7 @@ var sfdp = {
         if (show_type) {
             return htmls + '</tr>';
         } else {
-            return htmls + '<td><a class="layui-btn layui-btn-xs " onclick="sfdp.dl(this)">删</a><input name="id" value="'+id+'" type="hidden"></td></tr>';
+            return htmls + '<td><a style="color: chocolate;"onclick="sfdp.dl(this)">删</a><input name="id" value="'+id+'" type="hidden"></td></tr>';
         }
     },
     sublist_build: function (id, data = '', types, stable, show_type = false) {
@@ -257,7 +270,7 @@ var sfdp = {
             head_html += '<th>' + this + '</th>';
         });
         if (show_type) {
-            html = '<div id="' + stable + '"><table class="'+sfdp.ui.table+' table"><tr class="text-c title"><th>序号</th>' + head_html + '</tr></table></div>';
+            html = '<div id="' + stable + '"><table class="'+sfdp.ui.table+' table"><tr class="text-c title"><th style="width: 65px">序号</th>' + head_html + '</tr></table></div>';
         } else {
             localStorage.setItem("sub"+code, JSON.stringify(td_data));
             html = '<form id="' + stable + '" class="sub_list  layui-form" data="' + stable + '">' +
@@ -284,7 +297,7 @@ var sfdp = {
             var reg = new RegExp("dropdown_","g");//g,表示全部替换。
             htmls = htmls.replace(reg,'Atr'+length+"_dropdown_");
         }
-        $('#'+id+'_table tbody').append(htmls+'<td> <a onclick="sfdp.dl(this)" class="layui-btn layui-btn-xs">删</a><input name="id" value="" type="hidden"></td>');
+        $('#'+id+'_table tbody').append(htmls+'<td> <a onclick="sfdp.dl(this)" style="color: chocolate;">删</a><input name="id" value="" type="hidden"></td>');
         $('.this-select').select2({width:'100%'});
         sfdp.setDate();
     },
@@ -1408,12 +1421,91 @@ var sfdp = {
     rec_field(dataCode){
         var all_data = JSON.parse(localStorage.getItem("json_data"));
         var default_data = all_data['sublist'][dataCode]['data'];
+        var obj = [{'pv':100,'uv':105},{'pv':123,'uv':132},{'pv':128,'uv':138},{'pv':88,'uv':68}];
+        var news_data  = [];
         $.each(default_data,function(index,obj){
+            news_data.push(obj);
+        });
+        var new_datas = sfdp.sortByKey(news_data,'td','asc');
+        $.each(new_datas,function(index,obj){
             var html = sfdp.field_config(obj.td_type, obj.tpfd_id, dataCode);
-            $('#trdata').after(`<tr class="trdata"><td>${obj.td} <a style="font-size: 6px;padding: 1px 3px;float: right;" class="button" onclick=sfdp.del_sub(this,"${obj.tpfd_id}","${obj.tr_id}","${obj.td}")>删</a></td><td>${html}</td> </tr>`);
+            $('#trdata').after(`<tr class="trdata"><td data-id="${obj.td}" style="text-align: center"><a style="font-size: 6px;padding: 1px 3px;" class="button" onclick=sfdp.del_sub(this,"${obj.tpfd_id}","${obj.tr_id}","${obj.td}")>删</a> <a style="font-size: 6px;padding: 1px 3px;" class="button" onclick=sfdp.moveUp(this)> ↑ </a>  <a style="font-size: 6px;padding: 1px 3px;" class="button" onclick=sfdp.moveDown(this)> ↓ </a></td><td>${html}</td> </tr>`);
         });
     },
-    del_sub(obj,tpfd_id,tr_id,xh){
+    sortByKey(arr,key,order){
+        for(i=0;i<arr.length;i++){
+            for(j=i+1;j<arr.length;j++){
+                if(order=='desc'){
+                    if(parseFloat(arr[i][key])<=parseFloat(arr[j][key])){
+                        var min=arr[i];
+                        arr[i]=arr[j];
+                        arr[j]=min;
+                    }
+                }else{
+                    if(parseFloat(arr[i][key])>=parseFloat(arr[j][key])){
+                        var max=arr[i];
+                        arr[i]=arr[j];
+                        arr[j]=max;
+                    }
+                }
+            }
+        }
+        return arr;
+    },
+    moveUp(obj) {
+        var current = $(obj).parent().parent(); //获取当前<tr>
+        var prev = current.prev();  //获取当前<tr>前一个元素
+        if(prev[0].id=='trdata'){
+            layer.msg('Tip:已经是最顶级了！');
+            return;
+        }
+        if (current.index() > 0) {
+            current.insertBefore(prev); //插入到当前<tr>前一个元素前
+        }
+        var all_data = JSON.parse(localStorage.getItem("json_data"));
+        var tr_id = current.children('td').eq(1).find('input[name=tr_id]').val();//
+        var tpfd_id = current.children('td').eq(1).find('input[name=tpfd_id]').val();//本
+        var ptpfd_id = prev.children('td').eq(1).find('input[name=tpfd_id]').val();//上一个
+        var default_data = all_data['sublist'][tr_id]['data'];
+        var tr_data = default_data[tpfd_id];
+        var ptr_data = default_data[ptpfd_id];
+        var td1 = tr_data.td;
+        var td2 = ptr_data.td;
+        tr_data.td = td2;
+        ptr_data.td = td1;
+        sfdp.dataSave({tpfd_id: tpfd_id}, tr_id, 'sublist_td_del');
+        sfdp.dataSave(tr_data, tr_id, 'sublist_data');
+        sfdp.dataSave({tpfd_id: ptpfd_id}, tr_id, 'sublist_td_del');
+        sfdp.dataSave(ptr_data, tr_id, 'sublist_data');
+        $("#up_save").trigger("click");
+    },
+     moveDown(obj) {
+        var current = $(obj).parent().parent(); //获取当前<tr>
+        var next = current.next(); //获取当前<tr>后面一个元素
+        if (next.length>0) {
+            current.insertAfter(next);  //插入到当前<tr>后面一个元素后面
+            var all_data = JSON.parse(localStorage.getItem("json_data"));
+            var tr_id = current.children('td').eq(1).find('input[name=tr_id]').val();//
+            var tpfd_id = current.children('td').eq(1).find('input[name=tpfd_id]').val();//本
+            var ptpfd_id = next.children('td').eq(1).find('input[name=tpfd_id]').val();//上一个
+            var default_data = all_data['sublist'][tr_id]['data'];
+            var tr_data = default_data[tpfd_id];
+            var ptr_data = default_data[ptpfd_id];
+            var td1 = tr_data.td;
+            var td2 = ptr_data.td;
+            tr_data.td = td2;
+            ptr_data.td = td1;
+            sfdp.dataSave({tpfd_id: ptpfd_id}, tr_id, 'sublist_td_del');
+            sfdp.dataSave(ptr_data, tr_id, 'sublist_data');
+            sfdp.dataSave({tpfd_id: tpfd_id}, tr_id, 'sublist_td_del');
+            sfdp.dataSave(tr_data, tr_id, 'sublist_data');
+            $("#up_save").trigger("click");
+        }else{
+            layer.msg('Tip:已经是最后一个了！');
+            return;
+        }
+    },
+del_sub(obj,tpfd_id,tr_id,xh){
         $(obj).parent().parent().remove();
         sfdp.dataSave({tpfd_id: tpfd_id}, tr_id, 'sublist_td_del');
         var all_data = JSON.parse(localStorage.getItem("json_data"));

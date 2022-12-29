@@ -1,13 +1,11 @@
 <?php
 /**
  *+------------------
- * SFDP-超级表单开发平台V5.0
+ * SFDP-超级表单开发平台V7.0
  *+------------------
  * Sfdp 设计类
  *+------------------
  * Copyright (c) 2018~2020 https://cojz8.com All rights reserved.
- *+------------------
- * Author: guoguo(1838188896@qq.com)
  *+------------------
  */
 namespace sfdp\adaptive;
@@ -112,14 +110,10 @@ class Design{
      */
     static function descVerTodata($sid){
         $sfdp_ver_info =(new Design())->mode->findVer($sid);
-        if($sfdp_ver_info['s_fun_id']>0){
-            $fun = '<script src="/static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js"></script>';
-        }else{
-            $fun = '';
-        }
-        $field = json_decode($sfdp_ver_info['s_field'],true);
-        $list_field = json_decode($sfdp_ver_info['s_list'],true);
-        $searct_array = json_decode($sfdp_ver_info['s_search'],true);
+
+        $field = json_decode($sfdp_ver_info['s_field'] ?? '',true);
+        $list_field = json_decode($sfdp_ver_info['s_list'] ?? '',true);
+        $searct_array = json_decode($sfdp_ver_info['s_search'] ?? '',true);
         $searct_field =json_encode($list_field);
         $listid = ''; //变量赋值为空
         $listfield = []; //变量赋值为空
@@ -159,35 +153,32 @@ class Design{
             }
         }
         $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
-        return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'search'=>$searct_field,'fun'=>$fun,'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser,'fieldSysProcess'=>$fieldSysProcess,'fieldSysImg'=>$fieldSysImg];
+        return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'search'=>$searct_field,'fun'=>unit::uJs($sfdp_ver_info),'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser,'fieldSysProcess'=>$fieldSysProcess,'fieldSysImg'=>$fieldSysImg];
     }
     /**
      * 获取数据
      */
     static function getAddData($sid){
         $sfdp_ver_info = (new Design())->mode->findVer($sid);
-        if($sfdp_ver_info['s_fun_id']>0){
-            $sfdp_script_ver = Script::getVer($sfdp_ver_info['s_fun_id']);
-            $fun = '<script src="/static/sfdp/user-defined/'.$sfdp_ver_info['s_fun_ver'].'.js?ver='.$sfdp_script_ver.'"></script>';
-        }else{
-            $fun = '';
-        }
-        $field = json_decode($sfdp_ver_info['s_field'],true);
+        $field = self::fieldFun($sfdp_ver_info['s_field']);
+        $sfdp_ver_info['s_field'] = json_encode($field);
+        $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
+        $config = unit::sConfig($sfdp_ver_info,$load_file,$sid);
+        return ['info'=>$sfdp_ver_info,'fun'=>$config[0],'load_file'=>$load_file,'config'=>$config[1]];
+    }
+    static function fieldFun($sfdp_ver_info){
+        $field = json_decode($sfdp_ver_info,true);
         foreach($field['list'] as $k=>$v){
             foreach($v['data'] as $k2=>$v2){
-
                 if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
                     if($v2['td_type']=='cascade'){
                         $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun2($v2['checkboxes_func']);
-                         }else{
+                    }else{
                         $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun($v2['checkboxes_func']);
                     }
-
-
                 }
             }
         }
-        //dump($field);
         //字表数据
         if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
             foreach($field['sublist'] as $k=>$v){
@@ -198,9 +189,7 @@ class Design{
                 }
             }
         }
-        $sfdp_ver_info['s_field'] = json_encode($field);
-        $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
-        return ['info'=>$sfdp_ver_info,'fun'=>$fun,'load_file'=>$load_file];
+        return $field;
     }
     /**
      * 设计保存
