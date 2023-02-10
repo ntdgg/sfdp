@@ -209,7 +209,7 @@ class Data{
         foreach ($json as $k => $v) {
             foreach($jsondata['fieldArrAll'] as $k2=>$v2){
                 if(in_array($k2,explode(',',$Modue['field'] ?? ''))){
-                    if(strpos($v[$k2],',') !== false){
+                    if(strpos($v[$k2] ?? '',',') !== false){
                         $vk2 = explode(',',$v[$k2]);
                         $vk2value ='';
                         foreach($vk2 as $vvv){
@@ -276,15 +276,17 @@ class Data{
                         $v2['tpfd_data'] =  Data::getFun($v2['checkboxes_func'],$all);
                     }
                 }
-                if($v2['td_type']=='dropdowns' || $v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
-                    $value_arr = explode(",",$find[$v2['tpfd_db']]);
+                if($v2['td_type']=='suphelp'){
+                    $v2['tpfd_data'] =Data::getFun3($v2);
+                }
+                if(in_array($v2['td_type'],['dropdowns','dropdown','radio','checkboxes','suphelp'])){
+                    $value_arr = explode(",",$find[$v2['tpfd_db']] ?? '');
                     $fiedsver = '';
                     foreach($value_arr as $v3){
                         $fiedsver .=($v2['tpfd_data'][$v3] ?? '未选择').',';
                     }
                     $field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
                     $field['list'][$k]['data'][$k2]['tpfd_data'] = $v2['tpfd_data'];
-                    $field['list'][$k]['data'][$k2]['rvalue'] =$find[$v2['tpfd_db']];
                 }elseif($v2['td_type']=='system_user' || $v2['td_type']=="system_role"){
                     $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
                     $sys_user = unit::gconfig('sys_user');
@@ -303,7 +305,6 @@ class Data{
                 $field['list'][$k]['data'][$k2]['rvalue'] = $find[$v2['tpfd_db']];//增加真实值
             }
         }
-
         $sublist =[];
         if(isset($field['sublist']) && $field['sublist']!='' && is_array($field['sublist']) && count($field['sublist'])>0){
             foreach($field['sublist'] as $k=>$v){
@@ -417,4 +418,24 @@ class Data{
         }
         return $getData['msg'];
     }
+    /*超级链接获取数据*/
+    static function getFun3($field,$act='all'){
+        $whereRaw = '';
+        $info = Design::find($field['tpfd_suphelp']);
+        if(isset($field['tpfd_suphelp_where']) && $field['tpfd_suphelp_where']<>'' && $act=='view'){
+            $whereRaw = str_replace("{userid}",unit::getuserinfo('uid'),$field['tpfd_suphelp_where']);
+            $whereRaw = str_replace("{roleid}",unit::getuserinfo('role'),$whereRaw);
+        }
+        $data = (new Data())->mode->funData($info['s_db'],$field['tpfd_suphelp_value'].' as id,'.$field['tpfd_suphelp_label'].' as name',$whereRaw);
+        $tpfd_data = [];
+        foreach ($data as $k3 => $v3) {
+            if(!array_key_exists('name',$v3) || !array_key_exists('id',$v3)){
+                return ['code'=>1,'msg'=>unit::errMsg(3004),'errCode'=>3004];
+            }
+            $tpfd_data[$v3['id']] = $v3['name'];
+        }
+        return $tpfd_data;
+    }
+
+
 }

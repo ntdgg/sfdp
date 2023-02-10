@@ -279,6 +279,13 @@ var sfdp = {
         return html;
     },
     add_sub: function (id,Item,id2) {
+        try{
+            load_sub_check('add_before',id);//后置函数
+        }catch(e){
+            if(Debug){
+                console.log(e);
+            }
+        }
         let td_data = JSON.parse(localStorage.getItem(Item));
         var json = {1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '', 10: '', 11: '', 12: ''};
         for (x in td_data) {
@@ -300,6 +307,13 @@ var sfdp = {
         $('#'+id+'_table tbody').append(htmls+'<td> <a onclick="sfdp.dl(this)" style="color: chocolate;">删</a><input name="id" value="" type="hidden"></td>');
         $('.this-select').select2({width:'100%'});
         sfdp.setDate();
+        try{
+            load_sub_check('add_after',id);//后置函数
+        }catch(e){
+            if(Debug){
+                console.log(e);
+            }
+        }
     },
     fz: function (obj) {
         var tr = $(obj).parent().parent();
@@ -325,11 +339,25 @@ var sfdp = {
         sfdp.setDate();
     },
     dl: function (obj) {
+        try{
+            load_sub_check('del_before',obj);//后置函数
+        }catch(e){
+            if(Debug){
+                console.log(e);
+            }
+        }
         var length= $(obj).parent().parent().parent().children("tr").length;
         if(length!=2){
             $(obj).parent().parent().remove();
         }else{
             sfdp.ShowTip('最后一行，无法删除！');
+        }
+        try{
+            load_sub_check('del_after',obj);//后置函数
+        }catch(e){
+            if(Debug){
+                console.log(e);
+            }
         }
     },
     table_build: function (id, old_data = '', types) {
@@ -768,6 +796,15 @@ var sfdp = {
     tpfd_upload_img: function (data) {
         return '<div class="sfdp-form-item"><label class="sfdp-label">上传API</label> <div class="sfdp-input-block"><input  name="tpfd_upload_action" placeholder="不填写则为默认接口" type="text" value="' + (data.tpfd_upload_action || '') + '"  class="sfdp-input"></div></div>';
     },
+    /*5.0.1 高级组件*/
+    tpfd_suphelp: function (data) {
+        if (data.tpfd_suphelp == undefined) {
+            var tpfd_read = '-1';
+        } else {
+            var tpfd_read = data.tpfd_suphelp;
+        }
+        return '<div class="sfdp-form-item"><label class="sfdp-label">超级关联</label><div class="sfdp-input-block">' + sfdp.tpfd_select(server_yw_data, 'tpfd_suphelp', tpfd_read) + '</div></div> </div><div class="sfdp-form-item"><label class="sfdp-label">关联value</label> <div class="sfdp-input-block"><input  name="tpfd_suphelp_value" placeholder="不填写则为默认接口" type="text" value="' + (data.tpfd_suphelp_value || 'id') + '"  class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">关联label</label> <div class="sfdp-input-block"><input  name="tpfd_suphelp_label" placeholder="不填写则为默认接口" type="text" value="' + (data.tpfd_suphelp_label || 'name') + '"  class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">过滤条件</label> <div class="sfdp-input-block"><input  name="tpfd_suphelp_where" placeholder="使用WhereRaw过滤条件" type="text" value="' + (data.tpfd_suphelp_where || '') + '"  class="sfdp-input"></div></div>';
+    },
     /*5.0.1 返回基础数据*/
     tpfd_return: function (type, data) {
         var html ='';
@@ -776,6 +813,9 @@ var sfdp = {
         }
         if (isInArray(['radio','dropdown','dropdowns','cascade'],type)) {
             html = sfdp.tpfd_checkboxes(data, 'radio') + sfdp.tpfd_gaoji(data);
+        }
+        if (isInArray(['suphelp'],type)) {
+            html = sfdp.tpfd_suphelp(data)
         }
         if (isInArray(['system_user','system_role'],type)) {
             html =  sfdp.tpfd_gaoji(data) ;
@@ -812,7 +852,7 @@ var sfdp = {
         var field = {'text':'文本控件','edit':'编辑器','number':'数字控件','money':'金额控件','upload':'上传控件','upload_img':'单图上传',
             'checkboxes':'多选控件','radio':'单选控件','date':'时间日期','time_range':'时间范围','dropdown':'下拉选择','dropdowns':'下拉多选',
             'cascade':'级联组件','process':'进度组件','system_user':'系统用户','system_role':'系统角色','textarea':'多行控件','html':'HTML控件',
-            'wenzi':'文字控件','links':'按钮控件'
+            'wenzi':'文字控件','links':'按钮控件','suphelp':'穿透帮助'
         };
         var lable = `<label ${labid} class="sfdp-label">${field[type]}</label>`;
         switch (type) {
@@ -833,6 +873,9 @@ var sfdp = {
                 break;
             case 'upload_img':
                  html = '<div class="sfdp-input-block">图片上传 </div>';
+                break;
+            case 'suphelp':
+                html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
                 break;
             case 'checkboxes':
                  html = '<div class="sfdp-input-block">选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled></div> ';
@@ -880,6 +923,7 @@ var sfdp = {
                 lable = '';
                  html = '<fieldset ' + labid + '  class="layui-elem-field layui-field-title sfdp-label" style="text-align: left;border-width: 1px 0 0;float: left;width: 95%;"><legend>分组标题 </legend></fieldset>';
                 break;
+
         }
         if(mode=='zhubiao'){
             return `<div class="move_field" >${lable+html}<b class="ico red" id="del_con">㊀</b></div>`;
@@ -1085,12 +1129,13 @@ var sfdp = {
             var default_data = all_data['sublist'][parent_code]['data'][id];
         }
         if (default_data.tpfd_db === undefined) {
+            var field_name = {'text':'varchar','number':'int','money':'decimal','radio':'int','dropdown':'int','date':'date','textarea':'longtext','edit':'longtext','system_user':'int','system_role':'int','cascade':'int'}
+            var field_cd = {'text':'255','number':'11','money':'5,2','radio':'11','dropdown':'11','date':'0','textarea':'0','edit':'0','system_user':'11','system_role':'11','cascade':'11'}
             var tpfd_db = {
                 tpfd_id: id,
                 tr_id: parent_code,
                 tpfd_db: '',
-                tpfd_name: "",
-                tpfd_dbcd: "",
+                tpfd_name: "",tpfd_dblx : field_name[type] || 'varchar',tpfd_dbcd: field_cd[type] || '255',
                 tpfd_zanwei: "",
                 tpfd_moren: "",
                 tpfd_chaxun: "no",

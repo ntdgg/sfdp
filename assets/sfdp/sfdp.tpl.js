@@ -3,11 +3,46 @@ function install(type){
     editor.setValue(old+type);
     $('#code').val(editor.getValue());
 }
+//超级回调
+var load_suphelp_fun = `
+/**
+ * obj 超级组件的id
+ * rowData 选择行的数据
+ * Param 选中单据的内容
+ * */
+function load_suphelp_fun(obj,rowData,Param){
+
+
+
+}`;
+
+//子表事件
+var load_sub_check = `
+/**
+ * act add_before子表添加前   add_after子表添加后  del_before 删除前 del_after删除后
+ * id 选择行的数据
+ * */
+function load_sub_check(act,id){
+\tif(act=='add_before'){
+\t\tif($('#'+id+' tr').length >4){
+\t\t\talert('只能三个');
+\t\t\tthrow "Parameter is not a number!";
+\t\t}
+\t}
+}`;
+
+
 //编辑页面加载前
-var load_satr_fun = '\n\rfunction load_satr_fun(showtype){\r' +
-    '//Eg:showtype 状态为 add  edit ；\r' +
-    '' +
-    '}';
+var load_satr_fun = `
+/**
+ * showtype add页面为添加  edit页面为编辑
+ * */
+function load_satr_fun(showtype){
+
+\t
+\t
+}
+`;
 
 /*表单提交前校验*/
 var load_form_check='\n\rfunction load_form_check(curform){\r' +

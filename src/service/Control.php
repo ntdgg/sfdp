@@ -65,14 +65,15 @@ class Control{
         }
 		if($act =='desc'){
 			 $info = Design::find($sid);
+             $list = Design::select([['s_design','=','2']]);
 			 if($info['s_type']==0 || $info['s_type']==2){
-				 return lib::desc($info['s_field'],$info['id'],$info['s_look']);
+				 return lib::desc($info['s_field'],$info['id'],$info['s_look'],$list);
 			 }
             if($info['s_type']==1){
-				 return lib::desc2($info['s_field'],$info['id'],$info['s_look']);
+				 return lib::desc2($info['s_field'],$info['id'],$info['s_look'],$list);
 			 }
             if($info['s_type']==3){
-                return lib::desc3($info['s_field'],$info['id'],$info['s_look']);
+                return lib::desc3($info['s_field'],$info['id'],$info['s_look'],$list);
             }
 		}
 		if($act =='center'){
@@ -345,6 +346,7 @@ class Control{
 	 * @param  Array $sid sid值
 	 */
 	static function curd($act,$sid,$data='',$bid=''){
+        $old_sid = $sid;
 	    //使用sid找出当前的版本sid_ver; 2021年5月3日22:58:33
         $sid_ver = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
         if(!$sid_ver){
@@ -359,6 +361,9 @@ class Control{
 		if($act =='index'){
 			$modueId = Modue::findWhere([['sid','=',$sid]]);//找出模型
 			$fieldId = Field::select([['sid','=',$sid],['table_type','=',0]]);//找出模型字段
+            //ver
+            $filed_desc_info = View::ver($old_sid);
+
             $sfdp_design = Design::find($sid_ver['sid']);
 			$search = [];
 			foreach($fieldId as $k=>$v){
@@ -388,6 +393,10 @@ class Control{
 							$v['type_data'] = json_encode($sd);
 						}
 					}
+                    if($v['type']=='suphelp'){
+                        $getData = Data::getFun3($filed_desc_info['db_id'][$v['fid']]);
+                        $v['type_data'] = json_encode($getData);
+                    }
 					$search[] = $v;
 				}
                 if(in_array($v['field'],explode(',',$modueId['field'] ?? ''))){
@@ -427,8 +436,6 @@ class Control{
 			$map = SfdpUnit::Bsearch($data,$sid);
 			$list = Data::getListData($sid,$map,$data['page'],$data['limit'],$data['whereRaw']);
 			$jsondata = [];
-			$btnArray = $list['field']['btn'];
-			$tablename = $list['field']['db_name'];
 			foreach($list['list'] as $k=>$v){
 				$list['list'][$k]['url'] = '<a onClick=sfdp.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';
 				$jsondata[$k] = array_values($list['list'][$k]);

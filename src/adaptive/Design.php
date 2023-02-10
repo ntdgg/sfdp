@@ -142,11 +142,14 @@ class Design{
                         $v2['tpfd_data'] = Data::getFun($v2['checkboxes_func'],'all');
                     }
                 }
+                if($v2['td_type']=='suphelp'){
+                    $v2['tpfd_data'] =Data::getFun3($v2);
+                }
                 if(isset($v2['tpfd_db']) and(isset($v2['tpfd_list']))){
                     if(($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
                         $fieldArr[$v2['tpfd_db']]=$v2['tpfd_data'];
                     }
-                    if($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'){
+                    if($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'||$v2['td_type']=='suphelp'){
                         $fieldArrAll[$v2['tpfd_db']]=$v2['tpfd_data'];
                     }
                 }
@@ -176,6 +179,9 @@ class Design{
                     }else{
                         $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun($v2['checkboxes_func']);
                     }
+                }
+                if($v2['td_type']=='suphelp'){
+                    $field['list'][$k]['data'][$k2]['tpfd_data'] =Data::getFun3($v2,'view');
                 }
             }
         }

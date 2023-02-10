@@ -68,6 +68,14 @@ class AdapteeData{
 	function selectAll($table,$map=[]){
 		return Db::name($table)->where($map)->withoutField('d_id,uid,status,create_time,update_time,is_delete')->select()->toarray();
 	}
+    function funData($table,$field,$whereRaw){
+        if($whereRaw==''){
+            return Db::name($table)->field($field)->select()->toarray();
+            }else{
+            return Db::name($table)->whereRaw($whereRaw)->field($field)->select()->toarray();
+        }
+    }
+
 	function select($table,$map=[],$field='',$page=1,$limit=10,$whereRaw='',$order='',$is_saas='',$ewhereRaw=''){
 		$offset = ($page-1)*$limit;
 		if($field!=''){

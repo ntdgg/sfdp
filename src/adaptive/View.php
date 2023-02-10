@@ -21,10 +21,12 @@ class View{
 		$json = Design::findVerWhere([['status','=',1],['sid','=',$sid]]);
 		$field = json_decode($json['s_field'],true);
 		$data_ver_db = [];
+        $data_ver_db_id = [];
 		foreach((array)$field['list'] as $k=>$v){
 			foreach($v['data'] as $v2){
 				if(isset($v2['tpfd_db'])){
 					$data_ver_db[] = $v2;
+                    $data_ver_db_id[$v2['tpfd_id']] = $v2;
 				}
 			}
 		}
@@ -36,7 +38,7 @@ class View{
                     }
             }
         }
-		return ['db'=>$data_ver_db,'db2'=>$data_ver_db2,'all'=>$json['s_field'],'ver'=>$json];
+		return ['db'=>$data_ver_db,'db_id'=>$data_ver_db_id,'db2'=>$data_ver_db2,'all'=>$json['s_field'],'ver'=>$json];
 	}
 	/**
 	 * 保存版本

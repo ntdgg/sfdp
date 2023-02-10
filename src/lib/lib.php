@@ -224,11 +224,11 @@ php;
         }
         $lenth = count($field);
 		return <<<php
-  <link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.0" />
+  <link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.1" />
   <script src="{$patch}lib/jquery-1.12.4.js"></script>
   <script src="{$patch}lib/jquery-ui.js"></script>
 	<script src="{$patch}lib/layer/3.1.1/layer.js"></script>
-	<script src="{$patch}sfdp.7.0.js?v=7.0.0"></script>
+	<script src="{$patch}sfdp.7.0.js?v=7.0.1"></script>
 </head>
 <body style="padding:20px">
  <table>
@@ -318,7 +318,8 @@ php;
 	 * @param  int   $fid 设计ID
 	 * @param  int $look 是否锁定
 	 */
-	public static function desc($json,$fid,$look){
+	public static function desc($json,$fid,$look,$list){
+
 		$patch = unit::gconfig('static_url');
 		$urls= unit::gconfig('url');
 		$save = $urls['api'].'?act=save';
@@ -326,10 +327,16 @@ php;
 		$script = $urls['api'].'?act=script&sid='.$fid;
         $mysql = $urls['api'].'?act=mysql&sid='.$fid;
         $fix = $urls['api'].'?act=fix2&sid='.$fid;
+        $op = [];
+        $op[]=['cid'=>-1,'clab'=>'请选择关联的业务信息'];
+        foreach($list as $k=>$v){
+            $op[]=['cid'=>$v['id'],'clab'=>$v['s_title']];
+        }
+        $op_json = json_encode($op);
 		return <<<php
 	<html>
 	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
-	<link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.0" /> 
+	<link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.1" /> 
 	<body>
         <div>
 			<div id="ctlMenus" class="sfdp-con" style="float: left; width: 240px;">
@@ -360,6 +367,7 @@ php;
 					<div class="sfdp-tool-con"><a data="dropdowns">&#8194;<b class='ico'>S</b>&#8194;下拉多选</a></div>
 					<div class="sfdp-tool-con"><a data="cascade">&#8194;<b class='ico'>§</b>&#8194;级联组件</a></div>
 					<div class="sfdp-tool-con"><a data="process">&#8194;<b class='ico'>～</b>&#8194;进度组件</a></div>
+					<div class="sfdp-tool-con"><a data="suphelp">&#8194;<b class='ico'>↷</b>&#8194;穿透帮助</a></div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">内置组件 System control library</div>
 					<div class="sfdp-tool-con" ><a data="system_user">&#8194;<b class='ico'>ρ</b>&#8194;系统用户</a></div>
@@ -375,7 +383,7 @@ php;
 			</div>
 			<div class="sfdp-con" style="float: right; width: 360px;">
 				<div class="sfdp-att">
-				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><p> Sfdp V7.0正式版<br/><span style="font-size:19px;">超级表单开发</span></p><span style="font-size:15px;">[ © 流之云 <a href="https://www.cojz8.com/">Sfdp</a> 版权所有 ]</span></div>
+				<br/><br/><div style="padding: 24px 48px;"> <h1>\ (•◡•) / </h1><span style="font-size:19px;">超级表单开发</span> V7.0正式版</div>
 				</div>
 			</div>
 			<div class="sfdp-cl"></div>
@@ -383,13 +391,14 @@ php;
 		<script type="text/javascript" src="{$patch}lib/jquery-3.4.1.min.js"></script>
 		<script type="text/javascript" src="{$patch}lib/layer/3.1.1/layer.js"></script>
 		<script type="text/javascript" src="{$patch}lib/pingyin.js"></script>
-		<script type="text/javascript" src="{$patch}sfdp.7.0.js?v=7.0.0"></script>
-		<script type="text/javascript" src="{$patch}sfdp.config.js?v=7.0.0"></script>
+		<script type="text/javascript" src="{$patch}sfdp.7.0.js?v=7.0.1"></script>
+		<script type="text/javascript" src="{$patch}sfdp.config.js?v=7.0.1"></script>
 		<script type="text/javascript" src="{$patch}lib/jquery-ui.js"></script>
 		<script type="text/javascript">
 			var look_db = {$look};
 			var s_type = 0;
 			const server_url ='{$server_save}';
+			const server_yw_data = {$op_json};
 		    $(function(){
 				sfdp.int_data({$json});
 			});
@@ -404,7 +413,6 @@ php;
 			    stop: function( event, ui ) {
 			        let obj = {}
 			        let obj2 = []
-			        //alert(111);
 			        const json_data = JSON.parse(localStorage.getItem("json_data"));
 			        const sortedList = $("#sfdp-main div.sfdp-rows ")
 			        for(let i= 0; i< sortedList.length ;i++){
@@ -461,7 +469,7 @@ php;
 	 * @param  int   $fid 设计ID
 	 * @param  int $look 是否锁定
 	 */
-	public static function desc2($json,$fid,$look){
+	public static function desc2($json,$fid,$look,$list){
 		$patch = unit::gconfig('static_url');
 		$urls= unit::gconfig('url');
 		$save = $urls['api'].'?act=save';
@@ -475,7 +483,7 @@ php;
      * @param  int   $fid 设计ID
      * @param  int $look 是否锁定
      */
-    public static function desc3($json,$fid,$look){
+    public static function desc3($json,$fid,$look,$list){
         $patch = unit::gconfig('static_url');
         $urls= unit::gconfig('url');
         $save = $urls['api'].'?act=save';
@@ -513,6 +521,8 @@ php;
                 <a class="button" onclick="install(load_end_view)">查看页面脚本<a/> 
                 <a class="button" onclick="install(load_list_fun)">列表页面脚本<a/>
 				<a class="button" onclick="install(load_end_time_done)">日期回调函数<a/>
+				<a class="button" onclick="install(load_suphelp_fun)">穿透回调<a/>
+				<a class="button" onclick="install(load_sub_check)">子表回调<a/>
 			</td>
 			</tr>
 			<tr valign="center">
@@ -690,10 +700,10 @@ php;
 	 **/
 	static function commontmp($title){
 		$patch = unit::gconfig('static_url');
-		$css = '<link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.7.0.css?v=7.0.0" />';
+		$css = '<link rel="stylesheet" type="text/css" href="'.$patch.'sfdp.7.0.css?v=7.0.1" />';
 		$js = '<script src="'.$patch.'lib/jquery-1.12.4.js"></script>
 		<script src="'.$patch.'lib/layer/3.1.1/layer.js"></script>
-		<script src="'.$patch.'sfdp.7.0.js?v=7.0.0"></script>';
+		<script src="'.$patch.'sfdp.7.0.js?v=7.0.1"></script>';
 		$head ='<title>'.$title.'</title><head>'.$css.'</head><body style="background-color: white;">';
 		return ['head'=>$head,'css'=>$css,'js'=>$js];
 	}
