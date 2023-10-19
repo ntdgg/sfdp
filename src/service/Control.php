@@ -11,6 +11,7 @@
 namespace sfdp\service;
 
 use sfdp\adaptive\Design;
+use sfdp\adaptive\Userconfig;
 use sfdp\adaptive\View;
 use sfdp\adaptive\Script;
 use sfdp\adaptive\Functions;
@@ -85,7 +86,7 @@ class Control{
                 BuildFun::Bfun($sid['function'],$bill);
                 unit::errJSMsg('Success,脚本生成成功！',$urls['api'].'?act=script&sid='.$sid['sid']);
             }
-            return lib::mysql(Script::script($sid),$sid);
+            return lib::mysql();
         }
 		if($act =='script'){
 			if($sid !='' && is_array($sid)){
@@ -220,6 +221,21 @@ class Control{
 			$modue = Modue::findWhere([['sid','=',$json['ver']['id']]]);//找出模型字段
 			return lib::custom($sid,$field,$modue);
 		}
+        if($act =='fieldkey'){
+            $info = Design::find($sid);
+            if($info['s_design']<>2){
+                unit::errJSMsg('Err,校验错误,请先设计并部署！');
+            }
+            $json = View::ver($sid);
+            $field = Field::select([['sid','=',$json['ver']['id']],['table_type','=',0]]);;//找出模型字段
+            return lib::fieldkey($sid,$field);
+        }
+        if($act =='fieldkeyBuild'){
+            return json(Field::fieldBuildIndex($sid));
+        }
+        if($act=='fieldkeyDel'){
+            return json(Field::fieldDelIndex($sid));
+        }
 		if($act =='customOrder'){
 			$json = View::ver($sid['sid']);
 			$ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['order'=>$sid['order'],'update_time'=>time()]);
@@ -247,7 +263,7 @@ class Control{
                 if(isset($v['search']) && $v['search'] <> ''){
                     Field::saveWhere([['id','=',$v['id']]],['is_search'=>1,'search_type'=>$v['search'],'update_time'=>time()]);//更新查询条件
                 }
-                Field::saveWhere([['id','=',$v['id']]],['width'=>$v['width'],'update_time'=>time()]);//更新宽度
+                Field::saveWhere([['id','=',$v['id']]],['width'=>$v['width'],'field_wz'=>$v['field_wz'],'update_time'=>time()]);//更新宽度
             }
             ksort($list);ksort($list_name);
             $list_field = implode(',',$list);
@@ -269,7 +285,7 @@ class Control{
             if($sid['show_type']==1||$sid['show_type']==2){
                 if($sid['show_fun']!='sys_role'){
                     $ret = Data::getFun($sid['show_fun']);;
-                    if((!isset($ret['errCode']) || (isset($ret['code']) && $ret['errCode']!=3004))){
+                    if((isset($ret['errCode']) || (isset($ret['code']) && $ret['errCode']!=3004))){
                         return $ret;
                     }
                 }
@@ -317,6 +333,46 @@ class Control{
 				return json(['code'=>1,'msg'=>'保存失败']);
 			}
 		}
+        if($act =='customData'){
+            $ids = explode(",",$sid['ids_val']);//字段
+            $value = explode(",",$sid['value_val']);//表达式
+            $user = explode(",",$sid['user_val']);//用户值
+            $json = View::ver($sid['sid']);
+            $access = [];
+            foreach($ids as $k=>$v){
+                if($v <> '' && $value[$k] <> '' && $user[$k] <> ''){
+                    $access[] = [$v,$value[$k],$user[$k]];
+                }
+            }
+            $ret = Modue::saveWhere([['sid','=',$json['ver']['id']]],['linkdata'=>json_encode($access),'update_time'=>time()]);
+            if($ret){
+                return json(['code'=>0,'msg'=>'保存成功']);
+            }else{
+                return json(['code'=>1,'msg'=>'保存失败']);
+            }
+        }
+
+        if($act =='customUserConfig'){
+            $ids = explode(",",$sid['ids']);//字段
+            $json = View::ver($sid['sid']);
+            $access = [];
+            foreach($ids as $k=>$v){
+                $name =Field::findWhere([['sid','=',$json['ver']['id']],['field','=',$v]]);
+                $access[] = $name['name'];
+            }
+            $ret = Userconfig::add(['sid'=>$sid['sid'],'field'=>$sid['ids'],'field_name'=>implode(',',$access)]);
+            if($ret){
+                return json(['code'=>0,'msg'=>'保存成功']);
+            }else{
+                return json(['code'=>1,'msg'=>'保存失败']);
+            }
+        }
+        if($act =='scan'){
+            return lib::scan($sid);
+        }
+        if($act =='sign'){
+            return lib::sign($sid);
+        }
         return $act.'参数出错';
 	}
 	/**
@@ -361,11 +417,11 @@ class Control{
 		if($act =='index'){
 			$modueId = Modue::findWhere([['sid','=',$sid]]);//找出模型
 			$fieldId = Field::select([['sid','=',$sid],['table_type','=',0]]);//找出模型字段
-            //ver
             $filed_desc_info = View::ver($old_sid);
-
             $sfdp_design = Design::find($sid_ver['sid']);
 			$search = [];
+            $search_field = [];
+            $field_wz = [];
 			foreach($fieldId as $k=>$v){
 				if($v['is_search']==1){
 					if($v['type_lx']==1 && $v['function'] !=''){
@@ -373,7 +429,7 @@ class Control{
                         if($fun_mode==1 || $fun_mode==''){
                             $getFun = Functions::findWhere([['fun_name','=',$v['function']]]);
                             if(!$getFun){
-                                echo '<h2>系统级别错误('.$v2['function'].')：函数名无法找到~</h2>';exit;
+                                echo '<h2>系统级别错误('.$v['function'].')：函数名无法找到~</h2>';exit;
                             }
                             $getData = Common::query($getFun['function']);
                         }else{
@@ -397,10 +453,14 @@ class Control{
                         $getData = Data::getFun3($filed_desc_info['db_id'][$v['fid']]);
                         $v['type_data'] = json_encode($getData);
                     }
+                    $search_field[] = $v['field'];
 					$search[] = $v;
 				}
                 if(in_array($v['field'],explode(',',$modueId['field'] ?? ''))){
                     $field_lenth[$v['field']] = $v['width'] ?? '120';
+                }
+                if($v['field_wz']!=''){
+                    $field_wz[$v['field']] = $v['field_wz'];
                 }
 			}
 			$map = SfdpUnit::Bsearch($data,$sid);
@@ -413,9 +473,11 @@ class Control{
                 'table' => $sid_ver['s_db'],
 				'field'=>$field_name,
                 'field_lenth'=>$field_lenth ?? [],
+                'field_wz'=>$field_wz,
                 'sql_field'=>$field_mysql_name,
                 'count_field'=>$modueId['count_field'],
 				'search' =>json_encode($search),
+                'search_field' =>$search_field,
                 'fun' =>$list['field']['fun'],
 				'title' =>$modueId['title'],
 				'load_file' =>$list['field']['load_file'],
@@ -448,10 +510,17 @@ class Control{
 		}
 		if($act=='view'){
 			$info = Data::getViewData($sid,$data);
+            $linkdata = json_decode($info['m']['linkdata'] ?? '',true);
+            if($linkdata!= null && count($linkdata)>0){
+                foreach($linkdata as $k=>$v){
+                    $sid_ver_moduce = Design::findVerWhere([['status','=',1],['sid','=',$v[0]]]);
+                    $linkdata[$k][3] = (Modue::find($sid_ver_moduce['id']))['title'] ?? '未定义';
+                }
+            }
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/view.html',['info'=>$info['info'],'row'=>$info['row']]);
 				}else{
-				return ['info'=>$info['info'],'row'=>$info['row'],'config'=>$info['config']];
+				return ['info'=>$info['info'],'row'=>$info['row'],'config'=>$info['config'],'i'=>$info,'l'=>$linkdata];
 			}
 		}
 		if($act =='edit'){
@@ -488,11 +557,15 @@ class Control{
 		}
         if($act =='info'){
             $data = Design::getAddData($sid);
-            return ['config'=>$data['config'],'data'=>$data['info']['s_field']];
+            return ['config'=>$data['config'],'nofield'=>$data['nofield'],'data'=>$data['info']['s_field']];
         }
         if($act=='Data'){
             return M::Save($data);
         }
+        if($act=='UserConfig'){
+            return Userconfig::getInfo($old_sid);
+        }
+
 	}
 	static function fapi($post){
 		$key_name = [];

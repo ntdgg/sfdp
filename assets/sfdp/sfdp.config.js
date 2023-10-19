@@ -2,7 +2,8 @@ var sfdp = (function($){
     $.url = {
         user : '/gadmin/common/system_user',
         role :'/gadmin/common/system_role',
-        fun :'/gadmin/common/system_fun'
+        fun :'/gadmin/common/system_fun',
+        api :'/gadmin/sfdp/sfdpApi.html'
     }
     $.ui = {
         css : '/static/layui/css/layui.css',

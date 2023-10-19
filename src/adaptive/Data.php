@@ -199,6 +199,7 @@ class Data{
         $is_saas ='';
         /*超级管理员不受权限控制*/
         if($Modue['is_saas']==0 && unit::getuserinfo('uid')!=1){
+            //"concat(',',xtuid,',') regexp '(^|,)(".str_ireplace(',', '|', $ids).")(,|$)'";
             $is_saas = "concat(',',saas_id,',') regexp concat('".str_ireplace(',', ',|,', unit::getuserinfo('saas_id'))."')";
         }
         //saas_id
@@ -217,7 +218,7 @@ class Data{
                         }
                         $json[$k][$k2] = rtrim($vk2value, ",");
                     }else{
-                        $json[$k][$k2] = $jsondata['fieldArrAll'][$k2][$v[$k2]] ?? '<font color="red">未选择</font>';
+                        $json[$k][$k2] = $jsondata['fieldArrAll'][$k2][$v[$k2]] ?? unit::gconfig('data_default');
                     }
                     $json[$k]['g_sys_'.$k2] = $v[$k2] ?? '';
                 }
@@ -236,6 +237,11 @@ class Data{
             foreach($jsondata['fieldSysImg'] as $v4) {
                 if(isset($v[$v4])){
                     $json[$k][$v4] = '<img src="/'.$v[$v4].'"  width="100px" onclick=sfdp.openpage("看图",$(this).attr("src"))>';
+                }
+            }
+            foreach($jsondata['fieldSysSign'] as $v4) {
+                if(isset($v[$v4])){
+                    $json[$k][$v4] = '<img src="'.$v[$v4].'"  width="100px" onclick=sfdp.openpage("签名信息",$(this).attr("src"),{w:"710px",h:"510px"})>';
                 }
             }
         }
@@ -259,14 +265,17 @@ class Data{
     static function getViewData($sid,$bid){
         $sfdp_ver_info = Design::findVer($sid);
         $field = self::setField($sfdp_ver_info,$bid,'all');
+
         $load_file = SfdpUnit::Loadfile($field['field']['name_db'],$field['field']['tpfd_class'],$field['field']['tpfd_script']);
         $config = unit::sConfig($sfdp_ver_info,$load_file,$sid);
-        return ['info'=>json_encode($field['field']),'row'=>$field['find'],'config'=>$config[1]];
+        return ['info'=>json_encode($field['field']),'files'=>json_encode($field['files']),'row'=>$field['find'],'config'=>$config[1],'f'=>$field,'m'=>Modue::find($sid)];
     }
     /*字段统一处理*/
     static function setField($sfdp_ver_info,$bid,$all = ''){
         $field = json_decode($sfdp_ver_info['s_field'],true);
         $find = (new Data())->mode->find($field['name_db'],$bid);
+        $zfield = [];
+        $files = [];
         foreach($field['list'] as $k=>$v){
             foreach($v['data'] as $k2=>$v2){
                 if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
@@ -283,7 +292,11 @@ class Data{
                     $value_arr = explode(",",$find[$v2['tpfd_db']] ?? '');
                     $fiedsver = '';
                     foreach($value_arr as $v3){
-                        $fiedsver .=($v2['tpfd_data'][$v3] ?? '未选择').',';
+                        if($v3==''){
+                            $fiedsver .='';
+                        }else{
+                            $fiedsver .=($v2['tpfd_data'][$v3] ?? unit::gconfig('data_default')).',';
+                        }
                     }
                     $field['list'][$k]['data'][$k2]['value'] = rtrim($fiedsver, ',');
                     $field['list'][$k]['data'][$k2]['tpfd_data'] = $v2['tpfd_data'];
@@ -302,7 +315,15 @@ class Data{
                 }else{
                     $field['list'][$k]['data'][$k2]['value'] = $find[$v2['tpfd_db']];
                 }
+                if($v2['td_type']=='upload' || $v2['td_type']=='upload_img'){
+                    if($v2['tpfd_upload_type']==1){
+                        $files['ids'][$field['list'][$k]['data'][$k2]['tpfd_name']]= $field['list'][$k]['data'][$k2]['value'];
+                        }else{
+                        $files['url'][$field['list'][$k]['data'][$k2]['tpfd_name']]= $field['list'][$k]['data'][$k2]['value'];
+                    }
+                }
                 $field['list'][$k]['data'][$k2]['rvalue'] = $find[$v2['tpfd_db']];//增加真实值
+                $zfield[$field['list'][$k]['data'][$k2]['tpfd_db']]= $field['list'][$k]['data'][$k2]['value'];
             }
         }
         $sublist =[];
@@ -328,12 +349,19 @@ class Data{
                     $mkey = array_keys($v[1]);
                     $vvid =$vv['id'];
                     unset($vv['id']);
-                    $mkey2 = array_keys($vv);
                     foreach($mkey as $kkk=>$vvv){
-                        if($v[1][$vvv]['td_type']=='dropdown'||$v[1][$vvv]['td_type']=='radio'||$v[1][$vvv]['td_type']=='checkboxes'){
-                            $v[1][$vvv]['value'] =$v[1][$vvv]['tpfd_data'][$vv[$mkey2[$kkk]]] ?? '未匹配';
+
+                        if($v[1][$vvv]['td_type']=='dropdown'||$v[1][$vvv]['td_type']=='dropdowns'||$v[1][$vvv]['td_type']=='radio'||$v[1][$vvv]['td_type']=='checkboxes'){
+                            $value_arr = explode(",",$vv[$v[1][$vvv]['tpfd_db']] ?? '');
+                            $fiedsver = '';
+                            foreach($value_arr as $v33){
+
+                                $fiedsver .=($v[1][$vvv]['tpfd_data'][$v33] ?? unit::gconfig('data_default')).',';
+                            }
+                            $v[1][$vvv]['rvalue'] =  $vv[$v[1][$vvv]['tpfd_db']] ?? '';
+                            $v[1][$vvv]['value'] =  rtrim($fiedsver, ',');
                         }else{
-                            $v[1][$vvv]['value'] =$vv[$mkey2[$kkk]];
+                            $v[1][$vvv]['value'] =$vv[$v[1][$vvv]['tpfd_db']];
                         }
                     }
                     $v[1]['id'] =$vvid;
@@ -342,7 +370,7 @@ class Data{
             }
         }
         $field['sublists'] = $sublist;
-        return ['field'=>$field,'find'=>$find,'sublists'=>$sublist];
+        return ['field'=>$field,'find'=>$find,'sublists'=>$sublist,'z'=>$zfield,'files'=>$files];
     }
     /**
      * 子表数据
@@ -410,7 +438,6 @@ class Data{
         if ($getData['code'] == -1) {
             return $getData;
         }
-
         foreach ($getData['msg'] as $k3 => $v3) {
             if(!array_key_exists('name',$v3) || !array_key_exists('id',$v3)){
                 return ['code'=>1,'msg'=>unit::errMsg(3004),'errCode'=>3004];

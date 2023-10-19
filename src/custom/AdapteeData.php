@@ -66,7 +66,7 @@ class AdapteeData{
 		}
 	}
 	function selectAll($table,$map=[]){
-		return Db::name($table)->where($map)->withoutField('d_id,uid,status,create_time,update_time,is_delete')->select()->toarray();
+		return Db::name($table)->where($map)->withoutField('d_id,uid,status,create_time,update_time,is_delete')->order('id desc')->select()->toarray();
 	}
     function funData($table,$field,$whereRaw){
         if($whereRaw==''){
@@ -96,7 +96,7 @@ class AdapteeData{
         if($order==''){
             $order ='id desc';
         }
-		$list = $list->limit($offset,$limit)->field('id'.$field.'status,"url"')->order($order)->select()->toarray();
+		$list = $list->limit($offset,$limit)->field('id'.$field."status,'url'")->order($order)->select()->toarray();
         foreach($list as $k=>$v){
             if(isset($list[$k]['create_time'])){
                 $list[$k]['create_time'] = date('Y-m-d H:i:s',$list[$k]['create_time']);
@@ -105,7 +105,7 @@ class AdapteeData{
                 $list[$k]['update_time'] = date('Y-m-d H:i:s',$list[$k]['update_time']);
             }
             $list[$k]['g_sys_id'] = $v['id'];
-
+            $list[$k]['g_sys_status'] = $v['status'];
         }
 		$count = Db::name($table)->where($map);
 		if($whereRaw !=''){

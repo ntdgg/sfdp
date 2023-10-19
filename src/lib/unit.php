@@ -18,10 +18,11 @@ class unit{
     public static function sConfig($sfdp_ver_info,$load_file,$sid){
         $fun = self::uJs($sfdp_ver_info);
         $config = [
-            'g_js'=>self::sJs($sid),
+            'g_js'=>self::sJs($sfdp_ver_info['sid']),
             'fun' =>$fun,
             'load_file' =>$load_file,
             'upload_file'=>unit::gconfig('upload_file'),
+            'upload_files'=>unit::gconfig('upload_files'),
             's_type' =>$sfdp_ver_info['s_type']
         ];
         return [$fun,$config];
@@ -56,7 +57,7 @@ class unit{
      */
     public static function errJSMsg($msg,$url='',$relod=false){
         if($url <> ''){
-            echo "<script language='javascript'>alert('".$msg."'); location.assign('".$url."');</script>";exit;
+            echo "<script language='javascript'>parent.layer.msg('".$msg."'); location.assign('".$url."');</script>";exit;
         }else{
             echo '<script>var index = parent.layer.getFrameIndex(window.name);parent.layer.msg("'.$msg.'");setTimeout("parent.layer.close(index)",2000);</script>';exit;
         }

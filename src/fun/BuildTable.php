@@ -118,6 +118,25 @@ class BuildTable{
 		}else{
 			return ['code'=>1,'msg'=>'备份表不存在！'];
 		}
-		
 	}
+    static function buildIndex($table,$field,$index){
+        $tableName = unit::gconfig('int_db_prefix') . $table;
+        $sql = 'ALTER TABLE '.$tableName.' ADD '.$index.' ('.$field.')';
+        try {
+             Common::execute($sql);
+        } catch (\Exception $e) {
+            return ['code'=>1,'msg'=>'系统异常。'.$e->getMessage()];
+        }
+        return ['code'=>0,'msg'=>'索引创建成功！'];
+    }
+    static function delIndex($table,$field){
+        $tableName = unit::gconfig('int_db_prefix') . $table;
+        $sql = 'DROP INDEX '.$field.' ON '.$tableName;
+        try {
+            Common::execute($sql);
+        } catch (\Exception $e) {
+            return ['code'=>1,'msg'=>'系统异常。'.$e->getMessage()];
+        }
+        return ['code'=>0,'msg'=>'索引创建成功！'];
+    }
 }

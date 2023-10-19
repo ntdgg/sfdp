@@ -11,6 +11,7 @@
 namespace sfdp\adaptive;
 
 
+use sfdp\fun\BuildTable;
 use sfdp\fun\SfdpUnit;
 use sfdp\lib\unit;
 
@@ -36,6 +37,12 @@ class Field{
 	static function select($map=[])
     {
 		return (new Field())->mode->select($map);
+    }
+    /*获取Sup的查询条件来过滤*/
+    static function getSupRaw($suphelpID,$sid){
+        $sid_ver = (new Field())->mode->findFidVal($suphelpID);
+        $data = Design::descVerTodata($sid_ver);
+        return $data['fieldSup'][$suphelpID] ?? '';
     }
 	static function saveWhere($where,$data)
     {
@@ -130,6 +137,41 @@ class Field{
 	static function value($id){
 		return (new Field())->mode->value($id);		
 	}
+
+
+    static function fieldSelectIndex($sid){
+        return (new Field())->mode->selectFieldIndex($sid);
+    }
+    /**
+     * 创建字段索引信息
+     * @param $post
+     * @return array
+     */
+    static function fieldBuildIndex($post){
+        $res = (new Field())->mode->addFieldIndex(['sid'=>$post['sid'],'field'=>$post['key'],'type'=>$post['val'],'add_time'=>time()]);
+        if($res){
+            $info = Design::find($post['sid']);
+            return BuildTable::buildIndex($info['s_db'],$post['key'],$post['val']);
+        }else{
+            return ['code'=>1,'msg'=>'写入数据库出错。'];
+        }
+    }
+
+    static function fieldDelIndex($post){
+        $find = (new Field())->mode->viewFieldIndex($post['id']);
+        if(!$find){
+            return ['code'=>1,'msg'=>'索引已被删除！'];
+        }
+        /*执行删除*/
+        $del = (new Field())->mode->delFieldIndex($post['id']);
+        if($del){
+            $info = Design::find($find['sid']);
+            return BuildTable::delIndex($info['s_db'],$find['field']);
+        }else{
+            return ['code'=>1,'msg'=>'写入数据库出错。'];
+        }
+
+    }
 	
 	
 }

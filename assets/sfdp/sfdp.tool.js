@@ -36,7 +36,11 @@ var sfdpExcel = {
             if(idx == 0) {
                 html += '<tr>';
                 for(var i=0; i<columns.length; i++) {
-                    html += '<th>' + (i==0?'':String.fromCharCode(65+i-1)) + '</th>';
+                    if(i>26){
+                        html += '<th>' + (i==0?'':'A'+String.fromCharCode(65+i-1-26)) + '</th>';
+                    }else{
+                        html += '<th>' + (i==0?'':String.fromCharCode(65+i-1)) + '</th>';
+                    }
                 }
                 html += '</tr>';
             }
@@ -128,11 +132,20 @@ var sfdpExcel = {
                 csv.push(',,');
         }
         var sheet = {}; // 将要生成的sheet
+
         csv.forEach(function(row, i) {
             row = row.split(',');
-            if(i == 0) sheet['!ref'] = 'A1:'+String.fromCharCode(65+row.length-1)+(csv.length-1);
+                if(row.length>=26) {
+                    if(i == 0) sheet['!ref'] = 'A1:'+'A'+String.fromCharCode(65+row.length-1-26)+(csv.length-1);
+                 }else{
+                    if(i == 0) sheet['!ref'] = 'A1:'+String.fromCharCode(65+row.length-1)+(csv.length-1);
+                }
             row.forEach(function(col, j) {
-                sheet[String.fromCharCode(65+j)+(i+1)] = {v: col};
+                if(j>=26){
+                    sheet['A'+String.fromCharCode(65+j-26)+(i+1)] = {v: col};
+                }else{
+                    sheet[String.fromCharCode(65+j)+(i+1)] = {v: col};
+                }
             });
         });
         return {sheet,csv};

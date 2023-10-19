@@ -30,7 +30,7 @@ class AdapteeModue{
 			return  false;
 		}
 	}
-	function find($id){	
+	function find($id){
 		$info = Db::name('sfdp_modue')->where('sid',$id)->find();
 		if($info){
 			return  $info;

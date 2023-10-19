@@ -3,6 +3,53 @@ function install(type){
     editor.setValue(old+type);
     $('#code').val(editor.getValue());
 }
+function sys_fun(data){
+    layer.open({
+        type: 1,
+        shade: false,
+        area: ['420px', '240px'], //宽高
+        title: false, //是否显示标题
+        content: data,
+    });
+
+}
+sys_data_int
+//系统变量
+var sys_data_api = `
+    <div style="padding: 15px">
+    //同步请求<br/>
+    sfdp.sFuns('/gadmin/sapi?fun=get_sfuns_id',{id:1}).then(res => {<br/>
+      console.log(res)<br/>
+    })<br/>
+    //异步请求<br/>
+    sfdp.sFun('/gadmin/sapi?fun=get_info_id',{id:id},set_yf);' +<br/>
+    
+    function set_yf(res){<br/>
+    <br/>
+    }<br/>
+     </div>
+`;
+//系统变量
+var sys_data_int = `
+    <div style="padding: 15px">
+    /*父级变量*/<br/>
+     parent.g_soft_uid  //登入账号id<br/>
+     parent.g_soft_username //登入账号名<br/>
+     parent.g_soft_realname //登入真实姓名<br/>
+     parent.g_soft_rolename //登入角色名<br/>
+     parent.g_soft_roleid   //登入角色id<br/>
+   /*页面变量*/<br/>
+    g_bill_id 单据id<br/>
+     showtype 页面类型，比如add 查看 edit修改<br/>
+     is_wf  是否工作流信息<br/>
+     g_uid   用户id<br/>
+     g_role  角色id<br/>
+     g_saas  saasid信息<br/>
+     g_username 用户姓名<br/>
+     g_sid  设计sid<br/>
+     </div>
+`;
+
 //超级回调
 var load_suphelp_fun = `
 /**
@@ -67,7 +114,10 @@ var load_end_fun='\n\rfunction load_end_fun(act){\n\r' +
     '//    if($(\'#dropdown_2021233\').get(0).selectedIndex!==0){\n' +
     '//        var zdid=$("#dropdown_2021233").val();\n' +
     '//      \tsfdp.sFun(\'/gadmin/sapi?fun=get_info_id\',{id:id},set_yf);\n' +
-    '//    }' +
+    '//    }\r' +
+    '//   sfdp.sFuns(\'/gadmin/sapi?fun=get_sfuns_id\',{id:1}).then(res => {\r' +
+    '//       console.log(res)\r' +
+    '//   })\r' +
     '    \r' +
     '    \r' +
     '}';

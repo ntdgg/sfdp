@@ -42,6 +42,12 @@ class Api
 	  * 调用 sfdp\server\Control 的核心适配器进行API接口的调用
 	  */
 	 public function sfdpApi($act='list',$sid='',$map = null){
+         if($act=='scan'){
+             return Control::api($act,input('id'));
+         }
+         if($act=='sign'){
+             return Control::api($act,input('id'));
+         }
          if($act=='field'){
              return Control::api($act,$sid);
          }
@@ -58,7 +64,7 @@ class Api
 			$data = ['sid'=>$sid,'node'=>$node];
 			return Control::api($act,$data);
 		}
-		if(in_array($act,['desc','center','script','mysql','ui','fix','fix2','deldb','custom','customCount','customSave','customSearch','customSearch','customAccess','customOrder','customShow'])){
+		if(in_array($act,['desc','center','script','fieldkeyBuild','fieldkey','mysql','ui','fix','fix2','deldb','custom','customCount','customSave','customSearch','customSearch','customAccess','customData','customOrder','customShow','customUserConfig'])){
 			if (unit::is_post()) {
 				$data = input('post.');
 				return Control::api($act,$data);
@@ -83,6 +89,10 @@ class Api
 			$data = input('post.');
 			return Control::api($act,$data);
 		}
+        if($act=='fieldkeyDel'){
+            $data = ['sid'=>input('sid'),'id'=>input('id')];;
+            return Control::api($act,$data);
+        }
 		
 	}
 	/**
@@ -137,6 +147,9 @@ class Api
 		}
         if($act=='Data'){
             return Control::curd($act,$sid,$bid);
+        }
+        if($act=='UserConfig'){
+            return Control::curd($act,$sid);
         }
 		
 	}

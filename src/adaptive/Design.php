@@ -110,7 +110,6 @@ class Design{
      */
     static function descVerTodata($sid){
         $sfdp_ver_info =(new Design())->mode->findVer($sid);
-
         $field = json_decode($sfdp_ver_info['s_field'] ?? '',true);
         $list_field = json_decode($sfdp_ver_info['s_list'] ?? '',true);
         $searct_array = json_decode($sfdp_ver_info['s_search'] ?? '',true);
@@ -122,6 +121,8 @@ class Design{
         $fieldSysUser = [];
         $fieldSysProcess = [];
         $fieldSysImg = [];
+        $fieldSysSign = [];
+        $fieldSup = [];
         foreach($field['list'] as $k=>$v){
             foreach($v['data'] as $k2=>$v2){
                 if($v2['td_type']=='process'){
@@ -129,6 +130,9 @@ class Design{
                 }
                 if($v2['td_type']=='upload_img'){
                     $fieldSysImg[]=$v2['tpfd_db'];
+                }
+                if($v2['td_type']=='sign'){
+                    $fieldSysSign[]=$v2['tpfd_db'];
                 }
                 if($v2['td_type']=='system_user'||$v2['td_type']=='system_role'){
                     $fieldSysUser[$v2['tpfd_db']]=$v2['td_type'];
@@ -143,7 +147,9 @@ class Design{
                     }
                 }
                 if($v2['td_type']=='suphelp'){
+                    $fieldSup[$v2['tpfd_id']] = $v2['tpfd_suphelp_where'];
                     $v2['tpfd_data'] =Data::getFun3($v2);
+
                 }
                 if(isset($v2['tpfd_db']) and(isset($v2['tpfd_list']))){
                     if(($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
@@ -156,18 +162,31 @@ class Design{
             }
         }
         $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
-        return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'search'=>$searct_field,'fun'=>unit::uJs($sfdp_ver_info),'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser,'fieldSysProcess'=>$fieldSysProcess,'fieldSysImg'=>$fieldSysImg];
+        return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'search'=>$searct_field,'fun'=>unit::uJs($sfdp_ver_info),'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser,'fieldSysProcess'=>$fieldSysProcess,'fieldSysImg'=>$fieldSysImg,'fieldSup'=>$fieldSup,'fieldSysSign'=>$fieldSysSign];
     }
     /**
      * 获取数据
      */
-    static function getAddData($sid){
+    static function getAddData($sid,$app=0){
         $sfdp_ver_info = (new Design())->mode->findVer($sid);
         $field = self::fieldFun($sfdp_ver_info['s_field']);
         $sfdp_ver_info['s_field'] = json_encode($field);
         $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
-        $config = unit::sConfig($sfdp_ver_info,$load_file,$sid);
-        return ['info'=>$sfdp_ver_info,'fun'=>$config[0],'load_file'=>$load_file,'config'=>$config[1]];
+        if($app==1){
+            $config = ['',''];
+         }else{
+            $config = unit::sConfig($sfdp_ver_info,$load_file,$sid);
+        }
+        $nofield = [];
+        foreach ($field['list'] as $key=>$item) {
+            foreach ($item['data'] as $v) {
+                if(isset($v['td_type']) && $v['td_type']=='billno'){
+                    $info = Bill::findWhere(['type'=>$sfdp_ver_info['sid'],'state'=>1]);
+                    $nofield = [$v['tpfd_db'],$info['name'] ?? '',$info['lenth'] ?? ''];
+                }
+            }
+        }
+        return ['info'=>$sfdp_ver_info,'fun'=>$config[0],'nofield'=>$nofield,'load_file'=>$load_file,'config'=>$config[1]];
     }
     static function fieldFun($sfdp_ver_info){
         $field = json_decode($sfdp_ver_info,true);

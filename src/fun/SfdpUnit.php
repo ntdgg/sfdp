@@ -43,6 +43,7 @@ class SfdpUnit{
 					if(strpos($k,'@') !== false){
 						$time_st = 1;
 						$time_field = str_replace("@","",$k);
+                        $time_field = str_replace("[","",$time_field);
 					}
 					$info = Field::findWhere([['field','=',$k],['sid','=',$sid],['is_search','=',1]]);
 					if($info){
@@ -74,6 +75,7 @@ class SfdpUnit{
                 if($Modue['show_type']==2 && $k==$Modue['show_field'] && $v != ''){
                     $map[] = [$Modue['show_field'],'=',$v];
                 }
+                $time_st = 0;
 			}
 		}
 		return $map;

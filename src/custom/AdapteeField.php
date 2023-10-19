@@ -49,6 +49,7 @@ class AdapteeField{
 			return  false;
 		}
 	}
+
 	function value($id){	
 		$info = Db::name('sfdp_field')->where('id',$id)->value('name');
 		if($info){
@@ -57,6 +58,7 @@ class AdapteeField{
 			return  false;
 		}
 	}
+
 	function findWhere($map){
 		$info = Db::name('sfdp_field')->where($map)->find();
 		if($info){
@@ -64,8 +66,31 @@ class AdapteeField{
 		}else{
 			return  false;
 		}
-		
 	}
-	
-	
+
+    function findFidVal($fid,$field='sid'){
+        $info = Db::name('sfdp_field')->where('fid',$fid)->order('id desc')->value($field);
+        if($info){
+            return  $info;
+        }else{
+            return  false;
+        }
+    }
+    function viewFieldIndex($id){
+        return Db::name('sfdp_field_index')->find($id);
+    }
+    function selectFieldIndex($sid){
+        return Db::name('sfdp_field_index')->where('sid',$sid)->select()->toArray();
+    }
+    function delFieldIndex($id){
+        return Db::name('sfdp_field_index')->delete($id);
+    }
+    function addFieldIndex($data){
+        $info = Db::name('sfdp_field_index')->insertGetId($data);
+        if($info){
+            return  $info;
+        }else{
+            return  false;
+        }
+    }
 }
