@@ -23,17 +23,12 @@
 *   Sfdp通过可视化的业务单据设计，可以完整的构建一套业务逻辑系统。
 *   Sfdp通过脚本、函数的支持，在逻辑实现更加简洁、可用。
 
+## ❤ 特别推荐
 
-# ☀️青年计划
-团队一直致力于中国PHP工作流引擎、业务表单引擎的研发和设计，至今已经有4个年头，2018年初正式立项研发工作流引擎，2019年获得开源中国GVP项目。TPFLOW、SFDP全部使用最宽松的开源MIT协议（可以应用与商业系统、个人系统均可，只需保留版权信息）;[使用声明](https://www.gadmin8.com/index/doc/show.html?id=9)
+<a href='https://www.crmeb.com/'><img src="https://images.gitee.com/uploads/images/2021/1109/164354_0aafe3d2_892944.gif" width="120px"></a>  高品质开源商城系统40w+开发者的选择，值得托付
 
 
-青年计划，为了PHP开源工作流引擎、业务表单引擎的进步，我们全面开启青年计划，服务更多青年学者，为开源做奉献，为工作流引擎做奉献！[前去申请](https://gadmin8.com/index/young.html)
 
-## ❤ 特别赞助商（赞助Sfdp可联系作者）
-| 芦虎导航                                                                                 | 绮风云                                                                                                                  | ShopXO                                                                                             | CRMEB                                                                                                                                       | 顶想云                                                                                                                     |
-|--------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| <a href='https://www.luhu.co/'><img src="https://statics.luhu.co/main/images/logo.svg" width="120px"> </a> | <a href='https://www.suidc.cn/'><img src="https://www.suidc.cn/static/qf_cloud/home/img/logo.svg" width="120px"> </a> | <a href='https://www.shopxo.net/'><img src="https://shopxo.net/images/logo.png" width="120px"></a> | <a href='https://www.crmeb.com/'><img src="https://images.gitee.com/uploads/images/2021/1109/164354_0aafe3d2_892944.gif" width="120px"></a> | <a href='https://www.topthink.com/'><img src="https://www.topthink.com/asset/images/logo.e330c4.svg" width="120px"></a> |
 
 
 # ⭐演示及产品推荐
@@ -76,6 +71,18 @@ Gadmin企业级开发平台：  [传送门](https://gadmin8.com "Demo") 包含�
 设计器、源代码标注有版权的位置，未经许可，严禁删除及修改，违者将承担法律侵权责任！
 坚决打击网络诈骗行为，严禁将本插件集成在任何违法违规的程序上。
 ~~~
+
+# ☀️青年计划
+团队一直致力于中国PHP工作流引擎、业务表单引擎的研发和设计，至今已经有4个年头，2018年初正式立项研发工作流引擎，2019年获得开源中国GVP项目。TPFLOW、SFDP全部使用最宽松的开源MIT协议（可以应用与商业系统、个人系统均可，只需保留版权信息）;[使用声明](https://www.gadmin8.com/index/doc/show.html?id=9)
+
+
+青年计划，为了PHP开源工作流引擎、业务表单引擎的进步，我们全面开启青年计划，服务更多青年学者，为开源做奉献，为工作流引擎做奉献！[前去申请](https://gadmin8.com/index/young.html)
+
+## ❤ 特别赞助商（赞助Sfdp可联系作者）
+| 芦虎导航                                                                                 | 绮风云                                                                                                                   | CRMEB                                                                                                                                       | 顶想云                                                                                                                     |
+|--------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| <a href='https://www.luhu.co/'><img src="https://statics.luhu.co/main/images/logo.svg" width="120px"> </a> | <a href='https://www.suidc.cn/'><img src="https://www.suidc.cn/static/qf_cloud/home/img/logo.svg" width="120px"> </a> | <a href='https://www.crmeb.com/'><img src="https://images.gitee.com/uploads/images/2021/1109/164354_0aafe3d2_892944.gif" width="120px"></a> | <a href='https://www.topthink.com/'><img src="https://www.topthink.com/asset/images/logo.e330c4.svg" width="120px"></a> |
+
 
 # ✨ 鸣谢  Thanks
 
