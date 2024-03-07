@@ -34,9 +34,9 @@ class Field{
         return (new Field())->mode->saveWhere([['id','=',$id]],$postData);
     }
 
-	static function select($map=[])
+	static function select($map=[],$order='id asc')
     {
-		return (new Field())->mode->select($map);
+		return (new Field())->mode->select($map,$order);
     }
     /*获取Sup的查询条件来过滤*/
     static function getSupRaw($suphelpID,$sid){
@@ -56,8 +56,8 @@ class Field{
 				['sid'=>$varId,'field'=>'id','name'=>'主键','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
 				['sid'=>$varId,'field'=>'uid','name'=>'用户id','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
 				['sid'=>$varId,'field'=>'status','name'=>'审核状态','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'text','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
-				['sid'=>$varId,'field'=>'create_time','name'=>'新增时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
-				['sid'=>$varId,'field'=>'update_time','name'=>'更新时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>120,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>'']
+				['sid'=>$varId,'field'=>'create_time','name'=>'新增时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>180,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>''],
+				['sid'=>$varId,'field'=>'update_time','name'=>'更新时间','name_type'=>'int','zanwei'=>'','moren'=>'','width'=>180,'is_request'=>'','is_read'=>'','length'=>11,'type_data'=>'','type'=>'datetime','data'=>'','function'=>'','type_lx'=>'','is_list'=>'','is_search'=>'','fid'=>'','search_type'=>'','table_type'=>0,'table_id'=>'']
 			];
 			foreach($varInfo as $k=>$v){
 				$type_lx = intval($v['xx_type'] ?? 0);

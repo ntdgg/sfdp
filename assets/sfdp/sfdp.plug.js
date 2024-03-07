@@ -37,10 +37,10 @@ var sfdpPlug = {
                 lab =`<fieldset class="layui-elem-field layui-field-title" style="margin: 0px;"><legend>${data.tpfd_name}</legend></fieldset>`;
             }
             if (s_type==1) {
-                lab = `<div>`;
+                lab = '<div>';
             }
             if(data.tpfd_lable==0){
-                lab =``;
+                lab ='';
             }
             var html = lab + sfdpPlug.common(type,data,field_att,Curd);
         }
@@ -171,7 +171,7 @@ var sfdpPlug = {
                 tags += `<option value="${key}" ${check}>${data[key]}</option>`;
             }
         }
-        if(attr=='0'){
+        if(attr=='0' || jsonData.td_type=='suphelp'){
             tags += `</select><a class="layui-btn layui-btn-primary" onclick="sfdpPlug.supHelp(${jsonData.tpfd_suphelp},'${jsonData.tpfd_name}','${selectId}')" style="border-left-width: 0px;"><i class="layui-icon">&#xe604;</i></a>`
             }else{
             tags += `</select>`
@@ -220,7 +220,7 @@ var sfdpPlug = {
                     if (y == def_check && type=='radio') {
                         check = 'checked';
                     }
-                    if (sfdpPlug.isInArray(def_check,y) && type=='checkbox') {
+                    if (def_check != null &&sfdpPlug.isInArray(def_check,y) && type=='checkbox') {
                         check = 'checked';
                     }
                 }
@@ -306,10 +306,11 @@ var sfdpPlug = {
                 html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data.rvalue}">${data.value}  <a class="layui-btn layui-btn-primary" onclick="sfdpPlug.supHelp(${data.tpfd_suphelp},'${data.tpfd_name}',${data.rvalue},'show')" style="border: 0px;color: #5e7ce0;"><i class="layui-icon">&#xe604;</i></a></div>`;
             }else if(type==='sign'){
                 html = lab + '<span id="' + data.tpfd_id + '_sign" style="height:38px;padding-left: 10px;"><img width="100px"src="'+(data.value || '')+'"onClick=sfdp.view_img("'+(data.value || '')+'")></span>';
+            }else if(type==='wenzi'){
+                html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" >${data.tpfd_moren}</div>`;
             }else{
                 var data_value = sfdpPlug.htmlEncode(data.value);
-                html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data_value}">${data.value}
-</div>`;
+                html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data_value}">${data.value}</div>`;
             }
         }
         return html + '</div></div>';

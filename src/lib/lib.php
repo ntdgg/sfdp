@@ -286,7 +286,7 @@ php;
                 if (in_array($v['field'], $fielcount)) {
                     $countchecked = 'checked';
                 }
-                $alltable .= ' <tr><th><b>' . $v['name'] . '('.$v['field'].')<b> </th><th><input class="sfdp-input" placeholder="需显示填写序号" name="'.$v['field'].'[list]" value="' . array_search($v['field'],$listfield) . '" type="number" ></th><th><input name="'.$v['field'].'[count]" ' . $countchecked . ' type="checkbox" value="1"></th><th><input name="'.$v['field'].'[field_wz]" class="sfdp-input" placeholder="left左,right右"  value="' . $v['field_wz'] . '"></th><th><input name="'.$v['field'].'[search]" class="sfdp-input" placeholder="如：=,>,like"  value="' . $v['search_type'] . '"></th><th><input width="50px" name="'.$v['field'].'[width]" class="sfdp-input"  name="" value="' . $v['width'] . '" type="number"> <input type="hidden" name="'.$v['field'].'[id]"  value="' . $v['id'] . '"><input name="'.$v['field'].'[title]"  value="' . $v['name'] . '" type="hidden"></th></tr>';
+                $alltable .= ' <tr><th><b>' . $v['name'] . '('.$v['field'].')<b> </th><th><input class="sfdp-input" placeholder="需显示填写序号" name="'.$v['field'].'[list]" value="' . array_search($v['field'],$listfield) . '" type="number" ></th><th style="text-align: center;"><input name="'.$v['field'].'[count]" ' . $countchecked . ' type="checkbox" value="1"></th><th><input name="'.$v['field'].'[field_wz]" class="sfdp-input" placeholder="left左,right右"  value="' . $v['field_wz'] . '"></th><th><input name="'.$v['field'].'[search]" class="sfdp-input" placeholder="如：=,>,like"  value="' . $v['search_type'] . '"></th><th><input width="50px" name="'.$v['field'].'[width]" class="sfdp-input"  name="" value="' . $v['width'] . '" type="number"> <input type="hidden" name="'.$v['field'].'[id]"  value="' . $v['id'] . '"><input name="'.$v['field'].'[title]"  value="' . $v['name'] . '" type="hidden"></th><th><input width="50px" name="'.$v['field'].'[field_length]" class="sfdp-input"  name="" value="' . $v['field_length'] . '" type="number"> </th></tr>';
             }
         }
         $ywlist = Design::select([['s_design','=','2']]);
@@ -303,21 +303,21 @@ php;
 </head>
 <body style="padding:20px">
  <table>
-        <tr><td colspan=6><input id="order" class="sfdp-input"  placeholder="排序规则如：id desc" value='{$modue["order"]}'></td><td style="text-align:center"><a onclick='save_order()'  class='button' >保存排序</a></td></tr>
-        <tr><td colspan=6>
+        <tr><td colspan=7><input id="order" class="sfdp-input" style="width: 48%;display: inline;" placeholder="排序规则如：id desc" value='{$modue["order"]}'><input id="height" class="sfdp-input"  placeholder="表格行高度设置" value='{$modue["height"]}'  style="width: 48%;display: inline;"></td><td style="text-align:center"><a onclick='save_order()'  class='button' >保存排序</a></td></tr>
+        <tr><td colspan=7>
         {$access_html}
 	<div id="access1">权限字段：<select style="width:200px" name="accsee_ids"><option value="">请选择</option>{$search}</select>
 	<select style="width:200px" name="accsee_eq"><option value="=">等于</option><option value="<>">不等于</option><option value="in">包含</option><option value="no in">不包含</option></select>
 	<select style="width:200px" name="accsee_user"><option value="uid">当前用户</option><option value="role">当前角色</option></select>
 	<select style="width:200px" name="accsee_fun"><option value="and">and</option><option value="or">or</option></select>
     <span class='button' onclick=addaccess(1)>Add</span></div></td><td style="text-align:center"><a onclick='save_access()'  class='button' >保存权限</a></td></tr>
-     <tr><td colspan=6>
+     <tr><td colspan=7>
         {$linkdata_html}
 	<div id="data1">数据归集：<select style="width:200px" name="data_ids"><option value="">请选择</option>{$ywlistop}</select>
 	<input class="sfdp-input" placeholder="关联字段信息" id="data_field" name="data_field" type="text" value="" style="width: 220px;display: inline;">
 	<input class="sfdp-input" placeholder="WhereRaw条件" id="data_where" name="data_where" type="text" value="" style="width: 220px;display: inline;">
     <span class='button' onclick=data(1)>Add</span></div></td><td style="text-align:center"><a onclick='save_data()'  class='button' >保存权限</a></td></tr>
-    <tr><td colspan=6>列表形式：<select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">树形列表</option><option value="2">Tab列表</option><option value="3">商品列表</option><option value="4">分级列表</option></select><input class="sfdp-input" placeholder="关联字段信息" id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 220px;display: inline;"><input class="sfdp-input" placeholder="元素信息：用来额外展示相关的树或者Tab数据" style="width: 40%;display: inline;" id="show_fun" name="show_fun" type="text" value="{$show_fun}"></div>
+    <tr><td colspan=7>列表形式：<select style="width:200px" name="show_type" id="show_type"><option value="0">普通列表</option><option value="1">树形列表</option><option value="2">Tab列表</option><option value="3">商品列表</option><option value="4">分级列表</option></select><input class="sfdp-input" placeholder="关联字段信息" id="show_field" name="show_field" type="text" value="{$show_field}" style="width: 220px;display: inline;"><input class="sfdp-input" placeholder="元素信息：用来额外展示相关的树或者Tab数据" style="width: 40%;display: inline;" id="show_fun" name="show_fun" type="text" value="{$show_fun}"></div>
 	</td><td style="text-align:center"><a onclick='save_show()'  class='button'>保存布局</a></td></tr>
         <tr><th  style='width: 15%;text-align: center;'><b>字段<b> </th>
             <th  style='width: 8%;text-align: center;'><b>列表<b> </th>
@@ -325,6 +325,7 @@ php;
             <th  style='width: 5%;text-align: center;'><b>定位<b> </th>
             <th  style='width: 5%;text-align: center;'><b>查询<b> </th>
             <th  style='width: 5%;text-align: center;'><b>宽度<b> </th>
+            <th  style='width: 5%;text-align: center;'><b>字串长度<b> </th>
             <th rowspan={$lenth} style="width: 5%;text-align:center"><b><a onclick='update()' class='button'>保存属性</a></b> </th>
         </tr>
         <form id='form'>
@@ -401,7 +402,7 @@ php;
 		sfdp.sAjax("{$url}?act=customAccess",{sid:{$sid},ids_val:ids.join(','),value_val:value.join(','),user_val:user.join(','),fun_val:fun.join(',')});
 	}
 	function save_order(){
-		sfdp.sAjax("{$url}?act=customOrder",{sid:{$sid},order:$('#order').val()});
+		sfdp.sAjax("{$url}?act=customOrder",{sid:{$sid},height:$('#height').val(),order:$('#order').val()});
 	}
 	function save_show(){
 		sfdp.sAjax("{$url}?act=customShow",{sid:{$sid},show_field:$('#show_field').val(),show_type:$('#show_type').val(),show_fun:$('#show_fun').val()});
@@ -434,7 +435,7 @@ php;
         }
         $op_json = json_encode($op);
 		return <<<php
-	<html>
+    <!DOCTYPE html>
 	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
 	<link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.1" /> 
 	<body>
@@ -446,33 +447,11 @@ php;
 				<div class="sfdp-cl" ></div>
 				<div class="sfdp-tool-title sfdp-mt10">页面布局 Form control library</div>
 				<style>
-                    .colbj_x{
-                        background-color: #ffffff;
-                        text-align: center;
-                        overflow: hidden;
-                        color:black
-                    }
-                    #colbj{
-                        text-align: center;
-                        position: relative;
-                        overflow: hidden;
-                     }
-                    #colbj:hover{
-                        overflow: visible;
-                        z-index: 999;
-                        cursor: pointer;
-                    }
-                 .inform {
-                            position: absolute;
-                            display: block;
-                            width: 250px;
-                            background-color: white;
-                            overflow: auto;
-                            box-shadow: 0px 0px 10px #000;
-                            border-radius: 5px;
-                            padding: 10px;
-                            line-height: 29px;
-                        }
+                    .colbj_x{ background-color: #ffffff; text-align: center; overflow: hidden; color:black }
+                    #colbj{ text-align: center; position: relative; overflow: hidden; }
+                    #colbj:hover{ overflow: visible; z-index: 999; cursor: pointer; }
+                    .inform { position: absolute; display: block; width: 250px; background-color: white; overflow: auto; box-shadow: 0px 0px 10px #000; border-radius: 5px; padding: 10px; line-height: 29px; }
+                    .disableTableList{width:200px; padding-left:20px; font-size:14px; height:40px; line-height:40px; float:left;}
 				</style>
 				<div class='sfdp-tool-fix' id="colbj"><a onclick='sfdp.build_bj()'>&#8194;<b class='ico'>↭</b>&#8194;栅格布局 </a>
                     <div id="b1-0">

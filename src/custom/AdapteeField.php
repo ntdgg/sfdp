@@ -30,8 +30,8 @@ class AdapteeField{
 			return  false;
 		}
 	}
-	function select($map){
-		return Db::name('sfdp_field')->where($map)->select()->toArray();
+	function select($map,$order = 'id asc'){
+		return Db::name('sfdp_field')->where($map)->order($order)->select()->toArray();
 	}
 	function saveWhere($where,$data){
 		$info = Db::name('sfdp_field')->where($where)->update($data);

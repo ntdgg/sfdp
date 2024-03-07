@@ -37,10 +37,8 @@ class Data{
         $data['uid']=unit::getuserinfo('uid');
         $data['create_time']=time();
         $table = $data['name_db'];
-        unset($data['name_db']);
-        unset($data['tpfd_check']);
         $subdata  = json_decode($data['@subdata'],true);
-        unset($data['@subdata']);
+        unset($data['name_db'],$data['tpfd_check'],$data['@subdata'],$data['@saas_id']);
         $did = (new Data())->mode->add($table,$data);
         if(!$did){
             return $did;
@@ -163,7 +161,7 @@ class Data{
     /**
      * 获取列表数据
      */
-    static function getListData($sid,$map,$page=1,$limit=15,$ewhereRaw=''){
+    static function getListData($sid,$map,$page=1,$limit=15,$ewhereRaw='',$sys_order=''){
         $jsondata = Design::descVerTodata($sid);
         $Modue = Modue::find($jsondata['sid']);
         /*权限系统组合过滤*/
@@ -202,12 +200,18 @@ class Data{
             //"concat(',',xtuid,',') regexp '(^|,)(".str_ireplace(',', '|', $ids).")(,|$)'";
             $is_saas = "concat(',',saas_id,',') regexp concat('".str_ireplace(',', ',|,', unit::getuserinfo('saas_id'))."')";
         }
+        if($sys_order==''||$sys_order==null){
+            $sys_order = $Modue['order'];//模块设置排序
+        }
+        $field_length = Field::select([['sid','=',$sid],['field_length','>',0]]);
         //saas_id
         /*权限系统组合过滤*/
-        $list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit,$whereRaw,$Modue['order'],$is_saas,$ewhereRaw);
+        $list = (new Data())->mode->select($jsondata['db_name'],$map,$Modue['field'],$page,$limit,$whereRaw,$sys_order,$is_saas,$ewhereRaw);
         $json = $list['data'];
+
         //dump($jsondata['fieldSysProcess']);
         foreach ($json as $k => $v) {
+
             foreach($jsondata['fieldArrAll'] as $k2=>$v2){
                 if(in_array($k2,explode(',',$Modue['field'] ?? ''))){
                     if(strpos($v[$k2] ?? '',',') !== false){
@@ -244,6 +248,15 @@ class Data{
                     $json[$k][$v4] = '<img src="'.$v[$v4].'"  width="100px" onclick=sfdp.openpage("签名信息",$(this).attr("src"),{w:"710px",h:"510px"})>';
                 }
             }
+            /*增加字段超出长度控制*/
+            foreach ($field_length as $k5=>$v5){
+                if(isset($v[$v5['field']])){
+                    if (mb_strlen($v[$v5['field']]) > $v5['field_length']) {
+                        $json[$k][$v5['field']] = '<span title="'.$v[$v5['field']].'">'.mb_substr($v[$v5['field']], 0, $v5['field_length']) . '...</span>';
+                    }
+                }
+            }
+
         }
         return ['count'=>$list['count'],'list'=>$json,'field'=>$jsondata,'title'=>$jsondata['title']];
     }
@@ -264,14 +277,13 @@ class Data{
      */
     static function getViewData($sid,$bid){
         $sfdp_ver_info = Design::findVer($sid);
-        $field = self::setField($sfdp_ver_info,$bid,'all');
-
+        $field = self::setField($sfdp_ver_info,$bid,'all',1);
         $load_file = SfdpUnit::Loadfile($field['field']['name_db'],$field['field']['tpfd_class'],$field['field']['tpfd_script']);
         $config = unit::sConfig($sfdp_ver_info,$load_file,$sid);
         return ['info'=>json_encode($field['field']),'files'=>json_encode($field['files']),'row'=>$field['find'],'config'=>$config[1],'f'=>$field,'m'=>Modue::find($sid)];
     }
     /*字段统一处理*/
-    static function setField($sfdp_ver_info,$bid,$all = ''){
+    static function setField($sfdp_ver_info,$bid,$all = '',$is_view=0){
         $field = json_decode($sfdp_ver_info['s_field'],true);
         $find = (new Data())->mode->find($field['name_db'],$bid);
         $zfield = [];
@@ -282,11 +294,20 @@ class Data{
                     if($v2['td_type']=='cascade'){
                         $v2['tpfd_data'] =  Data::getFun2($v2['checkboxes_func'],$all);
                     }else{
-                        $v2['tpfd_data'] =  Data::getFun($v2['checkboxes_func'],$all);
+                        if($is_view==1){
+                            $v2['tpfd_data'] =  Data::getFun($v2['checkboxes_func'],$all,$find[$v2['tpfd_db']]);
+                        }else{
+                            $v2['tpfd_data'] =  Data::getFun($v2['checkboxes_func'],$all);
+                        }
                     }
                 }
                 if($v2['td_type']=='suphelp'){
-                    $v2['tpfd_data'] =Data::getFun3($v2);
+                    /*如果$all = all 则输出全部数据，否则则按whereRaw过滤数据*/
+                    if($all=='all'){
+                        $v2['tpfd_data'] =Data::getFun3($v2);
+                    }else{
+                        $v2['tpfd_data'] =Data::getFun3($v2,'view');
+                    }
                 }
                 if(in_array($v2['td_type'],['dropdowns','dropdown','radio','checkboxes','suphelp'])){
                     $value_arr = explode(",",$find[$v2['tpfd_db']] ?? '');
@@ -322,6 +343,9 @@ class Data{
                         $files['url'][$field['list'][$k]['data'][$k2]['tpfd_name']]= $field['list'][$k]['data'][$k2]['value'];
                     }
                 }
+                if($is_view==1){
+                    unset($v2['tpfd_data']);
+                }
                 $field['list'][$k]['data'][$k2]['rvalue'] = $find[$v2['tpfd_db']];//增加真实值
                 $zfield[$field['list'][$k]['data'][$k2]['tpfd_db']]= $field['list'][$k]['data'][$k2]['value'];
             }
@@ -331,7 +355,9 @@ class Data{
             foreach($field['sublist'] as $k=>$v){
                 foreach($v['data'] as $k2=>$v2) {
                     if (isset($v2['xx_type']) && $v2['xx_type'] == 1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
-                        $field['sublist'][$k]['data'][$k2]['tpfd_data'] = self::getFun($v2['checkboxes_func'],$all);
+                        if($is_view!=1){
+                            $field['sublist'][$k]['data'][$k2]['tpfd_data'] = self::getFun($v2['checkboxes_func'],$all);
+                        }
                     }else{
                         if(isset($v2['tpfd_data'])){
                             $field['sublist'][$k]['data'][$k2]['tpfd_data']  = $v2['tpfd_data'];
@@ -350,13 +376,16 @@ class Data{
                     $vvid =$vv['id'];
                     unset($vv['id']);
                     foreach($mkey as $kkk=>$vvv){
-
                         if($v[1][$vvv]['td_type']=='dropdown'||$v[1][$vvv]['td_type']=='dropdowns'||$v[1][$vvv]['td_type']=='radio'||$v[1][$vvv]['td_type']=='checkboxes'){
                             $value_arr = explode(",",$vv[$v[1][$vvv]['tpfd_db']] ?? '');
                             $fiedsver = '';
                             foreach($value_arr as $v33){
-
-                                $fiedsver .=($v[1][$vvv]['tpfd_data'][$v33] ?? unit::gconfig('data_default')).',';
+                                if($v[1][$vvv]['xx_type']==0){
+                                    $fiedsver .=($v[1][$vvv]['tpfd_data'][$v33] ?? unit::gconfig('data_default')).',';
+                                    }else{
+                                    $array = self::getFun($v[1][$vvv]['checkboxes_func'],$all,$v33);
+                                    $fiedsver .=($array[$v33] ?? unit::gconfig('data_default')).',';
+                                }
                             }
                             $v[1][$vvv]['rvalue'] =  $vv[$v[1][$vvv]['tpfd_db']] ?? '';
                             $v[1][$vvv]['value'] =  rtrim($fiedsver, ',');
@@ -365,6 +394,9 @@ class Data{
                         }
                     }
                     $v[1]['id'] =$vvid;
+                    if($is_view==1){
+                        unset($v[1]['tpfd_data']);
+                    }
                     $sublist[$k][$kk] = $v[1];
                 }
             }
@@ -388,7 +420,7 @@ class Data{
         return $buile_table;
     }
     /*函数处理数据*/
-    static function getFun($checkboxes_func,$all =''){
+    static function getFun($checkboxes_func,$all ='',$mode='show'){
         //函数名转为数据信息
         $fun_mode = unit::gconfig('fun_mode') ?? 1;
         if ($fun_mode == 1 || $fun_mode == '') {
@@ -403,7 +435,7 @@ class Data{
             if (!class_exists($className)) {
                 return ['code'=>1,'msg'=>unit::errMsg(3003),'errCode'=>3003];
             }
-            $getData = (new $className())->func($checkboxes_func,$all);
+            $getData = (new $className())->func($checkboxes_func,$all,$mode);
         }
         if ($getData['code'] == -1) {
             return $getData;

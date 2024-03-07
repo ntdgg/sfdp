@@ -217,7 +217,7 @@ class Control{
                 unit::errJSMsg('Err,校验错误,请先设计并部署！');
 			}
 			$json = View::ver($sid);
-			$field = Field::select([['sid','=',$json['ver']['id']],['table_type','=',0]]);;//找出模型字段
+			$field = Field::select([['sid','=',$json['ver']['id']],['table_type','=',0]],'');;//找出模型字段
 			$modue = Modue::findWhere([['sid','=',$json['ver']['id']]]);//找出模型字段
 			return lib::custom($sid,$field,$modue);
 		}
@@ -238,7 +238,7 @@ class Control{
         }
 		if($act =='customOrder'){
 			$json = View::ver($sid['sid']);
-			$ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['order'=>$sid['order'],'update_time'=>time()]);
+			$ret =Modue::saveWhere([['sid','=',$json['ver']['id']]],['order'=>$sid['order'],'height'=>$sid['height'],'update_time'=>time()]);
 			if($ret){
 				return json(['code'=>0,'msg'=>'保存成功']);
 			}else{
@@ -263,7 +263,7 @@ class Control{
                 if(isset($v['search']) && $v['search'] <> ''){
                     Field::saveWhere([['id','=',$v['id']]],['is_search'=>1,'search_type'=>$v['search'],'update_time'=>time()]);//更新查询条件
                 }
-                Field::saveWhere([['id','=',$v['id']]],['width'=>$v['width'],'field_wz'=>$v['field_wz'],'update_time'=>time()]);//更新宽度
+                Field::saveWhere([['id','=',$v['id']]],['width'=>$v['width'],'field_length'=>$v['field_length'],'field_wz'=>$v['field_wz'],'update_time'=>time()]);//更新宽度
             }
             ksort($list);ksort($list_name);
             $list_field = implode(',',$list);
@@ -480,6 +480,7 @@ class Control{
                 'search_field' =>$search_field,
                 'fun' =>$list['field']['fun'],
 				'title' =>$modueId['title'],
+                'height' =>$modueId['height'],
 				'load_file' =>$list['field']['load_file'],
 				'show_field' =>$modueId['show_field'],
                 'show_type' =>$modueId['show_type'],
@@ -487,7 +488,7 @@ class Control{
                 'sfdp_design' =>$sfdp_design
 			];
 			$btns = explode(',',$modueId['btn']);
-			$btns_tohtml = self::btnArray($btns,$sid);
+			$btns_tohtml = self::btnArray($btns,$old_sid);
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/index.html',['btn'=>$btns_tohtml,'config'=>$config,'list'=>$list['list']]);
 				}else{
@@ -496,7 +497,7 @@ class Control{
 		}
 		if($act =='GetData'){
 			$map = SfdpUnit::Bsearch($data,$sid);
-			$list = Data::getListData($sid,$map,$data['page'],$data['limit'],$data['whereRaw']);
+			$list = Data::getListData($sid,$map,$data['page'],$data['limit'],$data['whereRaw'] ?? '',$data['sys_order']);
 			$jsondata = [];
 			foreach($list['list'] as $k=>$v){
 				$list['list'][$k]['url'] = '<a onClick=sfdp.openfullpage("查看","'.url('/index/sfdp/sfdpCurd',['act'=>'view','sid'=>$sid,'bid'=>$v['id']]).'")	class="btn  radius size-S">查看</a>';

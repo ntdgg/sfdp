@@ -76,7 +76,8 @@ legend{
 	height: calc(100% - 52px);
 }
 #sfdp-main {
-	min-height: 300px;
+	min-height: 500px;
+	max-height: 960px;
 	height: calc(100% - 3px);
 	background-color: #FFFFFF;
 	border: 1px dashed #999;

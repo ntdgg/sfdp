@@ -19,7 +19,7 @@ use sfdp\fun\SfdpUnit;
 
 use sfdp\lib\unit;
 
-define('SFDP_Ver', '7.0.0' );
+define('SFDP_Ver', '7.0.2' );
 
 define('BEASE_SFDPURL', realpath ( dirname ( __FILE__ ) ) );
 

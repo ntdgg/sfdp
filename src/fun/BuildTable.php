@@ -23,7 +23,7 @@ class BuildTable{
     static function Btable($table,$data,$btn,$name,$all='')
     {
 		if (in_array($table, unit::gconfig('black_table'))) {
-			return ['msg'=>'该数据表不允许创建','code'=>1];
+			return ['msg'=>'该数据表不允许创建','code'=>-1];
         }
         $tableName = unit::gconfig('int_db_prefix') . $table;
         $tableExist = false;

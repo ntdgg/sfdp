@@ -88,9 +88,9 @@ var sfdp = {
     },
     // 生成过滤条件组
     generateFilterGroup: function (list) {
-        let htmlTags = ``
+        let htmlTags = ``;
         for (const item of list) {
-            let type = item.type || 'text'
+            let type = item.type || 'text';
             htmlTags += `<div class='layui-input-inline' style="min-width:90px;max-width: 110px;">` +sfdpPlug.PlugList(type,item) + `</div>`;
         }
         $('#search').html(htmlTags);
@@ -147,11 +147,11 @@ var sfdp = {
                     });
                 }
                 for (x in int_data.sublist) {
-                    var divclass='';
-                    var activ='';
+                    var divclass='',
+                        activ='';
                     if(xh==1){
-                        var divclass='on';
-                        var activ='activ';
+                        divclass='on';
+                        activ='activ';
                     }
                     $("#tab").append(`<li class="${activ}">${int_data.sublist[x]['title']}</li>`);
                     let table = sfdp.sublist_build(int_data.sublist[x]['type'], int_data.sublist[x], showtype, int_data.name_db + '_d' + xh);
@@ -172,6 +172,11 @@ var sfdp = {
                             if(str2.test(htmls)){
                                 var reg = new RegExp("dropdowns_","g");//g,表示全部替换。
                                 htmls = htmls.replace(reg,'Etr'+length+"_dropdowns_");
+                            }
+                            var str3=new RegExp('upload_');
+                            if(str3.test(htmls)){
+                                var reg = new RegExp("upload_","g");//g,表示全部替换。
+                                htmls = htmls.replace(reg,'EF'+length+"_upload_");
                             }
                             $("#" + int_data.name_db + "_d" + (Number(x) + 1) + " .table .title").after(htmls);
                         }
@@ -330,6 +335,11 @@ var sfdp = {
             var reg = new RegExp("dropdowns_","g");//g,表示全部替换。
             htmls = htmls.replace(reg,'Atr'+length+"_dropdowns_");
         }
+        var str3=new RegExp('upload_');
+        if(str3.test(htmls)){
+            var reg = new RegExp("upload_","g");//g,表示全部替换。
+            htmls = htmls.replace(reg,'F'+length+"_upload_");
+        }
         $('#'+id+'_table tbody').append(htmls+'<td> <a onclick="sfdp.dl(this)" style="color: chocolate;">删</a><input name="id" value="" type="hidden"></td>');
         $('.this-select').select2({width:'100%'});
         $('.tagInput').tagsInput({defaultText: '回车输入..',width:'100%'});
@@ -347,7 +357,7 @@ var sfdp = {
         tr.next().find("input").val("");
         tr.find('[data-widget="select2"]').each(function(){
             $(this).select2('destroy');
-        })
+        });
         tr.after(tr.clone());
         tr.find('[data-widget="select2"]').each(function(){
             $(this).select2({
@@ -355,14 +365,14 @@ var sfdp = {
                 width: 'resolve'
             });
             $(this).select2();
-        })
+        });
         tr.next().find('[data-widget="select2"]').each(function(){
             $(this).select2({
                 minimumResultsForSearch: -1,
                 width: 'resolve'
             });
             $(this).select2();
-        })
+        });
         sfdp.setDate();
     },
     dl: function (obj) {
@@ -1011,7 +1021,7 @@ var sfdp = {
     /*5.0.1 数据库设计自动带数据*/
     sys_config: function () {
         var json_data = JSON.parse(localStorage.getItem("json_data"));
-        var xEdit = '', xDel = '', xStatus = '', xWorkFlow = '', XImport = '';
+        var xEdit = '', xDel = '', xStatus = '', xWorkFlow = '', XImport = '', XDelAll = '', XCopy = '';
         if (json_data.tpfd_btn === 'undefined') {
             json_data.tpfd_btn = {};
         }
@@ -1031,6 +1041,13 @@ var sfdp = {
         if (isInArray(btnArray, 'Import')) {
             XImport = 'checked';
         }
+        if (isInArray(btnArray, 'DelAll')) {
+            XDelAll = 'checked';
+        }
+        if (isInArray(btnArray, 'Copy')) {
+            XCopy = 'checked';
+        }
+
         if (json_data.tpfd_del=='0') {
            var s_del = 'checked';
         }else{
@@ -1063,7 +1080,7 @@ var sfdp = {
         }
         var html = '<form id="configform"> <div class="sfdp-form-item"><label class="sfdp-label">表单标题</label><div class="sfdp-input-block"><input name="name" type="text" value="' + json_data.name + '" class="sfdp-input"></div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">数据表名</label><div class="sfdp-input-block"><input name="name_db" type="text" value="' + (json_data.name_db) + '"' + ((look_db) == '1' ? 'readonly' : '') + ' class="sfdp-input"></div></div>' +
-            '<div class="sfdp-form-item"><label class="sfdp-label">列表控件</label><div class="sfdp-input-block"><input  name="tpfd_btn" value=add type="checkbox" checked  onclick="return false;">添加 <input  name="tpfd_btn" value=Edit type="checkbox" ' + xEdit + ' >编辑 <input  name="tpfd_btn" value=Del type="checkbox" ' + xDel + ' >删除 <input  name="tpfd_btn" value=View type="checkbox" checked  onclick="return false;">查看 <input  name="tpfd_btn" value=Status ' + xStatus + ' type="checkbox">简单审核 <input  name="tpfd_btn" value=WorkFlow type="checkbox" ' + xWorkFlow + '>工作流引擎 <input  name="tpfd_btn" value=Import type="checkbox" ' + XImport + '>导入引擎 </div></div>' +
+            '<div class="sfdp-form-item"><label class="sfdp-label">列表控件</label><div class="sfdp-input-block"><input  name="tpfd_btn" value=add type="checkbox" checked  onclick="return false;">添加 <input  name="tpfd_btn" value=Edit type="checkbox" ' + xEdit + ' >编辑 <input  name="tpfd_btn" value=Del type="checkbox" ' + xDel + ' >删除 <input  name="tpfd_btn" value=View type="checkbox" checked  onclick="return false;">查看 <input  name="tpfd_btn" value=Status ' + xStatus + ' type="checkbox">核准 <input  name="tpfd_btn" value=WorkFlow type="checkbox" ' + xWorkFlow + '>工作流 <input  name="tpfd_btn" value=DelAll type="checkbox" ' + XImport + '>导入 <input  name="tpfd_btn" value=DelAll type="checkbox" ' + XDelAll + '>批删 <input  name="tpfd_btn" value=Copy type="checkbox" ' + XCopy + '>复制 </div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">数据软删</label><div class="sfdp-input-block">' +
             '<input  name="tpfd_del" value=0 type="radio" ' + (s_del || '') + '>是' +
             '<input  name="tpfd_del" value=1 type="radio" ' + (s_del2 || '') + '>否</div><label class="sfdp-label">租户模式</label><div class="sfdp-input-block">' +
@@ -1351,6 +1368,10 @@ var sfdp = {
             sfdp.dataSave({tr: code, data: {}, type: 2, show: 1}, code, 'tr');
         }
         sfdp.setSortable();
+        $("#up_save").trigger("click");
+        setTimeout(function () {
+            window.location.reload();
+        }, 1000);
     },
     /*7.0.0 批量布局模式设计*/
     build_bjs: function (num) {
@@ -1422,6 +1443,8 @@ var sfdp = {
                         var parent_code = $(this).parent().attr("id");
                         old_tr.td = parent_td;
                         old_tr.tr_id = parent_code;
+                        $('#'+parent_code+' #'+parent_td).removeClass("fb-fz");
+                        $('#'+parent_code+' #'+parent_td).addClass("fb-disabled ui-sortable-disabled");
                         sfdp.dataSave({tpfd_id: old_tr.tpfd_id}, field_code, 'td_del');//删除旧的
                         sfdp.dataSave(old_tr, parent_code, 'tr_data');
                         $(this).html($(ui.item));
@@ -1721,7 +1744,7 @@ $("#sfdp-main").on("click", ".sfdp-rows", function (e) {
     if (mode === 'zibiao') {
         var rownum = json_data.sublist[activeDom].type;
         var html = '<style>.trdata .sfdp-label{min-width:60px;}.trdata .sfdp-form-item{margin-bottom: 2px;clear: none;}.trdata .sfdp-title,.wybs,.zjkd{display: none}.trdata .sfdp-input{width: 90px}</style><div class="sfdp-form-item">' +
-            '<label class="sfdp-label">子表标识</label><div class="sfdp-input-block"><input type="text" readonly id="row-id" value="' + activeDom +  '" class="sfdp-input"></div> <label class="sfdp-label">子表标题</label><div class="sfdp-input-block"><input id="row-title" autocomplete="off"  type="text" value="' + (json_data.sublist[activeDom].title || '请设置子表单标题') + '" class="sfdp-input"></div><label class="sfdp-label">子表列数</label><div class="sfdp-input-block"><input readonly id="zibiaonum" type="text" value="' + rownum + '" class="sfdp-input"></div><label class="sfdp-label" >添加列</label><div class="sfdp-input-block"><select id="type"><option value="text">文本</option><option value="number">数字</option><option value="money">金额</option><option value="dropdown">下拉</option><option value="date">时间日期</option><option value="textarea">多行文本</option><option  value="time_range">时间范围</option><option value="dropdowns">下拉多选</option><option value="cascade">级联组件</option><option value="tag">tag输入</option></select><div class="button" onclick=sfdp.add_field("text","'+activeDom+'")>添加</div></div></div>' +
+            '<label class="sfdp-label">子表标识</label><div class="sfdp-input-block"><input type="text" readonly id="row-id" value="' + activeDom +  '" class="sfdp-input"></div> <label class="sfdp-label">子表标题</label><div class="sfdp-input-block"><input id="row-title" autocomplete="off"  type="text" value="' + (json_data.sublist[activeDom].title || '请设置子表单标题') + '" class="sfdp-input"></div><label class="sfdp-label">子表列数</label><div class="sfdp-input-block"><input readonly id="zibiaonum" type="text" value="' + rownum + '" class="sfdp-input"></div><label class="sfdp-label" >添加列</label><div class="sfdp-input-block"><select id="type"><option value="text">文本</option><option value="number">数字</option><option value="money">金额</option><option value="upload">上传</option><option value="dropdown">下拉</option><option value="date">时间日期</option><option value="textarea">多行文本</option><option  value="time_range">时间范围</option><option value="dropdowns">下拉多选</option><option value="cascade">级联组件</option><option value="tag">tag输入</option></select><div class="button" onclick=sfdp.add_field("text","'+activeDom+'")>添加</div></div></div>' +
             '' +
             '<div class="sfdp-form-item" style="padding: 10px;"><table class="table"><tr class="text-c title" id="trdata" style="background-color: #f2f2f2;"><th width="4%">序号</th><th width="96%">子表配置</th></tr></table></div></form> ';
         layer.open({

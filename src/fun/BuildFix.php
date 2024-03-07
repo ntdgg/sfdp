@@ -111,7 +111,13 @@ class BuildFix{
 						$new_modue_name[array_search($fiels['name'],$old_modue_name)] =$v['tpfd_name'];
 					}
 				}
-				$update[$fiels['id']] =['field'=>$v['tpfd_db'],'name_type'=>$v['tpfd_dblx'],'length'=>$v['tpfd_dbcd'],'name'=>$v['tpfd_name']];
+                $checkboxes_func = '';
+                $xx_type ='';
+                if(isset($v['xx_type']) && $v['xx_type'] == 1){
+                    $xx_type=1;
+                    $checkboxes_func = $v['checkboxes_func'];
+               }
+				$update[$fiels['id']] =['field'=>$v['tpfd_db'],'name_type'=>$v['tpfd_dblx'],'type_data'=>json_encode($v['tpfd_data'] ?? '',true),'length'=>$v['tpfd_dbcd'],'data'=>$xx_type,'name'=>$v['tpfd_name'],'function'=>$checkboxes_func];
 			}else{
 				//新增字段信息
 				if($v['tpfd_dblx']=='datetime'||$v['tpfd_dblx']=='longtext'||$v['tpfd_dblx']=='date'){
@@ -122,7 +128,6 @@ class BuildFix{
 				$addfield[] = self::field($v,$varId);
 			}
 		}
-		
 		//删除的字段信息
 		$delfiels = Db::name('sfdp_field')
 			->where('sid',$old_verid)
@@ -170,6 +175,12 @@ class BuildFix{
 			}
 			//更新设计表
 			Design::saveDesc(['s_db_bak'=>1,'s_look'=>1,'s_design'=>2,'id'=>$sid],'update');
+            $className = unit::gconfig('node_action');
+            $Node = (new $className())->UpdateNode($sid,$json['tpfd_btn']);//获取目录节点信息
+            if($Node['code']==1){
+                Db::rollback();
+                return ['code'=>-1,'msg'=>'更新菜单信息失败，联系管理员！'];
+            }
 			Db::commit();
 			return ['code'=>0,'msg'=>'更新主表信息成功！！'];
 		}catch (\Exception $e) {
