@@ -58,7 +58,14 @@ class SfdpUnit{
 						}
 					}
 					if($time_st ==1){
-						$map[] = [$time_field,'between',$v];
+                        if($time_field=='create_time' || $time_field=='update_time'){
+                            $date = explode(' - ', $v);
+                            $startTime = strtotime($date[0].' 00:00:00');
+                            $endTime = strtotime($date[1].' 23:59:59');
+                            $map[] = [$time_field, 'between', [$startTime, $endTime]];
+                        }else {
+                            $map[] = [$time_field, 'between', explode(' - ', $v)];
+                        }
 					}
 					//全局权限过滤
 					if($k=='uid'){

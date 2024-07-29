@@ -66,8 +66,8 @@ var sfdp = {
                     var divclass='';
                     var activ='';
                     if(xh==1){
-                         divclass='on';
-                         activ='activ';
+                        divclass='on';
+                        activ='activ';
                     }
                     $("#tab").append(`<li class="${activ}">${int_data.sublist[x]['title']}</li>`);
                     let table = sfdp.sublist_build(int_data.sublist[x]['type'], int_data.sublist[x], 'show', int_data.name_db + '_d' + xh, true);
@@ -91,7 +91,11 @@ var sfdp = {
         let htmlTags = ``;
         for (const item of list) {
             let type = item.type || 'text';
-            htmlTags += `<div class='layui-input-inline' style="min-width:90px;max-width: 110px;">` +sfdpPlug.PlugList(type,item) + `</div>`;
+            if(type=='datetime'||type=='date'){
+                htmlTags += `<div class='layui-input-inline' style="min-width:180px;max-width: 180px;">` +sfdpPlug.PlugList(type,item) + `</div>`;
+                }else{
+                htmlTags += `<div class='layui-input-inline' style="min-width:90px;max-width: 110px;">` +sfdpPlug.PlugList(type,item) + `</div>`;
+            }
         }
         $('#search').html(htmlTags);
         sfdp.setDate();
@@ -109,7 +113,7 @@ var sfdp = {
     imp:function(){
         var str = $('#tabCon .on .title a').attr("onclick");
         var parts = str.split(',"');
-            parts = parts[1].split('",');
+        parts = parts[1].split('",');
         sfdp.openpage('导入数据', '/gadmin/sfdp/imp?zid='+parts[0]);
     },
     showadd: function (int_data, showtype = 'add') {
@@ -123,8 +127,11 @@ var sfdp = {
                 }else{
                     var form_style = '';
                 }
-
-                $('#table').html('<form action="" method="post" name="form" id="form" class="'+ form_style +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><input type="hidden" readonly name="@saas_id" value="' + int_data.tpfd_saas + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"></div></form>');
+                var s_form_submit ='';
+                if(int_data.s_form_submit !=undefined || int_data.s_form_submit==1){
+                    s_form_submit = 'onkeydown="if(event.keyCode===13) {return false;}"';
+                }
+                $('#table').html('<form '+s_form_submit+' action="" method="post" name="form" id="form" class="'+ form_style +'"><input type="hidden" readonly name="name_db" value="' + int_data.name_db + '"><input type="hidden" readonly name="@saas_id" value="' + int_data.tpfd_saas + '"><div id="table_view" style="margin:10px"><input type="hidden" readonly name="@subdata" id="subdata_subdata"></div></form>');
                 //恢复主表单设计
                 for (x in int_data.list) {
                     let table = sfdp.table_build(int_data.list[x]['type'], int_data.list[x], showtype);//恢复表单布局设计
@@ -198,6 +205,190 @@ var sfdp = {
         sfdp.setDate();//初始化日期选择器
         sfdpPlug.sliderSet();
         sfdp.setTips();
+        sfdp.setRule();
+    },
+    setRule:function(type=''){
+        // 遍历所有拥有 "data-rule" 属性的输入元素
+        $('input[data-rule],select[data-rule]').each(function() {
+            var $input = $(this); // 输入元素 jQuery 对象
+            var formClass = $input.closest("form").attr("class");
+            var mode = 'zhubiao';
+
+            if (formClass.includes("sub_list")) {
+                mode = 'zibiao'
+            }
+            var rule = $input.data('rule'); // 获取 "data-rule" 属性的值
+            if(rule.includes('set(')){
+                $input.on('change', function() {
+                    sfdp.setRuleAjax($input,rule,mode);
+                });
+                return;
+            };
+            //子表求和计算
+            if(rule.includes('sum(')){
+                var sFuns = rule.match(/sum\((.*)\)/)[1];
+                var inputname = $('#' + sFuns).attr('name')
+                $('body').on('input propertychange', "input[name='"+inputname+"']", function(event) {
+                    var sum = 0;
+                    $('input[name="'+inputname+'"]').each(function() {
+                        var value = parseFloat($(this).val());
+                        if (!isNaN(value)) {
+                            sum += value;
+                        }
+                    });
+                    $input.val(sum).trigger("change");
+                });
+                if(type=='del'){
+                    var sum = 0;
+                    $('input[name="'+inputname+'"]').each(function() {
+                        var value = parseFloat($(this).val());
+                        if (!isNaN(value)) {
+                            sum += value;
+                        }
+                    });
+                    $input.val(sum).trigger("change");
+                }
+
+                return;
+            };
+
+            if(rule){
+                var fieldsInRule = rule.split(/[+\-*/|]/);
+                fieldsInRule = fieldsInRule.filter(function(el) {
+                    return el.includes('_');
+                });
+                var rulename = $input.attr('name')
+                // 为规则中的每个字段添加输入事件监听器，当字段值发生变化时，更新值
+                $(fieldsInRule).each(function(index, fieldName) {
+                    fieldName =  fieldName.replace(/\(/g, '').replace(/\)/g, '')
+                    if(mode=='zhubiao'){
+                        $('#' + fieldName).on('input', function() {
+                            sfdp.setRuleValue($input,rule,fieldsInRule);
+                        });
+                    }else{
+                        var inputname = $('#' + fieldName).attr('name')
+                        //字表改监听跟传递TR
+                        $('body').on('input propertychange', "input[name='"+inputname+"']", function(event) {
+                            sfdp.setRuleValueSub(rulename,$(this).closest('tr'),rule,fieldsInRule);
+                        });
+                    }
+                });
+            }
+        });
+    },
+    setRuleAjax:function($input,rule,mode){
+        var sFuns = rule.match(/set\((.*)\)\|/)[1];
+        // 用JavaScript的split函数以"|"分割字符串
+        var items = rule.split("|");
+        items = items.map(function(item) {
+            return item.trim();
+        });
+        // 使用filter函数过滤出非空字符串
+        var nonEmptyItems = items.filter(function(item) {
+            return item != "";
+        });
+        if(nonEmptyItems[0]!=''){
+            //创建一个元素请求
+            nonEmptyItems.shift();
+
+            sfdp.sFuns('/gadmin/sapi?fun='+sFuns,{id:$input.val()}).then(res => {
+                nonEmptyItems.forEach(function(item) {
+                    var obj ='';
+                    var obj_name ='';
+                    //判断是否包含转换函数
+                    if (item.includes("@")) {
+                        var myArr = item.split("@");
+                        obj = myArr[0];
+                        obj_name = myArr[1];
+                    } else {
+                        obj = item;
+                        obj_name = $('#' + item).attr('name');
+                    }
+                    var element = $('#' + obj);
+                    if (element.is('input')) {
+                        if(mode=='zibiao'){
+                            var tr =  $input.closest('tr')
+                            tr.find("input[id='"+obj+"']").val(res.data[obj_name] || '');
+                        }else{
+                            $('#' + obj).val(res.data[obj_name] || '');
+                        }
+                    }else if (element.is('select')) {
+                        if(mode=='zibiao'){
+                            var tr =  $input.closest('tr')
+                            tr.find("select[id='"+obj+"']").val(res.data[obj_name] ?? '').trigger("change");
+                            //如果设置了readonly 那么清空全部只保留为选中
+                            if(tr.find("select[id='"+obj+"']").attr('readonly')){
+                                tr.find("select[id='"+obj+"']").find('option').each(function() {
+                                    if (!$(this).is(':selected')) {
+                                        $(this).attr('disabled',true);
+                                    }else{
+                                        $(this).attr('disabled',false);
+                                    }
+                                });
+                            }
+                        }else{
+                            $('#' + obj).val(res.data[obj_name] || '').trigger("change");
+                        }
+                    }else if (element.is('radio')) {
+                        $('input[id='+obj+'][value='+res.data[obj_name]+']').prop('checked', true);
+                    }else if (element.is('checkbox')) {
+                        $('input[id='+obj+'][value='+res.data[obj_name]+']').prop('checked', true);
+                    }
+                });
+
+            })
+        }
+    },
+    setRuleValue:function($input,rule,fieldsInRule){
+        var fun = '';
+        // 将规则中的字段名替换为实际的输入字段值
+        $(fieldsInRule).each(function(index, fieldName) {
+             fieldName =  fieldName.replace(/\(/g, '').replace(/\)/g, '')
+            var fieldValue = $('#' + fieldName).val() || '0';
+            if (fieldName.includes("FUN1") || fieldName.includes("FUN2")) {
+                fun = fieldName;
+            }
+            rule = rule.replace(new RegExp(fieldName, 'g'), fieldValue);
+        });
+        rule = rule.replace('|0', '');
+        var calc = math.evaluate(rule);
+        if (fun!='') {
+            var fun_val = fun.split("_");
+            if (fun.includes("FUN1")) {
+                calc = calc.toFixed(fun_val[1]);
+            }
+            if (fun.includes("FUN2")) {
+                calc = sfdp.calc_sswr(calc,fun_val[1]);
+            }
+        }
+        $input.val(calc).trigger("change");
+    },
+    /**
+     * value: 数据源
+     * n: 保留几位小数
+     */
+     calc_sswr:function(value, ws=0) {
+        if(ws === 0) return parseInt(value);
+        let tran = Math.round(value * Math.pow(10, ws)) / Math.pow(10, ws);
+        let tranV = tran.toString();
+        let newVal = tranV.indexOf('.');
+        if(newVal < 0) {
+            tranV += '.'
+        };
+        for(let i = tranV.length - tranV.indexOf('.'); i <= ws; i++) {
+            tranV += '0';
+        };
+        return tranV
+    },
+    setRuleValueSub:function($input,tr,rule,fieldsInRule){
+        // 将规则中的字段名替换为实际的输入字段值
+        $(fieldsInRule).each(function(index, fieldName) {
+             fieldName =  fieldName.replace(/\(/g, '').replace(/\)/g, '')
+
+            var fieldValue =  tr.find("input[id='"+fieldName+"']").val() || '0';
+            rule = rule.replace(new RegExp(fieldName, 'g'), fieldValue);
+        });
+        tr.find("input[name='"+$input+"']").removeAttr('readonly').val(math.evaluate(rule)).trigger("propertychange").prop('readonly', true);
     },
     setTips:function(){
         $(".sfdp_tips").mouseover(function(){
@@ -274,11 +465,11 @@ var sfdp = {
             heads[td_data[x]['td']] = td_data[x]['tpfd_name'];
             heads_width[td_data[x]['td']] = td_data[x]['tpfd_width'];
             if (types === 'add') {
-                 html = '';// sfdpPlug.PlugInit(type,td_data[x],true);
+                html = '';// sfdpPlug.PlugInit(type,td_data[x],true);
             } else if (types === 'edit') {
-                 html = sfdpPlug.PlugInit(type,td_data[x],true,);
+                html = sfdpPlug.PlugInit(type,td_data[x],true,);
             } else {
-                 html = sfdpPlug.view_show(type,td_data[x],true);
+                html = sfdpPlug.view_show(type,td_data[x],true);
             }
             json[td_data[x]['td']] = html;
         }
@@ -344,6 +535,7 @@ var sfdp = {
         $('.this-select').select2({width:'100%'});
         $('.tagInput').tagsInput({defaultText: '回车输入..',width:'100%'});
         sfdp.setDate();
+        sfdp.setRule();
         try{
             load_sub_check('add_after',id);//后置函数
         }catch(e){
@@ -388,10 +580,10 @@ var sfdp = {
         }
         //var length= $(obj).parent().parent().parent().children("tr").length;
         //if(length!=2){
-            $(obj).parent().parent().remove();
+        $(obj).parent().parent().remove();
         //}else{
-            //sfdp.ShowTip('最后一行，无法删除！');
-       // }
+        //sfdp.ShowTip('最后一行，无法删除！');
+        // }
         try{
             load_sub_check('del_after',obj);//后置函数
         }catch(e){
@@ -399,6 +591,7 @@ var sfdp = {
                 console.log(e);
             }
         }
+        sfdp.setRule('del');
     },
     table_build: function (id, old_data = '', types) {
         var code = old_data['tr'];
@@ -408,11 +601,11 @@ var sfdp = {
         for (x in td_data) {
             var type = td_data[x]['td_type'];
             if (types === 'add') {
-                 html = sfdpPlug.PlugInit(type,td_data[x]);
+                html = sfdpPlug.PlugInit(type,td_data[x]);
             } else if (types === 'edit') {
-                 html = sfdpPlug.PlugInit(type,td_data[x],false,'edit');
+                html = sfdpPlug.PlugInit(type,td_data[x],false,'edit');
             } else {
-                 html = sfdpPlug.view_show(type, td_data[x]);
+                html = sfdpPlug.view_show(type, td_data[x]);
             }
             json[td_data[x]['td']] = html;
         }
@@ -433,12 +626,12 @@ var sfdp = {
     },
     common_return: function (data) {
         if (data.code === 0) {
-            layer.msg(data.msg, {icon: 1, time: 1500}, function () {
+            layer.msg(data.msg, {icon: 1, time: 500}, function () {
                 var index = parent.layer.getFrameIndex(window.name);
                 if(parent.$('#tabledata').length){
-                    parent.layui.table.reload('tabledata');
+                    parent.$('#searchsubmit').trigger("click");
                     parent.layer.close(index);
-                    }else{
+                }else{
                     parent.location.reload();
                 }
             });
@@ -451,8 +644,8 @@ var sfdp = {
     },
     addoption: function (id, type = 'checkbox') {
         $('#checkboxes' + id).children('span').attr("onclick", "sfdp.editoption(" + id + ")");
-        $('#checkboxes' + id).children('span').html('Del');
-        var html = '<div id="checkboxes' + (id + 1) + '"><input type="' + type + '" name="tpfd_check" value=' + (id + 1) + ' ><input name="tpfd_data" type="text" value="选项' + (id + 2) + '"><span onclick=sfdp.addoption(' + (id + 1) + ',"' + type + '")>Add</span></div>';
+        $('#checkboxes' + id).children('span').html('━');
+        var html = '<div id="checkboxes' + (id + 1) + '"><input name="tpfd_data" type="text" value="选项' + (id + 2) + '"><span style="padding: 8px;font-size: 16px;font-weight: 800;" onclick=sfdp.addoption(' + (id + 1) + ',"' + type + '")>✚</span></div>';
         $('#checkboxes' + id).after(html);
     },
     editoption: function (id) {
@@ -503,7 +696,7 @@ var sfdp = {
             area: [w, h],
             fix: false, // 不固定
             maxmin: true,
-            shade: 0.4,
+            shade: 0.1,
             title: title,
             content: url,
             success: function (layero, index) {
@@ -533,6 +726,31 @@ var sfdp = {
     Askshow: function (url, msg) {
         layer.confirm(msg, function (index) {
             sfdp.sGet(url);
+        });
+    },
+    AskshowFix: function (url, msg) {
+        layer.confirm(msg, function (index) {
+            $.get(url, function (data, status) {
+                if (status === 'success') {
+                    if (data.code === 0) {
+                        layer.msg(msg, {icon: 1, time: 1500}, function () {
+                            location.reload();
+                        });
+                    } else {
+                        if(data.msg=='备份数据表已经存在，请先删除！'){
+                            sfdp.Askshow(url+'&delbak=1',"<font color='red'>【警告】</font>是否删除备份表并且执行更新?")
+                        }else{
+                            layer.alert(data.msg, {title: "错误信息", icon: 2});
+                        }
+
+                    }
+                } else {
+
+
+                    layer.alert("状态: " + status, {title: "错误信息", icon: 2});
+                }
+
+            });
         });
     },
     H5uploadhtml: function (ids,img='') {
@@ -594,7 +812,7 @@ var sfdp = {
             var keyid = $(this).attr('id');
             if(type!='date' && type!='datetime'){
                 var fs = {'yyyy':'year','yyyy-MM':'month','yyyy-MM-dd':'date','yyyyMMdd':'date','yyyy-MM-dd':'date','MM-dd':'date','yyyy-MM-dd HH:mm:ss':'datetime'}
-                    type=fs[format];
+                type=fs[format];
             }
             if($(this).attr('readonly') == 'readonly'){
                 return;
@@ -614,9 +832,9 @@ var sfdp = {
                 trigger: 'click',
                 done: function(value, date, endDate){
                     if($.isFunction(window.load_end_time_done)){
-					    load_end_time_done(keyid,value); 
-    				}
-                  }
+                        load_end_time_done(keyid,value);
+                    }
+                }
             });
         });
         $(".time_range").click(function () {
@@ -637,9 +855,9 @@ var sfdp = {
                 trigger: 'click',
                 done: function(value){
                     if($.isFunction(window.load_end_time_done)){
-					    load_end_time_done(keyid,value); 
-    				}
-                  }
+                        load_end_time_done(keyid,value);
+                    }
+                }
             });
         });
     },
@@ -682,20 +900,20 @@ var sfdp = {
         });
     },
     sFuns:function(url, data){
-            return new Promise(function(resolve, reject) {
-                $.ajax({
-                    url: url,
-                    data: data,
-                    type: 'post',
-                    dataType: 'json',
-                    success: function(res) {
-                        resolve(res);
-                    },
-                    error: function(err) {
-                        reject(err);
-                    }
-                });
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'post',
+                dataType: 'json',
+                success: function(res) {
+                    resolve(res);
+                },
+                error: function(err) {
+                    reject(err);
+                }
             });
+        });
     },
     sFun: function (url, data, setActive) {
         $.ajax({
@@ -718,7 +936,7 @@ var sfdp = {
     },
     /*5.0.1 数据存储*/
     dataSave: function (data, key, type) {
-        var json_data = JSON.parse(localStorage.getItem("json_data"));
+        var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         switch (type) {
             case 'con':
                 json_data.tpfd_content = data;
@@ -766,7 +984,7 @@ var sfdp = {
                 break;
             default:
         }
-        localStorage.setItem("json_data", JSON.stringify(json_data));
+        localStorage.setItem("json_data_"+design_main_id, JSON.stringify(json_data));
     },
     layer_close: function () {
         var index = parent.layer.getFrameIndex(window.name);
@@ -806,18 +1024,124 @@ var sfdp = {
     },
     /*5.0.1 高级组件*/
     tpfd_gaoji: function (data) {
-       var default_data = [{cid: 0, clab: '是'}, {cid: 1, clab: '否'}];
-       var sub =  $('#row-id').val();
-       var html = '<div class="sfdp-form-item"><label class="sfdp-label">字段只读</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_read', (data.tpfd_read || 1)) + '</div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段必填</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_must', (data.tpfd_must  || 1)) + '</div></div>';
-       if(sub){
-           return html;
-       }else{
-           return html + '<div class="sfdp-form-item"><label class="sfdp-label">lable隐藏</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_lable', (data.tpfd_lable  || 1)) + '</div></div>';
-       }
+        var default_data = [{cid: 0, clab: '是'}, {cid: 1, clab: '否'}];
+        var sub =  $('#row-id').val();
+        var html = '<div class="sfdp-form-item"><label class="sfdp-label">字段只读</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_read', (data.tpfd_read || 1)) + '</div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段必填</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_must', (data.tpfd_must  || 1)) + '</div></div><div class="sfdp-form-item"><label class="sfdp-label">字段记忆</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_auto', (data.tpfd_auto  || 1)) + '</div></div><div class="sfdp-form-item"><label class="sfdp-label">内容唯一</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_key', (data.tpfd_key  || 1)) + '</div></div>';
+        if(sub){
+            return html;
+        }else{
+            return html + '<div class="sfdp-form-item"><label class="sfdp-label">lable隐藏</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_data, 'tpfd_lable', (data.tpfd_lable  || 1)) + '</div></div>';
+        }
     },
     /*5.0.1 默认组件*/
     tpfd_moren: function (data) {
-        return '<div class="sfdp-form-item"><label class="sfdp-label">默认内容</label><div class="sfdp-input-block" ><input type="text" name="tpfd_zanwei" value="' + (data.tpfd_zanwei || '') + '" class="sfdp-input" style="width: 85%;display: inline;"> <a onMouseOver=sfdp.showInform(this,0,"tpfd_zanwei"); style="float: right;font-size: 15px;padding: 6px;line-height: 1.3;">?<a/></div></div> <div class="sfdp-form-item"><label class="sfdp-label">占位内容</label><div class="sfdp-input-block"><input name="tpfd_moren" type="text" value="' + (data.tpfd_moren  || '') + '" class="sfdp-input"></div></div>';
+        var def = '<div class="sfdp-form-item"><label class="sfdp-label">默认内容</label><div class="sfdp-input-block" style="display: flex;"><input type="text" name="tpfd_zanwei" value="' + (data.tpfd_zanwei || '') + '" class="sfdp-input" style="width: 85%;"> <a onclick=sfdp.showInform(this,0,"tpfd_zanwei"); style="float: right;font-size: 15px;padding: 6px;color: red;">配<a/></div></div>'
+        if (isInArray(['text','number'],data.td_type)) {
+            def = def+' <div class="sfdp-form-item"><label class="sfdp-label">占位内容</label><div class="sfdp-input-block"><input name="tpfd_moren" type="text" value="' + (data.tpfd_moren  || '') + '" class="sfdp-input"></div></div>';
+        }
+        def = def+  '<div class="sfdp-form-item"><label class="sfdp-label">规则引擎</label><div class="sfdp-input-block" style="display: flex;"><input type="text" name="tpfd_rule" value="' + (data.tpfd_rule || '') + '" class="sfdp-input" style="width: 85%;"><a onclick="sfdp.set_rule()" style="font-size: 15px;padding: 6px;color: red;">配</a></div></div>'
+        return def;
+    },
+    set_rule_val:function(val){
+        var oldval = $('#roule_val').html();
+        if(val=='FUN1'){
+            layer.prompt({title: '请填写保留位数',value:'2'}, function(value, index, elem){
+                if(value === '') return elem.focus();
+                $('#roule_val').html(oldval + `<span class="editable">${val}_${value}</span>`);
+                layer.close(index);
+            });
+            return;
+        }
+        if(val=='FUN2'){
+            layer.prompt({title: '请填写保留位数',value:'2'}, function(value, index, elem){
+                if(value === '') return elem.focus();
+                $('#roule_val').html(oldval + `<span class="editable">${val}_${value}</span>`);
+                layer.close(index);
+            });
+            return;
+        }
+        if(val=='FUN3'){
+            layer.prompt({title: '请填写运算数',value:''}, function(value, index, elem){
+                if(value === '') return elem.focus();
+                $('#roule_val').html(oldval + `<span class="editable">${value}</span>`);
+                layer.close(index);
+            });
+            return;
+        }
+
+
+        let re = /set\(.+\)/;
+        if(re.test(oldval) && val!= '|'){
+            layer.prompt({title: '请确认参数信息，如字段不一致需要@字段名',value:val}, function(value, index, elem){
+                if(value === '') return elem.focus();
+                $('#roule_val').html(oldval + `<span class="editable">${value}</span>`);
+                layer.close(index);
+            });
+            }else{
+            $('#roule_val').html(oldval + `<span class="editable">${val}</span>`);
+        }
+    },
+    set_rule: function () {
+        var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
+        var field_html = '';
+        for (x in json_data.list) {
+            for (x2 in json_data.list[x]['data']) {
+                field_html += '<span class="button" onclick=sfdp.set_rule_val("' + json_data.list[x]['data'][x2]['tpfd_id'] + '")>' + json_data.list[x]['data'][x2]['tpfd_name'] + '</span>'
+            }
+        }
+        for (y in json_data.sublist) {
+            field_html += `<fieldset style="padding: 0px;"><legend>${y}</legend>`;
+            for (y2 in json_data.sublist[y]['data']) {
+                field_html += '<span class="button" onclick=sfdp.set_rule_val("' + json_data.sublist[y]['data'][y2]['tpfd_id'] + '")>' + json_data.sublist[y]['data'][y2]['tpfd_name'] + '</span>'
+            }
+            field_html += `</fieldset>`;
+        }
+        var oldval = $("input[name='tpfd_rule']").val() //旧数据
+        let symbols = ["\\+", "-", "\\*", "/", "\\(", "\\)", "\\|", "set\\(.+\\)", "\\w+@\\w+"]; // add any other symbols
+        let re = new RegExp("(" + symbols.join('|') + "|\\w+)", 'g');
+        let result = oldval.replace(re, '<span class="editable">$1</span>');
+        var html = '<style>.editable{font-size: 16px;padding: 3px;}</style><div class="layui-form">\n' +
+            '  <div id="roule_val" class="sfdp-textarea" style="height: 185px;margin: 10px;word-wrap: break-word;overflow-y: auto;">'+result+'</div>\n' +
+            '<div class="layui-row layui-col-space15">\n' +
+            '    <div class="col-6">\n' +
+            '      <div class="sfdp-card">\n' +
+            '        <div class="sfdp-card-head" style="">运算公式</div>\n' +
+            '        <div class="sfdp-card-body"><span class="button" onclick=sfdp.set_rule_val("+")>加法</span><span class="button" onclick=sfdp.set_rule_val("-")>减法</span><span class="button" onclick=sfdp.set_rule_val("*")>乘法</span><span class="button" onclick=sfdp.set_rule_val("/")>除法</span><br/><span class="button" onclick=sfdp.set_rule_val("(")>左括号</span><span class="button" onclick=sfdp.set_rule_val("sum")>子表求和</span><span class="button" onclick=sfdp.set_rule_val(")")>右括号</span> </div>\n' +
+            '        <div class="sfdp-card-head" style="">函数方法</div>\n' +
+            '        <div class="sfdp-card-body"><span class="button" onclick=sfdp.set_rule_val("FUN1")>保留位数</span><span class="button" onclick=sfdp.set_rule_val("FUN2")>四舍五入</span><span class="button" onclick=sfdp.set_rule_val("FUN3")>数值</span> </div>\n' +
+            '        <div class="sfdp-card-head" style="">数据方法</div>\n' +
+            '        <div class="sfdp-card-body"><span class="button" onclick=sfdp.openpage("元数组件","' + sfdp.url.fun + '?id=roule_val&value=",{w:"50%",h:"80%"})>元素赋值</span> <span class="button" onclick=sfdp.set_rule_val("|")>元素分割符</span></div>\n' +
+            '        <div class="sfdp-card-body">Tip:元素作用于本字段，用于本字段传值或者赋值给其他字段；</div>\n' +
+            '      </div>\n' +
+            '    </div>\n' +
+            '    <div class="col-6">\n' +
+            '      <div class="sfdp-card">\n' +
+            '        <div class="sfdp-card-head">字段数据</div>\n' +
+            '        <div class="sfdp-card-body" style="height: 320px;overflow-y: auto;">' + field_html  + '</div>\n' +
+            '      </div>\n' +
+            '    </div>\n' +
+            '  </div></div>';
+
+        layer.open({
+            type: 1,
+            title: '规则设置 Rule Set',
+            area: ['620px', '665px'], //宽高
+            btn: ['保存', '取消'],
+            // 按钮1 的回调
+            btn1: function (index, layero, that) {
+                var data = $('#roule_val').html().replace(/<span class="editable">|<\/span>/g, '');
+                $("input[name='tpfd_rule']").val(data)
+                $('#save_fields').click();
+                layer.close(index);
+            },
+            content: html
+        });
+        sfdp.roule_val_del();
+    },
+    roule_val_del: function () {
+        $("#roule_val").on("click", ".editable", function (e) {
+           $(this).remove();
+        });
     },
     /*5.0.1 列表组件*/
     tpfd_list: function (data) {
@@ -843,18 +1167,18 @@ var sfdp = {
         var html = '';
         for (x in data) {
             if (x == data.length - 1) {
-                var btn = '<span onclick=sfdp.addoption(' + x + ',"' + type + '")>Add</span>';
+                var btn = '<span style="padding: 8px;font-size: 16px;font-weight: 800;" onclick=sfdp.addoption(' + x + ',"' + type + '")>✚</span>';
             } else {
-                var btn = '<span onclick=sfdp.editoption(' + x + ')>Del</span>';
+                var btn = '<span style="padding: 8px;font-size: 16px;font-weight: 800;" onclick=sfdp.editoption(' + x + ')>━</span>';
             }
-            html += '<div id="checkboxes' + x + '"><input ' + data[x]['checked'] + ' name="tpfd_check" value=' + x + ' type="' + type + '"><input name="tpfd_data" type="text" value="' + data[x]['clab'] + '">' + btn + '</div>';
+            html += '<div id="checkboxes' + x + '"><input name="tpfd_data" type="text" value="' + data[x]['clab'] + '">' + btn + '</div>';
         }
         return html;
     },
     /*5.0.1 通用设置组件*/
     tpfd_common: function (data) {
         var default_field = [{cid: 'int', clab: 'int', checked: ''}, {cid: 'time', clab: 'time', checked: ''}, {cid: 'varchar', clab: 'varchar', checked: 'checked'}, {cid: 'decimal', clab: 'decimal', checked: 'checked'}, {cid: 'datetime', clab: 'datetime',checked: ''}, {cid: 'date', clab: 'date',checked: ''}, {cid: 'longtext', clab: 'longtext', checked: ''}];
-        return '<input name="tpfd_id" type="hidden" value="' + data.tpfd_id + '"><input name="tr_id" type="hidden" value="' + data.tr_id + '"><div  style="margin: 5px;"><div class="sfdp-title">字段设置</div></div><div class="sfdp-form-item wybs"><label class="sfdp-label">唯一标识</label><div class="sfdp-input-block"><input type="text"  autocomplete="off" value="' + data.tpfd_id + '" readonly class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label">字段标题</label><div class="sfdp-input-block"> <input id="tpfd_name"  name="tpfd_name" type="text"  value="' + data.tpfd_name + '"  class="sfdp-input"> </div></div><div class="sfdp-form-item"><label class="sfdp-label">字段名称</label><div class="sfdp-input-block"> <input id="tpfd_db" name="tpfd_db" type="text" value="' + data.tpfd_db + '"  class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段类型</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_field, 'tpfd_dblx', (data.tpfd_dblx || 'varchar')) + ' </div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段长度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_dbcd" type="text" value="' + (data.tpfd_dbcd || '255')  + '" class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label ">组件宽度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_width" type="text" value="' + (data.tpfd_width || '120')  + '" class="sfdp-input"></div></div>' + sfdp.tpfd_list(data);
+        return '<input name="tpfd_id" type="hidden" value="' + data.tpfd_id + '"><input name="tr_id" type="hidden" value="' + data.tr_id + '"><div  style="margin: 5px;"><div class="sfdp-title">字段设置</div></div><div class="sfdp-form-item wybs"><label class="sfdp-label">唯一标识</label><div class="sfdp-input-block" style="display: flex;"><input type="text"  autocomplete="off" value="' + data.tpfd_id + '" readonly class="sfdp-input" style="width: 85%"><a onclick=sfdp.sfdp_user_filed("'+data.tpfd_id+'"); style="float: right;font-size: 15px;padding: 6px;color:red;">S</a></div></div><div class="sfdp-form-item"><label class="sfdp-label">字段标题</label><div class="sfdp-input-block"> <input id="tpfd_name"  name="tpfd_name" type="text"  value="' + data.tpfd_name + '"  class="sfdp-input"> </div></div><div class="sfdp-form-item"><label class="sfdp-label">字段名称</label><div class="sfdp-input-block"> <input id="tpfd_db" name="tpfd_db" type="text" value="' + data.tpfd_db + '"  class="sfdp-input"></div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段类型</label><div class="sfdp-input-block">' + sfdp.tpfd_select(default_field, 'tpfd_dblx', (data.tpfd_dblx || 'varchar')) + ' </div></div> <div class="sfdp-form-item"><label class="sfdp-label">字段长度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_dbcd" type="text" value="' + (data.tpfd_dbcd || '255')  + '" class="sfdp-input"></div></div><div class="sfdp-form-item"><label class="sfdp-label ">组件宽度</label><div class="sfdp-input-block"><input style="width:80px" name="tpfd_width" type="text" value="' + (data.tpfd_width || '120')  + '" class="sfdp-input"></div></div>' + sfdp.tpfd_list(data);
     },
     /*5.0.1 上传控制组件*/
     tpfd_upload: function (data) {
@@ -862,6 +1186,36 @@ var sfdp = {
         var action_data = [{cid: 0, clab: '内置接口'}, {cid: 1, clab: '自定义API'}];
         return '<div class="sfdp-form-item"><label class="sfdp-label">上传配置</label>' + sfdp.tpfd_select(default_data, 'tpfd_upload_type', (data.tpfd_upload_type||0)) + '</div><div class="sfdp-form-item"><label class="sfdp-label">上传接口</label>' + sfdp.tpfd_select(action_data, 'tpfd_upload_api', (data.tpfd_upload_api||0)) + '' +
             ' API:<input style="width:80px;display: inline;" name="tpfd_upload_action" type="text" value="' + (data.tpfd_upload_action||'') + '"  class="sfdp-input"></div>';
+    },
+    sfdp_user_filed:function(field_id){
+        //询问是否执行
+        layer.confirm('是否将当前字段保存为用户自定义字段？', {
+            btn: ['确定', '取消'] //按钮
+        }, function(){
+            var tr_id = $('input[name="tr_id"]').val();
+            var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
+            var field_json =  json_data.list[tr_id].data[field_id];
+            if(field_json.tpfd_name==''||field_json.tpfd_name==undefined){
+                layer.msg("字段名称不能为空！");
+                return false;
+            }
+            $.ajax({
+                url:user_field_url,
+                data:{field_name:field_json.tpfd_db,field_title:field_json.tpfd_name,field_json:JSON.stringify(field_json)},
+                type:'post',
+                cache:true,
+                dataType:'json',
+                success:function(data) {
+                    if(data.code==0){
+                        sfdp.ShowTip('success');
+                    }else{
+                        sfdp.ShowTip(data.msg);
+                    }
+                }
+            });
+        }, function(){
+            layer.msg('已取消');
+        });
     },
     /*5.0.2 上传控制组件*/
     tpfd_upload_img: function (data) {
@@ -880,12 +1234,11 @@ var sfdp = {
     tpfd_return: function (type, data) {
         var html ='';
         if (isInArray(['text','number','money','process','textarea','billno','scan','sign','tag'],type)) {
-            html = sfdp.tpfd_moren(data);
         }
         if (isInArray(['radio','dropdown','dropdowns','cascade'],type)) {
             html = sfdp.tpfd_checkboxes(data, 'radio');
         }
-        if (isInArray(['suphelp'],type)) {
+        if (isInArray(['suphelp','suphelps'],type)) {
             html = sfdp.tpfd_suphelp(data)
         }
         if (isInArray(['html','wenzi'],type)) {
@@ -897,29 +1250,30 @@ var sfdp = {
         }
         switch (type) {
             case 'checkboxes':
-                 html = `${sfdp.tpfd_checkboxes(data)}`;
+                html = `${sfdp.tpfd_checkboxes(data)}`;
                 break;
             case 'date':
-                 html = sfdp.tpfd_date(data) + sfdp.tpfd_moren(data);
+                html = sfdp.tpfd_date(data);
                 break;
             case 'time_range':
-                 html = sfdp.tpfd_date_type(data)
+                html = sfdp.tpfd_date_type(data)
                 break;
             case 'links':
                 data.tpfd_zanwei = '_blank'
                 data.tpfd_moren = 'www.gadmin8.com';
-                 html =   sfdp.tpfd_moren(data);
                 break;
         }
         if (!isInArray(['html','wenzi','links'],type)) {
             html =  html +sfdp.tpfd_gaoji(data);
         }
         html = html + `<div class="sfdp-form-item"><label class="sfdp-label ">帮助信息</label><div class="sfdp-input-block"><input name="tpfd_help" type="text" value="` + (data.tpfd_help || '')  + `" class="sfdp-input"></div></div>`;
-        if (isInArray(['text','number'],type)) {
-            html = html + `<div class="sfdp-form-item"><label class="sfdp-label ">验证规则</label><div class="sfdp-input-block"><input  name="tpfd_yztype" type="text" value="` + (data.tpfd_yztype || '')  + `" class="sfdp-input" style="width: 85%;display: inline;"> <a onMouseOver="sfdp.showInform(this,1,'tpfd_yztype');" style="float: right;font-size: 15px;padding: 6px;line-height: 1.3;">?<a/></div></div>`;
+        if (isInArray(['text','number','money'],type)) {
+            html = html + `<div class="sfdp-form-item"><label class="sfdp-label ">验证规则</label><div class="sfdp-input-block" style="display: flex;"><input  name="tpfd_yztype" type="text" value="` + (data.tpfd_yztype || '')  + `" class="sfdp-input" style="width: 85%;"> <a onclick="sfdp.showInform(this,1,'tpfd_yztype');" style="float: right;font-size: 15px;padding: 6px;color: red;">配<a/></div></div>`;
             html = html + `<div class="sfdp-form-item"><label class="sfdp-label ">验证提示</label><div class="sfdp-input-block"><input  name="tpfd_yztip" type="text" value="` + (data.tpfd_yztip || '')  + `" class="sfdp-input"></div></div>`;
+            html = html + `<div class="sfdp-form-item"><label class="sfdp-label ">后缀内容</label><div class="sfdp-input-block"><input  name="tpfd_prefix" type="text" value="` + (data.tpfd_prefix || '')  + `" class="sfdp-input"></div></div>`;
         }
-        return `<form id="fieldform" class="${data.tpfd_id}">${sfdp.tpfd_common(data)+html}</div><div class="sfdp-form-item"><div style="margin-left: 5%;" class="button" onclick=sfdp.save_field("${data.tpfd_id}")>保存</div></div></form>`;
+        html = html + sfdp.tpfd_moren(data);
+        return `<form id="fieldform" class="${data.tpfd_id}">${sfdp.tpfd_common(data)+html}</div><div class="sfdp-form-item"><div style="margin-left: 5%;" class="button" onclick=sfdp.save_field("${data.tpfd_id}") id="save_fields">保存</div></div></form>`;
     },
     /*5.0.1 拖拽进去设计容器的时候改变为响应的控件样式*/
     btn_to_input: function (labid, type ,mode) {
@@ -927,12 +1281,12 @@ var sfdp = {
         var field = {'text':'文本控件','edit':'编辑器','number':'数字控件','money':'金额控件','upload':'上传控件','upload_img':'单图上传',
             'checkboxes':'多选控件','radio':'单选控件','date':'时间日期','time_range':'时间范围','dropdown':'下拉选择','dropdowns':'下拉多选',
             'cascade':'级联组件','process':'进度组件','system_user':'系统用户','system_role':'系统角色','textarea':'多行控件','html':'HTML控件',
-            'wenzi':'文字控件','links':'按钮控件','suphelp':'穿透帮助','billno':'编号规则','scan':'扫码组件','sign':'手写签名','tag':'tag输入信息'
+            'wenzi':'文字控件','links':'按钮控件','suphelp':'穿透帮助','suphelps':'穿透多选','billno':'编号规则','scan':'扫码组件','sign':'手写签名','tag':'tag输入信息'
         };
         var lable = `<label ${labid} class="sfdp-label">${field[type]}</label>`;
         switch (type) {
             case 'text':
-                 html = '<div class="sfdp-input-block"><input  type="text"  placeholder="请输入信息~" disabled class="sfdp-input"></div>';
+                html = '<div class="sfdp-input-block"><input  type="text"  placeholder="请输入信息~" disabled class="sfdp-input"></div>';
                 break;
             case 'billno':
                 html = '<div class="sfdp-input-block"><input  type="text"  placeholder="系统自动编号规则" disabled class="sfdp-input"></div>';
@@ -947,80 +1301,83 @@ var sfdp = {
                 html = '<div class="sfdp-input-block"><input  type="text"  placeholder="tag输入信息" disabled class="sfdp-input"></div>';
                 break;
             case 'edit':
-                 html = '<div class="sfdp-input-block"><textarea  disabled class="sfdp-input"></textarea></div> ';
+                html = '<div class="sfdp-input-block"><textarea  disabled class="sfdp-input"></textarea></div> ';
                 break;
             case 'number':
-                 html = '<div class="sfdp-input-block"><input  type="number"  placeholder="" disabled class="sfdp-input"></div>';
+                html = '<div class="sfdp-input-block"><input  type="number"  placeholder="" disabled class="sfdp-input"></div>';
                 break;
             case 'money':
-                 html = '<div class="sfdp-input-block"><input  type="money"  placeholder="" disabled class="sfdp-input"></div>';
+                html = '<div class="sfdp-input-block"><input  type="money"  placeholder="" disabled class="sfdp-input"></div>';
                 break;
             case 'upload':
-                 html = '<div class="sfdp-input-block">文件上传</div>';
+                html = '<div class="sfdp-input-block">文件上传</div>';
                 break;
             case 'upload_img':
-                 html = '<div class="sfdp-input-block">图片上传 </div>';
+                html = '<div class="sfdp-input-block">图片上传 </div>';
                 break;
             case 'suphelp':
                 html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
                 break;
+            case 'suphelps':
+                html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
+                break;
             case 'checkboxes':
-                 html = '<div class="sfdp-input-block">选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled></div> ';
+                html = '<div class="sfdp-input-block">选项1<input type="checkbox"  placeholder="" disabled> 选项2<input type="checkbox"  placeholder="" disabled></div> ';
                 break;
             case 'radio':
-                 html = '选项1<input type="radio"  placeholder="" disabled> 选项2<input type="radio"  placeholder="" disabled> ';
+                html = '选项1<input type="radio"  placeholder="" disabled> 选项2<input type="radio"  placeholder="" disabled> ';
                 break;
             case 'date':
-                 html = '<div class="sfdp-input-block"><input type="text"  placeholder="" disabled class="sfdp-input"></div> ';
+                html = '<div class="sfdp-input-block"><input type="text"  placeholder="" disabled class="sfdp-input"></div> ';
                 break;
             case 'time_range':
-                 html = '<div class="sfdp-input-block"><input type="text"  placeholder="" disabled class="sfdp-input"></div>';
+                html = '<div class="sfdp-input-block"><input type="text"  placeholder="" disabled class="sfdp-input"></div>';
                 break;
             case 'dropdown':
-                 html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
+                html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
                 break;
             case 'dropdowns':
-                 html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
+                html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
                 break;
             case 'cascade':
-                 html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
+                html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
                 break;
             case 'process':
-                 html = '<div class="sfdp-input-block"><div id="progressBar"><div id="progressBar_Track"></div></div></div>';
+                html = '<div class="sfdp-input-block"><div id="progressBar"><div id="progressBar_Track"></div></div></div>';
                 break;
             case 'system_user':
-                 html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div>';
+                html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div>';
                 break;
             case 'system_role':
-                 html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
+                html = '<div class="sfdp-input-block"><select disabled class="sfdp-input"><option value ="请选择">请选择</option></select></div> ';
                 break;
             case 'textarea':
-                 html = '<div class="sfdp-input-block"><textarea  disabled class="sfdp-input"></textarea></div> ';
+                html = '<div class="sfdp-input-block"><textarea  disabled class="sfdp-input"></textarea></div> ';
                 break;
             case 'html':
-                 html = '<b style="color: blue;">Look this is a HTML</b>';
+                html = '<b style="color: blue;">Look this is a HTML</b>';
                 break;
             case 'wenzi':
-                 html = '默认现实的文本';
+                html = '默认显示的文本';
                 break;
             case 'links':
-                 html = '<a class="button">按钮<a/>*默认内容即为链接地址 ';
+                html = '<a class="button">按钮<a/>*默认内容即为链接地址 ';
                 break;
             case 'group':
                 lable = '';
-                 html = '<fieldset ' + labid + '  class="layui-elem-field layui-field-title sfdp-label" style="text-align: left;border-width: 1px 0 0;float: left;width: 95%;"><legend>分组标题 </legend></fieldset>';
+                html = '<fieldset ' + labid + '  class="layui-elem-field layui-field-title sfdp-label" style="text-align: left;border-width: 1px 0 0;float: left;width: 95%;"><legend>分组标题 </legend></fieldset>';
                 break;
 
         }
         if(mode=='zhubiao'){
-            return `<div class="move_field" >${lable+html}<b class="ico red" id="del_con">㊀</b></div>`;
+            return `<div class="move_field" >${lable+html}<b title="点击可删除组件" class="ico red" id="del_con">㊀</b></div>`;
         }else{
             return html;
         }
     },
     /*5.0.1 数据库设计自动带数据*/
     sys_config: function () {
-        var json_data = JSON.parse(localStorage.getItem("json_data"));
+        var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         var xEdit = '', xDel = '', xStatus = '', xWorkFlow = '', XImport = '', XDelAll = '', XCopy = '';
         if (json_data.tpfd_btn === 'undefined') {
             json_data.tpfd_btn = {};
@@ -1049,7 +1406,7 @@ var sfdp = {
         }
 
         if (json_data.tpfd_del=='0') {
-           var s_del = 'checked';
+            var s_del = 'checked';
         }else{
             var s_del2 = 'checked';
         }
@@ -1063,6 +1420,18 @@ var sfdp = {
         }else{
             var s_saas2 = 'checked';
         }
+        if (json_data.s_form_submit=='0') {
+            var s_form_submit = 'checked';
+        }else{
+            var s_form_submit2 = 'checked';
+        }
+        if (json_data.s_form_print=='0') {
+            var s_form_print = 'checked';
+        }else{
+            var s_form_print2 = 'checked';
+        }
+
+
         if (json_data.s_sys_check=='0' || json_data.s_sys_check==undefined ) {
             var s_sys_check = 'checked';
         }else{
@@ -1080,12 +1449,17 @@ var sfdp = {
         }
         var html = '<form id="configform"> <div class="sfdp-form-item"><label class="sfdp-label">表单标题</label><div class="sfdp-input-block"><input name="name" type="text" value="' + json_data.name + '" class="sfdp-input"></div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">数据表名</label><div class="sfdp-input-block"><input name="name_db" type="text" value="' + (json_data.name_db) + '"' + ((look_db) == '1' ? 'readonly' : '') + ' class="sfdp-input"></div></div>' +
-            '<div class="sfdp-form-item"><label class="sfdp-label">列表控件</label><div class="sfdp-input-block"><input  name="tpfd_btn" value=add type="checkbox" checked  onclick="return false;">添加 <input  name="tpfd_btn" value=Edit type="checkbox" ' + xEdit + ' >编辑 <input  name="tpfd_btn" value=Del type="checkbox" ' + xDel + ' >删除 <input  name="tpfd_btn" value=View type="checkbox" checked  onclick="return false;">查看 <input  name="tpfd_btn" value=Status ' + xStatus + ' type="checkbox">核准 <input  name="tpfd_btn" value=WorkFlow type="checkbox" ' + xWorkFlow + '>工作流 <input  name="tpfd_btn" value=DelAll type="checkbox" ' + XImport + '>导入 <input  name="tpfd_btn" value=DelAll type="checkbox" ' + XDelAll + '>批删 <input  name="tpfd_btn" value=Copy type="checkbox" ' + XCopy + '>复制 </div></div>' +
+            '<div class="sfdp-form-item"><label class="sfdp-label">列表控件</label><div class="sfdp-input-block"><input  name="tpfd_btn" value=add type="checkbox" checked  onclick="return false;">添加 <input  name="tpfd_btn" value=Edit type="checkbox" ' + xEdit + ' >编辑 <input  name="tpfd_btn" value=Del type="checkbox" ' + xDel + ' >删除 <input  name="tpfd_btn" value=View type="checkbox" checked  onclick="return false;">查看 <input  name="tpfd_btn" value=Status ' + xStatus + ' type="checkbox">核准 <input  name="tpfd_btn" value=WorkFlow type="checkbox" ' + xWorkFlow + '>工作流 <input  name="tpfd_btn" value=Import type="checkbox" ' + XImport + '>导入 <input  name="tpfd_btn" value=DelAll type="checkbox" ' + XDelAll + '>批删 <input  name="tpfd_btn" value=Copy type="checkbox" ' + XCopy + '>复制 </div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">数据软删</label><div class="sfdp-input-block">' +
             '<input  name="tpfd_del" value=0 type="radio" ' + (s_del || '') + '>是' +
             '<input  name="tpfd_del" value=1 type="radio" ' + (s_del2 || '') + '>否</div><label class="sfdp-label">租户模式</label><div class="sfdp-input-block">' +
             '<input  name="tpfd_saas" value=0 type="radio" ' + (s_saas || '') + '>是' +
             '<input  name="tpfd_saas" value=1 type="radio" ' + (s_saas2 || '') + '>否</div></div>' +
+            '<div class="sfdp-form-item"><label class="sfdp-label">打印组件</label><div class="sfdp-input-block">' +
+            '<input  name="s_form_print" value=0 type="radio" ' + (s_form_print || '') + '>UE' +
+            '<input  name="s_form_print" value=1 type="radio" ' + (s_form_print2 || '') + '>Hiprint</div><label class="sfdp-label">表单提交</label><div class="sfdp-input-block">' +
+            '<input  name="s_form_submit" value=0 type="radio" ' + (s_form_submit || '') + '>回车提交数据' +
+            '<input  name="s_form_submit" value=1 type="radio" ' + (s_form_submit2 || '') + '>禁用回车提交</div></div>' +
             '<div class="sfdp-form-item"><label class="sfdp-label">鉴别信息</label><div class="sfdp-input-block">' +
             '<input  name="s_sys_check" value=0 type="radio" ' + (s_sys_check || '') + '>关闭' +
             '<input  name="s_sys_check" value=1 type="radio" ' + (s_sys_check2 || '') + '>开启</div><label class="sfdp-label">编辑条件</label><div class="sfdp-input-block">' +
@@ -1111,7 +1485,7 @@ var sfdp = {
     /*5.0.1 初始化系统配置*/
     int_data: function (int_data,type=0) {
         if (int_data === 1) {
-            var local_data = localStorage.getItem("json_data");
+            var local_data = localStorage.getItem("json_data_"+design_main_id);
             if (local_data != null) {
                 var desc_data = local_data;
             }
@@ -1119,9 +1493,9 @@ var sfdp = {
             var desc_data = int_data;
         }
         if (int_data == null || int_data === 1) {
-            localStorage.setItem("json_data", JSON.stringify(sfdp.sfdp_int_data(type)));
+            localStorage.setItem("json_data_"+design_main_id, JSON.stringify(sfdp.sfdp_int_data(type)));
         } else {
-            localStorage.setItem("json_data", JSON.stringify(int_data));
+            localStorage.setItem("json_data_"+design_main_id, JSON.stringify(int_data));
             if(type==0){
                 $('#fb_name').html(desc_data.name + '(DbTable:' + desc_data.name_db + ')');
                 for (x in desc_data.list) {
@@ -1160,18 +1534,19 @@ var sfdp = {
         $.each(heads, function () {
             head_html += '<th style="text-align: center">' + this + '</th>';
         });
-        html = '<fieldset  id="' + data.id + '_field"  mode="field" > <legend id="' + data.id + '_title">　' + (data.title || '请设置子表单标题') + '　<b class="ico red" id="del" data="' + data.id + '" >㊀</b>　</legend><div class="sfdp-rows " id="' + data.id + '" mode="zibiao"><div class="view-action"></div><table style="font-size: 12px;"><tr style="background-color: #f2f2f2;">'+head_html+'</tr><tr id="' + data.id + '_tr">'+html+'</tr></table></div></fieldset>';
+        html = '<fieldset  id="' + data.id + '_field"  mode="field" > <legend id="' + data.id + '_title">　' + (data.title || '请设置子表单标题') + '　<b title="点击可删除组件" class="ico red" id="del" data="' + data.id + '" >㊀</b>　</legend><div class="sfdp-rows " id="' + data.id + '" mode="zibiao"><div class="view-action"></div><table style="font-size: 12px;"><tr style="background-color: #f2f2f2;">'+head_html+'</tr><tr id="' + data.id + '_tr">'+html+'</tr></table></div></fieldset>';
         $('#sfdp-main').append(html);
         $(".fb-fz").sortable({
             opacity: 0.5,
             revert: true,
             animation: 150,
             stop: function (event, ui) {
+
                 var field_code = $(ui.item).children('label').attr("data-code");
                 //拖动放置后的代码转换，或者代码处理
                 if(field_code !==undefined){
                     var field_id = $(ui.item).children('label').attr("data-id");
-                    var json_data = JSON.parse(localStorage.getItem("json_data"));
+                    var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
                     var old_tr = json_data.list[field_code].data[field_id];
                     /*旧数据的样式处理下*/
                     $('#'+field_code+' #'+old_tr.td).addClass("fb-fz ui-sortable");
@@ -1215,7 +1590,7 @@ var sfdp = {
     },
     /*5.0.1 字段信息设置*/
     field_config: function (type, id, parent_code) {
-        var all_data = JSON.parse(localStorage.getItem("json_data"));
+        var all_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         var mode = $('#' + parent_code).attr('mode') || 'zhubiao';
         if (mode === 'zhubiao') {
             var default_data = all_data['list'][parent_code]['data'][id];
@@ -1248,15 +1623,15 @@ var sfdp = {
             return;
         }
         if (!DbFieldExp.test(params.tpfd_db)) {
-            sfdp.ShowTip('　数据表段有误　');
+            sfdp.ShowTip(`　检查不通过：${params.tpfd_db}字段应为英文且为小写　`);
             return;
         }
         if (params.tpfd_name === '') {
-            sfdp.ShowTip('　标题不能为空　');
+            sfdp.ShowTip('　检查不通过：标题不能为空　');
             return;
         }
         if (params.tpfd_dbcd === '') {
-            sfdp.ShowTip('　数据字段长度不能为空　');
+            sfdp.ShowTip('　检查不通过：数据字段长度不能为空　');
             return;
         }
         if(s_type != 1){
@@ -1268,6 +1643,8 @@ var sfdp = {
             sfdp.dataSave(params, params.tr_id, 'td_data');
         } else {
             sfdp.dataSave(params, params.tr_id, 'sublist_datasave');
+            $('.trdata').remove();
+            sfdp.rec_field2(params.tr_id);
         }
         $("#up_save").trigger("click");
     },
@@ -1284,7 +1661,7 @@ var sfdp = {
                 logout('仅允许使用小写字母和数字和下划线~');
                 return;
             }
-            var json_data = JSON.parse(localStorage.getItem("json_data"));
+            var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
             json_data['name'] = params.name;
             json_data['name_db'] = params.name_db;
             json_data['tpfd_btn'] = params.tpfd_btn;
@@ -1296,7 +1673,9 @@ var sfdp = {
             json_data['tpfd_open'] = params.tpfd_open;
             json_data['s_sys_check'] = params.s_sys_check;
             json_data['s_sys_edit'] = params.s_sys_edit;
-            localStorage.setItem("json_data", JSON.stringify(json_data));
+            json_data['s_form_print'] = params.s_form_print;
+            json_data['s_form_submit'] = params.s_form_submit;
+            localStorage.setItem("json_data_"+design_main_id, JSON.stringify(json_data));
             sfdp.ShowTip(' 设置成功 ！');
             setTimeout(function () {
                 $("#up_save").trigger("click");
@@ -1338,13 +1717,13 @@ var sfdp = {
     },
     /*5.0.1 附表设计*/
     build_fb: function (old_data = '') {
-        var json_data = JSON.parse(localStorage.getItem("json_data"));
+        var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         if (json_data.name === '') {
             sfdp.ShowTip(' 请先执行基础配置！');
             return;
         }
         var code = 'Id' + sfdp.dateFormat(new Date(), "hhmmssS");
-        $('#sfdp-main').append('<fieldset id="' + code + '_field" mode="field"> <legend id="' + code + '_title">子表设计</legend><div class="sfdp-rows " mode="zibiao" id="' + code + '"><div class="view-action"><b class="ico" id="del" data="' + code + '" >㊀</b></div><div class="col-6 sfdp-field-con fb-fz"  id="1"></div><div class="col-6 sfdp-field-con fb-fz" id="2"></div></div></fieldset>');
+        $('#sfdp-main').append('<fieldset id="' + code + '_field" mode="field"> <legend id="' + code + '_title">子表设计</legend><div class="sfdp-rows " mode="zibiao" id="' + code + '"><div class="view-action"><b title="点击可删除组件" class="ico" id="del" data="' + code + '" >㊀</b></div><div class="col-6 sfdp-field-con fb-fz"  id="1"></div><div class="col-6 sfdp-field-con fb-fz" id="2"></div></div></fieldset>');
         if (old_data === '') {
             sfdp.dataSave({id: code, title: '', data: {}, type: 2}, code, 'sublist');
         }
@@ -1352,7 +1731,7 @@ var sfdp = {
     },
     /*5.0.1 布局模式设计*/
     build_bj: function (old_data = '',tdnum=2) {
-        var json_data = JSON.parse(localStorage.getItem("json_data"));
+        var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         if (json_data.name === '') {
             sfdp.ShowTip(' 请先执行基础配置！');
             return;
@@ -1363,9 +1742,9 @@ var sfdp = {
         for (var i = 1; i <= tdnum; i++) {
             tdhtml += `<div class="col-${col} sfdp-field-con fb-fz"  id="${i}"></div>`;
         }
-        $('#sfdp-main').append(`<div class="sfdp-rows" id="${code}"><div class="view-action"><b class="ico" id="del" data="${code}" >㊀</b></div>${tdhtml}</div>`);
+        $('#sfdp-main').append(`<div class="sfdp-rows" id="${code}"><div class="view-action"><b title="点击可删除组件" class="ico" id="del" data="${code}" >㊀</b></div>${tdhtml}</div>`);
         if (old_data === '') {
-            sfdp.dataSave({tr: code, data: {}, type: 2, show: 1}, code, 'tr');
+            sfdp.dataSave({tr: code, data: {}, type: tdnum, show: 1}, code, 'tr');
         }
         sfdp.setSortable();
         $("#up_save").trigger("click");
@@ -1413,7 +1792,7 @@ var sfdp = {
         for (var i = 1; i <= id; i++) {
             html += '<div class="col-' + lan + ' sfdp-field-con fb-fz" id=' + i + '></div>';
         }
-        html = '<div class="sfdp-rows " id="' + code + '"><div class="view-action"><b class="ico" id="del" data="' + code + '" >㊀</b></div>' + html + '</div>';
+        html = '<div class="sfdp-rows " id="' + code + '"><div class="view-action"><b title="点击可删除组件" class="ico" id="del" data="' + code + '" >㊀</b></div>' + html + '</div>';
         var logs = '新增1*' + id + '单元行';
         if (old_data === '') {
             sfdp.dataSave({tr: code, data: {}, type: id}, code, 'tr');
@@ -1422,6 +1801,7 @@ var sfdp = {
             logout('[恢复]' + logs);
         }
         if (showtype === '') {
+
             $('#sfdp-main').append(html);
             $(".fb-fz").sortable({
                 opacity: 0.5,
@@ -1432,8 +1812,9 @@ var sfdp = {
                     //拖动放置后的代码转换，或者代码处理
                     if(field_code !==undefined){
                         var field_id = $(ui.item).children('label').attr("data-id");
-                        var json_data = JSON.parse(localStorage.getItem("json_data"));
+                        var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
                         var old_tr = json_data.list[field_code].data[field_id];
+
                         /*旧数据的样式处理下*/
                         $('#'+field_code+' #'+old_tr.td).addClass("fb-fz ui-sortable");
                         $('#'+field_code+' #'+old_tr.td).removeClass("fb-disabled ui-sortable-disabled");
@@ -1448,6 +1829,14 @@ var sfdp = {
                         sfdp.dataSave({tpfd_id: old_tr.tpfd_id}, field_code, 'td_del');//删除旧的
                         sfdp.dataSave(old_tr, parent_code, 'tr_data');
                         $(this).html($(ui.item));
+                        $('#'+parent_code+' #'+parent_td +' .move_field').addClass("ui-draggable ui-draggable-handle");
+                        $('#label'+field_id).attr("data-code",parent_code);
+                        $('.move_field').draggable({
+                            connectToSortable: ".fb-fz",
+                            helper: "original",
+                            revert: "invalid",
+                            cursor: "move"
+                        });
                         $("#up_save").trigger("click");
                     }else{
                         var type = $(this).children('div').children('a').attr("data");
@@ -1456,6 +1845,20 @@ var sfdp = {
                         $(this).removeClass("ui-sortable");
                         $(this).addClass("fb-disabled");
                         $(".fb-disabled").sortable("disable");
+
+                        if(type=='user_field'){
+                            var json = $(this).children('div').children('a').attr("data-json");
+                            var json = JSON.parse(json);
+                            var td_id = json.td_type + '_' + sfdp.dateFormat(new Date(), "yyyyMMddhhmmssS");
+                            $(this).html(sfdp.bulid_tpl(json.td_type, parent_code, $(this).attr("id"),td_id));
+                            json.td = $(this).attr("id");
+                            json.tpfd_id = td_id;
+                            json.tr_id = parent_code
+                            sfdp.fb_set_return(json);
+                            sfdp.dataSave(json, parent_code, 'tr_data');
+                            $("#up_save").trigger("click");
+                            return;
+                        }
                         $(this).html(sfdp.bulid_tpl(type, parent_code, $(this).attr("id")));
                     }
                 }
@@ -1473,6 +1876,7 @@ var sfdp = {
             for (x in td_data) {
                 var type = td_data[x]['td_type'];
                 var parent_code = old_data['tr'];
+
                 var html = sfdp.bulid_tpl(type, parent_code, td_data[x]['td'], td_data[x]['tpfd_id']);
                 var elem = $('#' + parent_code).children('div').eq(td_data[x]['td']);
                 elem.removeClass("fb-fz");
@@ -1488,7 +1892,7 @@ var sfdp = {
     },
     /*5.0.1 判断存储的数据是否存在*/
     has_item: function (Item) {
-        var json_data = JSON.parse(localStorage.getItem("json_data"));
+        var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         if (json_data[Item] === '') {
             alert('参数' + Item + '未配置！');
             return;
@@ -1565,7 +1969,7 @@ var sfdp = {
         if(dataType==''){
             layer_msg('未选择添加组件！');return;
         }
-        var all_data = JSON.parse(localStorage.getItem("json_data"));
+        var all_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         var default_data = all_data['sublist'][dataCode]['data'];
         var td_xh = Object.keys(default_data).length + 1
         sfdp.dataSave(td_xh, dataCode, 'sublist_num');
@@ -1573,10 +1977,26 @@ var sfdp = {
         var dataId = dataType + '_' + sfdp.dateFormat(new Date(), "yyyyMMddhhmmssS");
         sfdp.dataSave({td: td_xh, td_type: dataType, tpfd_id: dataId}, dataCode, 'sublist_data');
         var html = sfdp.field_config(dataType, dataId, dataCode);
-        $('#trdata').after(`<tr class="trdata"><td>${td_xh}</td><td>${html}</td> </tr>`);
+        $('#zbcon').html(html);
+    },
+    rec_field2:function(dataCode){
+        var all_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
+        var default_data = all_data['sublist'][dataCode]['data'];
+        var news_data  = [];
+        $.each(default_data,function(index,obj){
+            news_data.push(obj);
+        });
+        var new_datas = sfdp.sortByKey(news_data,'td','asc');
+        $.each(new_datas,function(index,obj){
+            $('#trdata').after(`<tr class="trdata"><td data-id="${obj.td}" style="text-align: center"><a style="font-size: 6px;padding: 1px 3px;" class="button" onclick=sfdp.del_sub(this,"${obj.tpfd_id}","${obj.tr_id}","${obj.td}")>删</a> <a style="font-size: 6px;padding: 1px 3px;" class="button" onclick=sfdp.moveUp(this)> 上移 </a>  <a style="font-size: 6px;padding: 1px 3px;" class="button" onclick=sfdp.moveDown(this)> 下移 </a></td><td style="text-align: center" onclick=sfdp.set_sub_sx('${obj.td_type}','${obj.tpfd_id}','${dataCode}')>${obj.tpfd_name}(${obj.tpfd_db})<input name="tpfd_id" type="hidden" value="${obj.tpfd_id}"><input name="tr_id" type="hidden" value="${obj.tr_id}"></td> <td style="text-align: center">${obj.td_type}</td><td style="text-align: center">${obj.tpfd_dbcd}</td></tr>`);
+        });
+    },
+    set_sub_sx:function(td_type,tpfd_id,dataCode){
+        var html = sfdp.field_config(td_type, tpfd_id, dataCode);
+        $('#zbcon').html(html);
     },
     rec_field(dataCode){
-        var all_data = JSON.parse(localStorage.getItem("json_data"));
+        var all_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         var default_data = all_data['sublist'][dataCode]['data'];
         var obj = [{'pv':100,'uv':105},{'pv':123,'uv':132},{'pv':128,'uv':138},{'pv':88,'uv':68}];
         var news_data  = [];
@@ -1619,7 +2039,7 @@ var sfdp = {
         if (current.index() > 0) {
             current.insertBefore(prev); //插入到当前<tr>前一个元素前
         }
-        var all_data = JSON.parse(localStorage.getItem("json_data"));
+        var all_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         var tr_id = current.children('td').eq(1).find('input[name=tr_id]').val();//
         var tpfd_id = current.children('td').eq(1).find('input[name=tpfd_id]').val();//本
         var ptpfd_id = prev.children('td').eq(1).find('input[name=tpfd_id]').val();//上一个
@@ -1636,15 +2056,16 @@ var sfdp = {
         sfdp.dataSave(ptr_data, tr_id, 'sublist_data');
         $("#up_save").trigger("click");
     },
-     moveDown(obj) {
+    moveDown(obj) {
         var current = $(obj).parent().parent(); //获取当前<tr>
         var next = current.next(); //获取当前<tr>后面一个元素
         if (next.length>0) {
             current.insertAfter(next);  //插入到当前<tr>后面一个元素后面
-            var all_data = JSON.parse(localStorage.getItem("json_data"));
+            var all_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
             var tr_id = current.children('td').eq(1).find('input[name=tr_id]').val();//
             var tpfd_id = current.children('td').eq(1).find('input[name=tpfd_id]').val();//本
             var ptpfd_id = next.children('td').eq(1).find('input[name=tpfd_id]').val();//上一个
+            console.log(tr_id);
             var default_data = all_data['sublist'][tr_id]['data'];
             var tr_data = default_data[tpfd_id];
             var ptr_data = default_data[ptpfd_id];
@@ -1663,23 +2084,23 @@ var sfdp = {
         }
     },
     del_sub(obj,tpfd_id,tr_id,xh){
-            $(obj).parent().parent().remove();
-            sfdp.dataSave({tpfd_id: tpfd_id}, tr_id, 'sublist_td_del');
-            var all_data = JSON.parse(localStorage.getItem("json_data"));
-            var default_data = all_data['sublist'][tr_id]['data'];
+        $(obj).parent().parent().remove();
+        sfdp.dataSave({tpfd_id: tpfd_id}, tr_id, 'sublist_td_del');
+        var all_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
+        var default_data = all_data['sublist'][tr_id]['data'];
 
-            $.each(default_data,function(index,val) {
-                if(val.td > xh){
-                    val.td = val.td-1;
-                    sfdp.dataSave(val, tr_id, 'sublist_data');
-                }
-            });
-            sfdp.dataSave(Object.keys(default_data).length, tr_id, 'sublist_num');
-            $('.trdata').remove();
-            sfdp.rec_field(tr_id);
+        $.each(default_data,function(index,val) {
+            if(val.td > xh){
+                val.td = val.td-1;
+                sfdp.dataSave(val, tr_id, 'sublist_data');
+            }
+        });
+        sfdp.dataSave(Object.keys(default_data).length, tr_id, 'sublist_num');
+        $('.trdata').remove();
+        sfdp.rec_field2(tr_id);
 
-            $("#up_save").trigger("click");
-        },
+        $("#up_save").trigger("click");
+    },
     /*7.0.1*/
     default_data(val){
         if(val.indexOf("{uid}") >= 0 ) {
@@ -1691,6 +2112,12 @@ var sfdp = {
         if(val.indexOf("{username}") >= 0 ) {
             return  g_username;
         }
+        if(val.indexOf("{realname}") >= 0 ) {
+            return  parent.g_soft_realname;
+        }
+        if(val.indexOf("{rolename}") >= 0 ) {
+            return  parent.g_soft_rolename;
+        }
         if(val.indexOf("{nowdate}") >= 0 ) {
             return  sfdp.dateFormat(new Date(), "yyyy-MM-dd");
         }
@@ -1701,7 +2128,7 @@ var sfdp = {
     },
     showInform(obj, type,name) {
         if(type==0){
-            var tmp = `<span onclick="sfdp.set_tip_data('${name}','{uid}')">用户id:{uid}</span><br/><span onclick="sfdp.set_tip_data('${name}','{role}')">用户角色id:{role}</span><br/><span onclick="sfdp.set_tip_data('${name}','{username}')">用户姓名:{username}</span><br/><span onclick="sfdp.set_tip_data('${name}','{nowdate}')">当前日期:{nowdate}</span>`
+            var tmp = `<span onclick="sfdp.set_tip_data('${name}','{uid}')">用户id:{uid}</span><br/><span onclick="sfdp.set_tip_data('${name}','{role}')">用户角色id:{role}</span><br/><span onclick="sfdp.set_tip_data('${name}','{username}')">操作员名:{username}</span><br/><span onclick="sfdp.set_tip_data('${name}','{nowdate}')">当前日期:{nowdate}</span><br/><span onclick="sfdp.set_tip_data('${name}','{nowdatetime}')">日期时间:{nowdatetime}</span><br/><span onclick="sfdp.set_tip_data('${name}','{realname}')">真实姓名:{realname}</span><br/><span onclick="sfdp.set_tip_data('${name}','{rolename}')">角色名字:{rolename}</span>`
         }
         if(type==1){
             var zzys = {"*":"不能为空！", "*6-16":"请填写6到16位任意字符！", "n":"请填写数字！", "n6-16":"请填写6到16位数字！", "s":"不能输入特殊字符！", "s6-18":"请填写6到18位字符！", "p":"请填写邮政编码！", "m":"请填写手机号码！", "e":"邮箱地址格式不对！", "url":"请填写网址！", "idcard":"身份证格式不正确！"}
@@ -1716,7 +2143,32 @@ var sfdp = {
         }
     },
     set_tip_data(obj,val){
+        $('#tpfd_yztype_divTip').remove()
+        $('#tpfd_zanwei_divTip').remove()
         $('input[name="'+obj+'"]').val(val);
+    },
+    open_design(url,sid=''){
+        return layer.open({
+            type:2,
+            area: ['99.5%', '99.5%'],
+            fix: false, // 不固定
+            title: "业务设计",
+            shade: 0,
+            anim:'slideUp',
+            content: url,
+            success: function (layero, index) {
+                var title = layero.find('.layui-layer-title'); // Get the title element
+                title.css({
+                    'height': '0px', // Set the font size
+                    'border': '0px', // Set the color
+                    // Add your other CSS properties here
+                });
+            },
+            cancel: function(index, layero, that){
+                localStorage.removeItem('json_data_'+sid);//清空设计数据，减少干扰
+                layer.close(index);
+            }
+        });
     }
 }
 /*5.0.1 日志输出信息*/
@@ -1739,24 +2191,25 @@ $("#sfdp-main").on("click", ".sfdp-rows", function (e) {
     var activeDom = $(this).attr('id');
     var show= 1;
     var mode = $(this).attr('mode') || 'zhubiao';
-    var json_data = JSON.parse(localStorage.getItem("json_data"));
+    var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
     var default_data = [{cid: 0, clab: '隐藏'}, {cid: 1, clab: '显示'}];
     if (mode === 'zibiao') {
         var rownum = json_data.sublist[activeDom].type;
-        var html = '<style>.trdata .sfdp-label{min-width:60px;}.trdata .sfdp-form-item{margin-bottom: 2px;clear: none;}.trdata .sfdp-title,.wybs,.zjkd{display: none}.trdata .sfdp-input{width: 90px}</style><div class="sfdp-form-item">' +
+        var html = '<style>.trdata .sfdp-label{min-width:60px;}.trdata .sfdp-form-item{margin-bottom: 2px;clear: none;}.trdata .sfdp-title,.wybs,.zjkd{display: none}.trdata .sfdp-input{width: 90px}</style><div class="sfdp-form-item" style="padding-top: 10px;">' +
             '<label class="sfdp-label">子表标识</label><div class="sfdp-input-block"><input type="text" readonly id="row-id" value="' + activeDom +  '" class="sfdp-input"></div> <label class="sfdp-label">子表标题</label><div class="sfdp-input-block"><input id="row-title" autocomplete="off"  type="text" value="' + (json_data.sublist[activeDom].title || '请设置子表单标题') + '" class="sfdp-input"></div><label class="sfdp-label">子表列数</label><div class="sfdp-input-block"><input readonly id="zibiaonum" type="text" value="' + rownum + '" class="sfdp-input"></div><label class="sfdp-label" >添加列</label><div class="sfdp-input-block"><select id="type"><option value="text">文本</option><option value="number">数字</option><option value="money">金额</option><option value="upload">上传</option><option value="dropdown">下拉</option><option value="date">时间日期</option><option value="textarea">多行文本</option><option  value="time_range">时间范围</option><option value="dropdowns">下拉多选</option><option value="cascade">级联组件</option><option value="tag">tag输入</option></select><div class="button" onclick=sfdp.add_field("text","'+activeDom+'")>添加</div></div></div>' +
             '' +
-            '<div class="sfdp-form-item" style="padding: 10px;"><table class="table"><tr class="text-c title" id="trdata" style="background-color: #f2f2f2;"><th width="4%">序号</th><th width="96%">子表配置</th></tr></table></div></form> ';
+            '<div class="sfdp-form-item">' +
+            '<div class="layui-row layui-col-space15"><div class="col-7"><div class="sfdp-card"><div class="sfdp-card-head">子表字段</div><div class="sfdp-card-body" style="height: 750px;overflow-y: auto;"><table class="table"><tr class="text-c title" id="trdata" style="background-color: #f2f2f2;"><th style="width: 30%;text-align: center">序号</th><th style="width: 40%;text-align: center">字段信息</th><th style="width: 15%;text-align: center">字段类型</th><th style="width: 15%;text-align: center">字段长度</th></tr></table></div></div></div><div class="col-5"><div class="sfdp-card"><div class="sfdp-card-body" style="height: 750px;overflow-y: auto;"><div id="zbcon"><div class="sfdp-card-head">属性配置</div></div></div></div></div></div></div></form> ';
         layer.open({
             type: 1,
             title: '子表设计 Schedule Set',
-            area: ['95%', '55%'], //宽高
+            area: ['55%', '85%'], //宽高
             content: html,
             cancel: function(index, layero){
                 window.location.reload();
             }
         });
-        sfdp.rec_field(activeDom);
+        sfdp.rec_field2(activeDom);
         return;
     } else {
         var zbtitle = '';
@@ -1771,6 +2224,13 @@ $("#sfdp-main").on("click", ".sfdp-rows", function (e) {
 
 /*5.0.1 监听删除点击事件*/
 $("#sfdp-main").on("click", "#del", function (event) {
+    const is_del = confirm("是否继续执行删除操作？");
+    if (!is_del) {
+       return;
+    }
+
+
+
     var mode = $('#' + $(this).attr("data")).attr('mode') || 'zhubiao';
     if (mode === 'zhubiao') {
         $('#' + $(this).attr("data")).remove();
@@ -1830,7 +2290,7 @@ $(document).on("input propertychange", "#row-num", function (e) {
         elem.eq(-1).remove();
     }
     sfdp.setSortable();
-    var json_data = JSON.parse(localStorage.getItem("json_data"));
+    var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
     var show = $("select[name='show']").find("option:selected").val();
     var trdata = json_data.list[p_id].data;//Json数据
     if(num>nowcd){
@@ -1847,7 +2307,7 @@ $(document).on("input propertychange", "#row-num", function (e) {
 $(document).on('input propertychange', "select[name='show']", function(event) {
     var p_id = $('#row-id').val();
     var show = $(this).val();
-    var json_data = JSON.parse(localStorage.getItem("json_data"));
+    var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
     var trdata = json_data.list[p_id];
     trdata['show'] = show;
     sfdp.dataSave(trdata, p_id, 'tr');

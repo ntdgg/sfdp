@@ -19,7 +19,7 @@ use sfdp\fun\SfdpUnit;
 
 use sfdp\lib\unit;
 
-define('SFDP_Ver', '7.0.2' );
+define('SFDP_Ver', '7.0.0' );
 
 define('BEASE_SFDPURL', realpath ( dirname ( __FILE__ ) ) );
 
@@ -69,7 +69,8 @@ class Api
 				$data = input('post.');
 				return Control::api($act,$data);
 			 }else{
-               return Control::api($act,$sid);
+                $delbak = input('delbak') ?? '';
+               return Control::api($act,$sid,$delbak);
 			 }
 		}
 		if($act=='save' || $act=='fun_save'){
@@ -81,6 +82,12 @@ class Api
              $data['sid'] = $sid;
              return Control::api($act,$data);
          }
+         if($act=='user_field'){
+             $data = input('post.');
+             return Control::api($act,$data);
+         }
+
+
 		if($act=='fun_update'){
 			$data = ['id'=>input('id'),'status'=>input('status')];;
 			return Control::api($act,$data);

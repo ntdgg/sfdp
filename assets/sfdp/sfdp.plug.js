@@ -10,6 +10,8 @@ var sfdpPlug = {
     PlugInit:function (type,data,is_sub= false,Curd='add') {
         var maste ='';
         var read ='';
+        var auto ='';
+        var rule ='';
         var rows_label ='';
         if (data.tpfd_must == 0) {
             maste = ' datatype="*" nullmsg="请填写'+data.tpfd_name+'"';
@@ -20,7 +22,19 @@ var sfdpPlug = {
         if (data.tpfd_read == 0) {
             read = 'readonly';
         }
-        var field_att = read + maste;
+        if (data.tpfd_auto == 1 || data.tpfd_auto == undefined) {
+            auto = ' autocomplete=off ';
+        }
+
+        if (data.tpfd_rule != '' &&  data.tpfd_auto != undefined) {
+            rule = ` data-rule='${data.tpfd_rule || ''}'` ;
+        }
+
+        if(data.tpfd_yztype && data.tpfd_yztype!=''){
+             maste =`datatype="${data.tpfd_yztype}" errormsg="${data.tpfd_yztip}"`;
+        }
+
+        var field_att =  rule + auto + read + maste ;
         if (typeof (data['tpfd_name']) == 'undefined') {
             return sfdpPlug.view_default(type, data);
         } else {
@@ -74,15 +88,15 @@ var sfdpPlug = {
             dropdown  : sfdpPlug.view_select(data, item.tpfd_db, '' , '', item.id,'','',item),
             suphelp  : sfdpPlug.view_select(data, item.tpfd_db, '' , '', item.id,'','',item),
             //upload: sfdpPlug.view_upload(data, item.field, 0),
-            date : '<input  type="text"  placeholder="'+item.name+'起" data-format="yyyy-MM-dd" data-type="date" class="datetime sfdp-input layui-input"  name="@' + item.field + '[]"></div><div class="layui-input-inline" style="width:90px"><input  type="text"  placeholder="'+item.name+'止" data-format="yyyy-MM-dd" data-type="date" class="datetime sfdp-input layui-input"  name="@' + item.field + '[]">',
+            system_user:'<input name="' + item.field + '"  type="hidden" readonly id="' + item.fid + '"><input onclick=sfdp.openpage("用户组件","'+sfdp.url.user+'?id=' + item.fid  + '",{w:"90%",h:"60%"}) type="text" readonly id="' + item.fid + '_text" value="' + (item.text || '请选择') +'" style="width:100%;" class="layui-input">',
+            system_role:'<input name="' + item.field + '"  type="hidden" readonly id="' + item.fid + '"><input  type="text" readonly id="' + item.fid + '_text" value="' + (item.text || '请选择') +'" style="width:100%;" class="layui-input" onclick=sfdp.openpage("角色组件","'+sfdp.url.role+'?id=' + item.fid + '",{w:"90%",h:"60%"})>',
+            date : '<input  type="text"  placeholder="'+item.name+'" data-format="yyyy-MM-dd" data-type="date" class="time_range sfdp-input layui-input"  name="@' + item.field + '[]">',
+            datetime : '<input  type="text" style="width: 180px"  placeholder="'+item.name+'" data-format="yyyy-MM-dd" data-type="date" class="time_range sfdp-input layui-input"  name="@' + item.field + '[]">',
             //group : ''
         }
         return fieldArray[type] || '组件不支持';
     },
     common:function (type,data,att,Curd) {
-        if(data.tpfd_yztype && data.tpfd_yztype!=''){
-            var att =`datatype="${data.tpfd_yztype}" errormsg="${data.tpfd_yztip}"`;
-        }
 
         var name = data.tpfd_db,radios='',checkboxes='',view_selects='';
         var placeholder ='placeholder="'+(data.tpfd_moren || '')+'"';
@@ -92,10 +106,10 @@ var sfdpPlug = {
             var value =(data.value || '');
         }
         if(type=='radio'){
-            radios = sfdpPlug.checkboxes_clss(data.tpfd_id,'radio',att,name,value,data.tpfd_data,data.tpfd_check);
+            radios = sfdpPlug.checkboxes_clss(data.tpfd_id,'radio',att,name,value,data.tpfd_data,Curd);
         }
         if(type=='checkboxes'){
-            checkboxes = sfdpPlug.checkboxes_clss(data.tpfd_id,'checkboxes',att,name,value,data.tpfd_data,data.tpfd_check);
+            checkboxes = sfdpPlug.checkboxes_clss(data.tpfd_id,'checkboxes',att,name,value,data.tpfd_data,Curd);
         }
         if(type=='dropdown'){
             view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,'',data.rvalue,data);
@@ -108,24 +122,33 @@ var sfdpPlug = {
             view_selects = sfdpPlug.view_select2(data.tpfd_data, name, value , att, data.tpfd_id);
         }
         if(type=='money'){
-            var max_num= [1,10,100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000];
+            var max_num= [1,10,100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000, 1000000000000000000, 10000000000000000000];
             var szcd = ((data.tpfd_dbcd).split(','))[0] || 0
             var xscd = ((data.tpfd_dbcd).split(','))[1] || 0
-            var max_number = max_num[szcd-2] || 10;
+            var max_number = max_num[szcd-xscd] || 10;
         }
         if(type=='suphelp'){
             view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,'',data.rvalue,data);
         }
+        if(type=='suphelps'){
+            view_selects = sfdpPlug.view_select(data.tpfd_data, name, value , att, data.tpfd_id,1,data.rvalue,data);
+        }
+        var tpfd_prefix='';
+        if(data.tpfd_prefix){
+            tpfd_prefix = `<div class="layui-input-split layui-input-suffix">${data.tpfd_prefix}</div>`;
+        }
+
         var fieldArray = {
             process : `<div id="${data.tpfd_id}" class="${data.tpfd_id} scrollBar"></div><input type="hidden" ${att} value="${value}"  name="${name}"  ${placeholder} id="${data.tpfd_id}_input" class="${sfdp.ui.input_input}">`,
             suphelp : view_selects,
+            suphelps : view_selects,
             billno: '<input type="text" readonly ' + att + ' value="' + value + '" name="' + name + '"placeholder="保存后自动生成编码" id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
             scan: '<input style="width:85%;" type="text" readonly ' + att + ' value="' + value + '" name="' + name + '"placeholder="快速识别二维码功能" id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '"><a href="javascript:" class="layui-btn  layui-btn-primary layui-border-blue" onclick=sfdp.openpage("扫描","'+sfdp.url.api+'?act=scan&id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"510px",h:"610px"})><i class="layui-icon layui-icon-camera"></i> 扫描</a>',
             sign: '<span id="' + data.tpfd_id + '_sign" style="height:38px;padding-left: 10px;"><img width="100px" src="'+(data.value || '')+'" onclick=sfdp.view_img("'+(data.value || '')+'")></span><input type="hidden" readonly ' + att + ' value="' + value + '" name="' + name + '"placeholder="签名信息" id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '"><a href="javascript:" class="layui-btn  layui-btn-primary layui-border-blue" onclick=sfdp.openpage("签名信息","'+sfdp.url.api+'?act=sign&id=' + data.tpfd_id + '",{w:"610px",h:"510px"})><i class="layui-icon layui-icon-edit"></i> 签名</a>',
-            text : `<input type="text" ${att}  value="${value}" name="${name}"  ${placeholder} id="${data.tpfd_id}" class="${sfdp.ui.input_input}">`,
+            text : `<input type="text" ${att}  value="${value}" name="${name}"  ${placeholder} id="${data.tpfd_id}" class="${sfdp.ui.input_input}">${tpfd_prefix}`,
             tag : `<input type="text" ${att}  value="${value}" name="${name}"  ${placeholder} id="${data.tpfd_id}" class="${sfdp.ui.input_input} tagInput">`,
             number :'<input type="number" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '">',
-            money :'<input type="text" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '" onkeyup="this.value=/^[0-9]*\\.?[0-9]{0,'+(xscd || 0)+'}$/.test(this.value) ? this.value : this.value.substring(0,this.value.length-1)" onblur="if(this.value>'+(max_number || 0)+'){layer.msg(\'不符合，最大值为'+(max_number || 0)+'。\');this.value='+(max_number-1 || 0)+';}">',
+            money :'<input type="text" ' + att + ' value="' + value + '" name="' + name + '"  '+placeholder+' id="' + data.tpfd_id + '" class="' + sfdp.ui.input_input + '" onkeyup="this.value=/^[-]?[0-9]{0,'+(szcd || 0)+'}\\.?[0-9]{0,'+(xscd || 0)+'}$/.test(this.value) ? this.value : this.value.substring(0,this.value.length-1)" onblur="if(Math.abs(this.value)>'+(max_number || 0)+'){layer.msg(\'不符合，最大值为'+(max_number || 0)+'。\');this.value=this.value>0 ? '+(max_number-1 || 0)+' : -'+(max_number-1 || 0)+';}">'+tpfd_prefix,
             radio : radios,
             checkboxes : checkboxes,
             textarea  : '<textarea id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea>',
@@ -138,10 +161,10 @@ var sfdpPlug = {
             html : '<div style="min-height: 38px;line-height: 38px;">'+ (data.value || data.tpfd_moren) + '</div>',
             wenzi : '<div style="min-height: 38px;line-height: 38px;">'+ (data.value || data.tpfd_moren) + '</div>',
             links : `<div style="min-height: 38px;line-height: 38px;"><a href="//${data.tpfd_moren}" target="${data.tpfd_zanwei}" class="layui-btn layui-btn-primary layui-border-blue">${data.tpfd_name}</a></div>`,
-            system_user:'<input name="' + name + '"  type="hidden" readonly id="' + data.tpfd_id + '" value="' + value + '"><input  type="text" readonly id="' + data.tpfd_id + '_text" value="' + (data.text || '请选择') +'" style="width:85%;" class="layui-input"><a  href="javascript:" class="layui-btn  layui-btn-primary layui-border-blue" style="width:15%;" onclick=sfdp.openpage("用户组件","'+sfdp.url.user+'?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"90%",h:"60%"})><i class="layui-icon layui-icon-friends"></i> 选择</a>',
+            system_user:'<input name="' + name + '"  type="hidden" readonly id="' + data.tpfd_id + '" value="' + value + '"><input  type="text" readonly id="' + data.tpfd_id + '_text" value="' + (data.text || '请选择') +'" style="width:85%;" class="layui-input"><a  href="javascript:" class="layui-btn  layui-btn-primary layui-border-blue" style="width:15%;padding: 0 3px;" onclick=sfdp.openpage("用户组件","'+sfdp.url.user+'?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"90%",h:"60%"})><i class="layui-icon layui-icon-friends"></i> 选择</a>',
             system_role:'<input name="' + name + '"  type="hidden" readonly id="' + data.tpfd_id + '" value="' + value + '"><input  type="text" readonly id="' + data.tpfd_id + '_text" value="' + (data.text || '请选择') +'" style="width:85%;" class="layui-input"><a  href="javascript:" class="layui-btn  layui-btn-primary layui-border-blue" style="" onclick=sfdp.openpage("用户组件","'+sfdp.url.role+'?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"90%",h:"60%"})><i class="layui-icon layui-icon-group"></i> 选择</a>',
             upload_img:sfdpPlug.view_upload_img(data,att),
-            edit:'<div id="div' + data.tpfd_id + '">' + value +'</div><textarea style="display:none" id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea><script></script><script type="text/javascript">' +
+            edit:'<div id="div' + data.tpfd_id + '"><p>' + value +'</p></div><textarea style="display:none" id="' + data.tpfd_id + '" name="' + name + '" ' + att + ' class="' + sfdp.ui.input_textarea + '">' + value +'</textarea><script></script><script type="text/javascript">' +
                 '$.getScript("/static/lib/wangEditor.min.js",function(){var html = $(\'#' + data.tpfd_id + '\').val();const E = window.wangEditor; const editor = new E(\'#div' + data.tpfd_id + '\');editor.config.zIndex = 500;const $text1 = $(\'#' + data.tpfd_id + '\');  editor.config.onchange = function (html) {$text1.val(html)};editor.config.uploadImgServer="/gadmin/common/eupload";editor.config.uploadFileName ="file";editor.create();$text1.val(editor.txt.html());}); </script>',
             group:'',
         }
@@ -164,15 +187,31 @@ var sfdpPlug = {
         }
         for (const key in data) {
             var check ='';
+            if(rvalue===''){
+                var  strs=[data[value] ?? ''];
+            }
             if(data.hasOwnProperty(key)){
-                if (value !== undefined  && sfdpPlug.isInArray(strs, data[key])) {
+                if (value !== undefined  && sfdpPlug.isInArray(strs,data[key]+'')) {
                     check = 'selected';
+                }
+                if(rvalue !== undefined && sfdpPlug.isInArray((rvalue+'').split(","),key+'')){
+
+                }else{
+                    check = '';
                 }
                 tags += `<option value="${key}" ${check}>${data[key]}</option>`;
             }
         }
-        if(attr=='0' || jsonData.td_type=='suphelp'){
-            tags += `</select><a class="layui-btn layui-btn-primary" onclick="sfdpPlug.supHelp(${jsonData.tpfd_suphelp},'${jsonData.tpfd_name}','${selectId}')" style="border-left-width: 0px;"><i class="layui-icon">&#xe604;</i></a>`
+
+        if(attr=='0' || jsonData.td_type=='suphelp' || jsonData.td_type=='suphelps'){
+
+            if(jsonData.td_type=='suphelp'){
+                tags += `</select><a class="layui-btn layui-btn-primary" onclick="sfdpPlug.supHelp(${jsonData.tpfd_suphelp},'${jsonData.tpfd_name}','${selectId}')" style="border-left-width: 0px;"><i class="layui-icon">&#xe604;</i></a>`
+            }
+            if(jsonData.td_type=='suphelps'){
+                tags += `</select><a class="layui-btn layui-btn-primary" onclick="sfdpPlug.supHelp(${jsonData.tpfd_suphelp},'${jsonData.tpfd_name}','${selectId}','selects')" style="border-left-width: 0px;"><i class="layui-icon">&#xe604;</i></a>`
+            }
+
             }else{
             tags += `</select>`
         }
@@ -181,6 +220,9 @@ var sfdpPlug = {
     supHelp:function(sid,title,selectId='',act = 'select'){
         if(act=='select'){
             sfdp.openpage(title, 'index?sid='+sid+'&supHelp='+selectId);
+        }
+        if(act=='selects'){
+            sfdp.openpage(title, 'index?sid='+sid+'&supHelp='+selectId+'&is_dx=1');
         }
         if(act=='show'){
             sfdp.openpage(title, 'view?sid='+sid+'&id='+selectId);
@@ -198,31 +240,44 @@ var sfdpPlug = {
             }else{
                 var upload_url = data.tpfd_upload_action;
             }
-            var html = '<input type="text" style="width:85%;"class="layui-input" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '><span>' + '<a class="layui-btn layui-btn-primary layui-border-blue" style="" id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + upload_url + '?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"90%",h:"60%"})><i class="layui-icon layui-icon-upload-drag"></i>上传</a></span>';
+
+            //设置多附件加载数据
+            var file_html="";
+            if(data.value!="") {
+                $.ajax({
+                    url: "/gadmin/common/getFileTrHtml.html?ids=" + data.value,
+                    type: 'GET',
+                    async: false, // 设置为 false 表示同步请求
+                    success: function (res) { file_html = res; }
+                });
+            }
+            var html = '<input type="hidden" style="width:85%;" class="layui-input" name="' + data.tpfd_db + '" readonly id="' + data.tpfd_id + '" value=' + (data.value || '') + '>' +
+                '<table class="layui-table" style="margin-top: 0px;" id="table_'+data.tpfd_id+'"><thead><tr><td colspan="2"><a class="layui-btn layui-btn-primary layui-border-blue" style="" id="label_' + data.tpfd_id + '" onclick=sfdp.openpage("多文件上传","' + upload_url + '?id=' + data.tpfd_id + '&value=' + (data.value || '') + '",{w:"90%",h:"60%"})><i class="layui-icon layui-icon-upload-drag"></i>上传</a ></td></tr><tr><th>附件名</th><th width="80">查看</th></tr></thead><tbody>'+file_html+'</tbody></table>';
         }
         return html;
     },
-    checkboxes_clss:function (id, type = 'checkbox', att,name,value,data,def_check) {
+    checkboxes_clss:function (id, type = 'checkbox', att,name,value,data,Curd) {
         if(type==='checkboxes'){
             type = 'checkbox';
         }
         var htmls = '',check='';
-        if (value !== undefined ) {
+        if(Curd==='add'){
+            var  strs = [data[value] ?? ''];
+        }else{
             var strs = (value).split(",");
         }
+
         for (y in data) {
             check ='';
             if (value !== undefined  && sfdpPlug.isInArray(strs, data[y])) {
                 check = 'checked';
             }
             if(isNaN(id)){
-                if(value==='' || value == undefined){
-                    if (y == def_check && type=='radio') {
-                        check = 'checked';
-                    }
-                    if (def_check != null &&sfdpPlug.isInArray(def_check,y) && type=='checkbox') {
-                        check = 'checked';
-                    }
+                if (value == y && type=='radio') {
+                    check = 'checked';
+                }
+                if (sfdpPlug.isInArray(strs, data[y]) && type=='checkbox') {
+                    check = 'checked';
                 }
             }
             htmls += '<input ' + att + ' ' + check + ' name="' + name + '[]" value=' + y + ' type="' + type + '" title="'+data[y]+'"><a>&nbsp &nbsp' + data[y] + '&nbsp &nbsp</a>';
@@ -247,7 +302,7 @@ var sfdpPlug = {
             dropdown :'<label>下拉选择：</label><select ><option value ="请选择">请选择</option></select>',
             textarea :'<label>多行控件：</label><textarea   ></textarea>',
             html :'<label>HTML控件：</label><b style="color: blue;">Look this is a HTML</b>',
-            wenzi :'<label>文字控件：</label>默认现实的文本',
+            wenzi :'<label>文字控件：</label>默认显示的文本',
         }
         return fieldArray[type];
     },
@@ -260,6 +315,10 @@ var sfdpPlug = {
                 var tpfd_help = '"';
             }else{
                 var tpfd_help = `sfdp_tips" sfdp-tip-data="${data.tpfd_help}"`;
+            }
+            var tpfd_prefix='';
+            if(data.tpfd_prefix){
+                tpfd_prefix = `(${data.tpfd_prefix})`;
             }
             var lab = `<div><label class="${sfdp.ui.rows_label} ${tpfd_help} id="label_${data.tpfd_id}"><b>${data.tpfd_name}：</b></label><div class="${sfdp.ui.rows_block}" id="${sfdpPlug.htmlEncode(data.value)}">`;
             if (is_sub || data.tpfd_lable==0) {
@@ -275,7 +334,7 @@ var sfdpPlug = {
                         }else{
                             var upload_url = data.tpfd_upload_action;
                         }
-                    html = lab + `<label id="label_${data.tpfd_id}" onclick=sfdp.openpage("附件阅读","${upload_url}?act=view&id=${data.tpfd_id}&value=${data.value}",{w:"98%",h:"98%"})><span style="font-size: 16px; color: #5e7ce0;">查看附件<span style="color: #f00;font-size: 16px;position: absolute;left: 62px;top: -1px;">${data.value.split(',').length}</span></></label>`;
+                    html = lab + `<label id="label_${data.tpfd_id}" onclick=sfdp.openpage("附件阅读","${upload_url}?act=view&id=${data.tpfd_id}&value=${data.value}",{w:"98%",h:"98%"})><span style="font-size: 16px; color: #1890ff;">查看附件<span style="color: #f00;font-size: 16px;position: absolute;left: 62px;top: -1px;">${data.value.split(',').length}</span></></label>`;
                     }
                 }else{
                     if(data.value==null || data.value==''){
@@ -303,14 +362,18 @@ var sfdpPlug = {
             }else if(type==='process'){
                 html = lab +`<div id="progressBar"><div id="progressBar_Track" style="width: ${data.value}%;"></div><a class="action-value" style="left: ${data.value-2}%">${data.value}</a></div>`;
             }else if(type==='suphelp') {
-                html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data.rvalue}">${data.value}  <a class="layui-btn layui-btn-primary" onclick="sfdpPlug.supHelp(${data.tpfd_suphelp},'${data.tpfd_name}',${data.rvalue},'show')" style="border: 0px;color: #5e7ce0;"><i class="layui-icon">&#xe604;</i></a></div>`;
+                if(data.rvalue=='<span title="流程隐藏字段">******</span>'){
+                    html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" >${data.value} </div>`;
+                }else{
+                    html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data.rvalue}">${data.value}  <a class="layui-btn layui-btn-primary" onclick="sfdpPlug.supHelp(${data.tpfd_suphelp},'${data.tpfd_name}',${data.rvalue},'show')" style="border: 0px;color: #1890ff;"><i class="layui-icon">&#xe604;</i></a></div>`;
+                }
             }else if(type==='sign'){
                 html = lab + '<span id="' + data.tpfd_id + '_sign" style="height:38px;padding-left: 10px;"><img width="100px"src="'+(data.value || '')+'"onClick=sfdp.view_img("'+(data.value || '')+'")></span>';
             }else if(type==='wenzi'){
                 html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" >${data.tpfd_moren}</div>`;
             }else{
                 var data_value = sfdpPlug.htmlEncode(data.value);
-                html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data_value}">${data.value}</div>`;
+                html = lab + `<div style="min-height: 38px;line-height: 38px;" id="${data.tpfd_id}" data-value="${data_value}">${data.value}${tpfd_prefix}</div>`;
             }
         }
         return html + '</div></div>';

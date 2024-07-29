@@ -50,7 +50,7 @@ legend{
 .ico{
 	font-weight: 700;
     font-size: 12px;
-    color: #3963bc;
+    color: #1890ff;
 }
 .red{
 	margin-left: 5px;
@@ -64,7 +64,7 @@ legend{
 	margin-top: 10px;
 }
 .sfdp-top {
-	background-color: #3963bc;
+	background-color: #1890ff;
 	height: 50px;
 	line-height: 50px;
 	padding-left: 15px;
@@ -76,7 +76,7 @@ legend{
 	height: calc(100% - 52px);
 }
 #sfdp-main {
-	min-height: 500px;
+	min-height: 600px;
 	max-height: 960px;
 	height: calc(100% - 3px);
 	background-color: #FFFFFF;
@@ -96,7 +96,7 @@ legend{
 	transition: background-color .1s linear;
 	line-height: 18px;
 	color: #fff;
-	background-color: #3963bc;
+	background-color: #1890ff;
 	padding: 4px 12px;
 	border-radius: 4px;
 }
@@ -154,7 +154,7 @@ legend{
 	margin-top:3px;
 }
 .sfdp-tool-con:hover{
-	border: 1px #3963bc dashed;
+	border: 1px #1890ff dashed;
 }
 .view-action {
 	position: absolute;
@@ -165,7 +165,7 @@ legend{
 }
 .sfdp-ctrl-active {
 	position: relative;
-	border: 2px solid #3963bc;
+	border: 2px solid #1890ff;
 }
 .sfdp-rows{
 	position: relative;
@@ -173,7 +173,7 @@ legend{
 
 }
 .sfdp-rows:hover {
-	border: 1px dashed #3963bc;
+	border: 1px dashed #1890ff;
 }
 .sfdp-field-con {
 	height: 38px;
@@ -207,7 +207,7 @@ legend{
 	font-weight: 400;
 	line-height: 20px;
 	text-align: right;
-	color: #3963bc;
+	color: #1890ff;
 	font-weight: 800;
 	min-width: 100px;
 }
@@ -308,7 +308,7 @@ legend{
 #progressBar_Track {
 	width: 80%;
 	height: 10px;
-	background-color: #3963bc;
+	background-color: #1890ff;
 	-webkit-border-radius: 2em;
 	-moz-border-radius: 2em;
 	border-radius: 2em;
@@ -327,7 +327,7 @@ legend{
 	height: 15px;
 	display: inline-block;
 	border-radius: 50%;
-	background-color: #3963bc;
+	background-color: #1890ff;
 	left: -15px;
 	border: 1px solid #eee;
 	box-sizing: border-box;
@@ -356,7 +356,7 @@ legend{
 	width: 0;
 	left: 0;
 	z-index: 2;
-	background-color: #3963bc;
+	background-color: #1890ff;
 }
 
 .slider-range .action-value,#progressBar .action-value{
@@ -385,7 +385,7 @@ legend{
 	display: inline-block;
 	width: 20px;
 	height: 20px;
-	border: 1px solid #5e7ce0;
+	border: 1px solid #1890ff;
 	border-radius: 20px;
 	vertical-align: text-top;
 	outline: none;
@@ -408,7 +408,7 @@ legend{
 	display: block;
 	width: 12px;
 	height: 12px;
-	background: #5e7ce0;
+	background: #1890ff;
 	-webkit-border-radius: 12px;
 	-moz-border-radius: 12px;
 	border-radius: 12px;
@@ -421,7 +421,7 @@ legend{
 }
 
 #table input[type="radio"]:checked {
-	border-color: #5e7ce0;
+	border-color: #1890ff;
 }
 
 #table input[type="radio"]:checked:after {
@@ -435,3 +435,24 @@ legend{
 	height: 16px;
 }
 
+.sfdp-card-head{
+	position: relative;
+	height: 42px;
+	line-height: 42px;
+	padding: 0 15px;
+	border-bottom: 1px solid #f8f8f8;
+	color: #333;
+	border-radius: 2px 2px 0 0;
+	font-size: 14px;
+}
+.sfdp-card{
+	border-radius: 2px;
+	background-color: #fff;
+	box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+}
+
+.sfdp-card-body {
+	position: relative;
+	padding: 10px 15px;
+	line-height: 24px;
+}

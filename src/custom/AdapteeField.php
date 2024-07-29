@@ -93,4 +93,18 @@ class AdapteeField{
             return  false;
         }
     }
+    function addFieldUser($data){
+        $info = Db::name('sfdp_user_field')->insertGetId($data);
+        if($info){
+            return  $info;
+        }else{
+            return  false;
+        }
+    }
+    function user_field_del($id){
+        return Db::name('sfdp_user_field')->delete($id);
+    }
+    function selectFieldUser(){
+        return Db::name('sfdp_user_field')->select()->toArray();
+    }
 }

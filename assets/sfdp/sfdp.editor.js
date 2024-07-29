@@ -99,13 +99,13 @@ var sfdpEditor = {
         });
     },
     check_data_ids: function (ids){
-        var json_data = JSON.parse(localStorage.getItem("json_data"));
+        var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
         $.each(json_data.list.Editor.data,function(index,value){
             if($.inArray( index,ids)==-1){
                 delete json_data.list.Editor.data[index];
             }
         });
-        localStorage.setItem("json_data", JSON.stringify(json_data));
+        localStorage.setItem("json_data_"+design_main_id, JSON.stringify(json_data));
     },
     /*清空未使用的字段信息*/
     check_data_con: function (con){

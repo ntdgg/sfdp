@@ -170,7 +170,23 @@ class Field{
         }else{
             return ['code'=>1,'msg'=>'写入数据库出错。'];
         }
+    }
 
+    static function user_field($data=[]){
+        if(empty($data)){
+            return (new Field())->mode->selectFieldUser();
+        }else{
+            $data['update_time']= time();
+            $res = (new Field())->mode->addFieldUser($data);
+            if($res){
+                return ['code'=>0,'msg'=>'添加成功'];
+            }else{
+                return ['code'=>1,'msg'=>'写入数据库出错。'];
+            }
+        }
+    }
+    static function user_field_del($id){
+        return (new Field())->mode->user_field_del($id);
     }
 	
 	

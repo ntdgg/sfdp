@@ -140,22 +140,20 @@ class Design{
                 if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
                     //函数名转为数据信息
                     if($v2['td_type']=='cascade'){
-                        $temp = array_column(Data::getFun2($v2['checkboxes_func'],'all'), 'name', 'id');
-                        $v2['tpfd_data'] = $temp;
+                        $v2['tpfd_data'] = self::set_c(Data::getFun2($v2['checkboxes_func'],'all'));
                     }else{
                         $v2['tpfd_data'] = Data::getFun($v2['checkboxes_func'],'all');
                     }
                 }
-                if($v2['td_type']=='suphelp'){
+                if($v2['td_type']=='suphelp'||$v2['td_type']=='suphelps'){
                     $fieldSup[$v2['tpfd_id']] = $v2['tpfd_suphelp_where'];
                     $v2['tpfd_data'] =Data::getFun3($v2);
-
                 }
                 if(isset($v2['tpfd_db']) and(isset($v2['tpfd_list']))){
                     if(($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes')and($v2['tpfd_list']=='yes')){
                         $fieldArr[$v2['tpfd_db']]=$v2['tpfd_data'];
                     }
-                    if($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'||$v2['td_type']=='suphelp'){
+                    if($v2['td_type']=='dropdowns'||$v2['td_type']=='cascade'||$v2['td_type']=='dropdown'||$v2['td_type']=='radio'||$v2['td_type']=='checkboxes'||$v2['td_type']=='suphelp'||$v2['td_type']=='suphelps'){
                         $fieldArrAll[$v2['tpfd_db']]=$v2['tpfd_data'];
                     }
                 }
@@ -164,6 +162,27 @@ class Design{
         $load_file = SfdpUnit::Loadfile($field['name_db'],$field['tpfd_class'],$field['tpfd_script']);
         return ['sid'=>$sfdp_ver_info['id'],'db_name'=>$field['name_db'],'load_file'=>$load_file,'btn'=>$field['tpfd_btn'],'field'=>rtrim($listid, ','),'search'=>$searct_field,'fun'=>unit::uJs($sfdp_ver_info),'title'=>$sfdp_ver_info['s_name'],'fieldArr'=>$fieldArr,'fieldArrAll'=>$fieldArrAll,'fieldSysUser'=>$fieldSysUser,'fieldSysProcess'=>$fieldSysProcess,'fieldSysImg'=>$fieldSysImg,'fieldSup'=>$fieldSup,'fieldSysSign'=>$fieldSysSign];
     }
+    static function set_c($array){
+        $result = [];
+        foreach ($array as $item) {
+            $name = $item['name'];
+            $pid = $item['pid'];
+            $parentName = '';
+            while ($pid != 0) {
+                foreach ($array as $parentItem) {
+                    if ($parentItem['id'] == $pid) {
+                        $parentName = $parentItem['name'] . '->' . $parentName;
+                        $pid = $parentItem['pid'];
+                        break;
+                    }
+                }
+            }
+
+            $result[$item['id']] = $parentName . $name;
+        }
+        return $result;
+    }
+
     /**
      * 获取数据
      */
@@ -177,6 +196,7 @@ class Design{
          }else{
             $config = unit::sConfig($sfdp_ver_info,$load_file,$sid);
         }
+        $keyfield = [];
         $nofield = [];
         foreach ($field['list'] as $key=>$item) {
             foreach ($item['data'] as $v) {
@@ -184,9 +204,12 @@ class Design{
                     $info = Bill::findWhere(['type'=>$sfdp_ver_info['sid'],'state'=>1]);
                     $nofield = [$v['tpfd_db'],$info['name'] ?? '',$info['lenth'] ?? ''];
                 }
+                if(isset($v['tpfd_key']) && $v['tpfd_key']=='0'){
+                    $keyfield[] = [$v['tpfd_db'],$v['tpfd_name']];
+                }
             }
         }
-        return ['info'=>$sfdp_ver_info,'fun'=>$config[0],'nofield'=>$nofield,'load_file'=>$load_file,'config'=>$config[1]];
+        return ['info'=>$sfdp_ver_info,'fun'=>$config[0],'nofield'=>$nofield,'keyfield'=>$keyfield,'load_file'=>$load_file,'config'=>$config[1]];
     }
     static function fieldFun($sfdp_ver_info){
         $field = json_decode($sfdp_ver_info,true);
@@ -199,7 +222,7 @@ class Design{
                         $field['list'][$k]['data'][$k2]['tpfd_data'] = Data::getFun($v2['checkboxes_func']);
                     }
                 }
-                if($v2['td_type']=='suphelp'){
+                if($v2['td_type']=='suphelp'||$v2['td_type']=='suphelps'){
                     $field['list'][$k]['data'][$k2]['tpfd_data'] =Data::getFun3($v2,'view');
                 }
             }

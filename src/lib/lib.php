@@ -198,7 +198,7 @@ php;
   <link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.1" />
   <script src="{$patch}lib/jquery-3.4.1.min.js?v=7.0"></script>
 	<script src="{$patch}lib/layer/3.1.1/layer.js"></script>
-	<script src="{$patch}sfdp.7.0.js?v=7.0.1"></script>
+	<script src="{$patch}sfdp.7.0.js?v=240319"></script>
 </head>
 <body style="padding:20px">
  <table>
@@ -428,10 +428,16 @@ php;
 		$script = $urls['api'].'?act=script&sid='.$fid;
         $mysql = $urls['api'].'?act=mysql&sid='.$fid;
         $fix = $urls['api'].'?act=fix2&sid='.$fid;
+        $user_field = $urls['api'].'?act=user_field&sid='.$fid;
         $op = [];
         $op[]=['cid'=>-1,'clab'=>'请选择关联的业务信息'];
         foreach($list as $k=>$v){
             $op[]=['cid'=>$v['id'],'clab'=>$v['s_title']];
+        }
+        $field_list = Field::user_field();
+        $fild_html ='';
+        foreach ($field_list as $k => $v){
+            $fild_html.="<div class='sfdp-tool-con'><a data='user_field' data-json='{$v['field_json']}'>&#8194;<b class='ico'>Α</b>&#8194;{$v['field_title']}</a></div>";
         }
         $op_json = json_encode($op);
 		return <<<php
@@ -443,7 +449,7 @@ php;
 			<div id="ctlMenus" class="sfdp-con" style="float: left; width: 240px;">
 				<div class="sfdp-tool-title">容器中枢 Design control area</div>
 				&#8194;&#8194;
-				<div class="button" onclick='sfdp.sys_config()'>配置</div><div class="button" id='up_save'>保存</div><div onclick='window.location.reload()' class="button">刷新</div><div class="button" onClick=sfdp.Askshow("{$fix}","【更新】对布局或字段进行调整,确定是否执行?")>更新</div>
+				<div class="button" onclick='sfdp.sys_config()'>配置</div><div class="button" id='up_save'>保存</div><div onclick='window.location.reload()' class="button">刷新</div><div class="button" onClick=sfdp.AskshowFix("{$fix}","【更新】对布局或字段进行调整,确定是否执行?")>更新</div>
 				<div class="sfdp-cl" ></div>
 				<div class="sfdp-tool-title sfdp-mt10">页面布局 Form control library</div>
 				<style>
@@ -464,7 +470,8 @@ php;
 				</div>
 				<div class='sfdp-tool-fix'onclick='sfdp.openfullpage("构建助手","{$mysql}")'><a>&#8194;<b class='ico'>ς</b>&#8194;构建助手 </a></div>
 				<div class="sfdp-cl"></div>
-				<div class="sfdp-tool-title sfdp-mt10">表单控件 Form control library</div>
+				<div class="sfdp-tool-title sfdp-mt10">表单控件 Form library <a style='float:right;color:blue;padding-right: 20px;' onclick='set_filed()'>内置</a></div>
+				    <div id="field_1">
 					<div class="sfdp-tool-con" ><a data="text">&#8194;<b class='ico'>Α</b>&#8194;文本组件</a></div>
 					<div class="sfdp-tool-con" ><a data="number">&#8194;<b class='ico'>½</b>&#8194;数字组件</a></div>
 					<div class="sfdp-tool-con" ><a data="money">&#8194;<b class='ico'>￥</b>&#8194;金额组件</a></div>
@@ -488,6 +495,11 @@ php;
 					<div class="sfdp-tool-con"><a data="scan">&#8194;<b class='ico'>~</b>&#8194;扫码组件</a></div>
 					<div class="sfdp-tool-con"><a data="sign">&#8194;<b class='ico'>⊱</b>&#8194;签名组件</a></div>
 					<div class="sfdp-tool-con"><a data="tag">&#8194;<b class='ico'>ω</b>&#8194;Tag组件</a></div>
+					<div class="sfdp-tool-con"><a data="suphelps">&#8194;<b class='ico'>Ð</b>&#8194;穿透多选</a></div>
+					</div>
+					<div id="field_2" style="display:none;">
+					{$fild_html}
+					</div>
 				<div class="sfdp-cl"></div>
 				<div class="sfdp-tool-title sfdp-mt10">内置组件 System control library</div>
 					<div class="sfdp-tool-con" ><a data="system_user">&#8194;<b class='ico'>ρ</b>&#8194;系统用户</a></div>
@@ -519,6 +531,8 @@ php;
 			var s_type = 0;
 			const server_url ='{$server_save}';
 			const server_yw_data = {$op_json};
+            const design_main_id = {$fid};
+            const user_field_url = '{$user_field}';
 		    $(function(){
 				sfdp.int_data({$json});
 			});
@@ -528,12 +542,29 @@ php;
 				  revert: "invalid",
 				  cursor: "move"
 			});
+			function set_filed(){
+                var field1 = document.getElementById('field_1');
+                var field2 = document.getElementById('field_2');
+                
+                if (field2.style.display === 'none' || field2.classList.contains('hidden')) {
+                    field2.style.display = 'block';
+                    field2.classList.remove('hidden');
+                    field1.style.display = 'none';
+                    field1.classList.add('hidden');
+                } else {
+                    field2.style.display = 'none';
+                    field2.classList.add('hidden');
+                    field1.style.display = 'block';
+                    field1.classList.remove('hidden');
+                }
+			}
+			
 			
 			$( "#sfdp-main" ).sortable({
 			    stop: function( event, ui ) {
 			        let obj = {}
 			        let obj2 = []
-			        const json_data = JSON.parse(localStorage.getItem("json_data"));
+			        const json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
 			        const sortedList = $("#sfdp-main div.sfdp-rows ")
 			        for(let i= 0; i< sortedList.length ;i++){
 			            let item = sortedList[i]
@@ -553,10 +584,13 @@ php;
 			});
             $(document).on("input propertychange", "#tpfd_name", function (e) {
                 var formclass = $(this).parent().parent().parent().attr('class');
+                if(localStorage.getItem("auto_py")==1){
+                    return;
+                }
                 $("."+formclass+" #tpfd_db").val($("."+formclass+" #tpfd_name").toPinyin().toLowerCase());
             });
 			$("#up_save").click(function(){
-				var int_data = localStorage.getItem("json_data");
+				var int_data = localStorage.getItem("json_data_"+design_main_id);
 				var id='{$fid}';
 				$.ajax({  
 					 url:'{$save}',
@@ -646,6 +680,7 @@ php;
                 <a class="button" onclick="install(load_form_check)">提交验证脚本<a/> 
                 <a class="button" onclick="install(load_end_view)">查看页面脚本<a/> 
                 <a class="button" onclick="install(load_list_fun)">列表页面脚本<a/>
+                <a class="button" onclick="install(load_list_after)">列表数据加载后<a/>
 				<a class="button" onclick="install(load_end_time_done)">日期回调函数<a/>
 				<a class="button" onclick="install(load_suphelp_fun)">穿透回调<a/>
 				<a class="button" onclick="install(load_sub_check)">子表回调<a/>
@@ -671,7 +706,7 @@ php;
                 theme: "dracula",	//设置主题
                  matchBrackets: true,
               });
-		   editor.setSize('auto',document.body.clientHeight - 140 +"px");
+		   editor.setSize('auto',document.body.clientHeight - 190 +"px");
 		   layer.open({
               type: 2,
               title: '开发字段库',
@@ -691,49 +726,80 @@ php;
      * @param  Array $info 设计数据
      * @param  int   $sid 设计ID
      */
-    public static function mysql(){
+    public static function mysql($sid){
         $tmp = self::commontmp('Sfdp超级表单设计器');
         $patch = unit::gconfig('static_url');
+        $sfdp_ai = unit::gconfig('sfdp_ai');
+        $fid =$sid;
         return <<<php
 	{$tmp['css']}
 		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/codemirror.css" />
 		<link rel="stylesheet" type="text/css" href="{$patch}lib/codemirror/dracula.css" />
+		<style>
+		    .CodeMirror {
+                height: 600px;
+            }
+		</style>
 		<script src="{$patch}lib/codemirror/codemirror.js"></script>
 		<script src="{$patch}lib/codemirror/javascript.js"></script>
+		<div style="margin: 10px;">
 		<table class="table">
 			<tr valign="center">
-			<td style='width:35px;text-align:center'>构建助手说明</td>
-			<td style='width:330px;text-align: left;'>
-			    *你可以使用 导出的数据表，快速构建一个项目模型
+			<td style='width:35px;text-align:center'><b>智能构建</b></td>
+			<td style='width:330px;text-align: left;' colspan='3'>
+			    <input id='keyword' placeholder="请输入开发的模块名称，如合同管理,人员信息,盖章系统等等！" class="sfdp-input"  style="width:550px;display: inline;"> 
+			    <button  class="button" onclick="get_ai()">&nbsp;&nbsp;开始分析&nbsp;&nbsp;</button>
 			</td>
 			</tr>
 			<tr valign="center">
-			<td style='width:35px;text-align:center'>建表语句</td><td style='width:330px' >
-			<textarea placeholder="请填写JQ脚本代码！" type="text/plain" style="width:100%;height:450px;display:inline-block;" id='code'></textarea> </td>
-			</tr>
-			<tr valign="center">
-			<td style='width:35px;text-align:center'>字段完善</td>
-			<td style='width:330px;text-align: left;' id='field'>
+			<td style='width:35px;text-align:center'><b>建表语句</b></td><td valign='top' style='width:330px' >
+			<textarea type="text/plain" style="width:100%;height:650px;display:inline-block;" id='code'></textarea> </td>
+			<td style='width:35px;text-align:center'><b>字段完善</b></td>
+			<td style='width:330px;text-align: left;' id='field' valign=top>
 			        
 			</td>
 			</tr>
 			<tr valign="center">
-			<td style='text-align:center' colspan='2' id="btn">
+			<td style='text-align:center' colspan='4' id="btn">
 			    <button  class="button" onclick="save()">&nbsp;&nbsp;数据分析执行&nbsp;&nbsp;</button>
-			    
+			   
 			</td>
 			</tr>
 		</table>
+		</div>
 	{$tmp['js']}
 	<script type="text/javascript" language="javascript">
+	    const design_main_id = {$fid};
 	    var field =[]; //组成字段数组
 		  var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 			lineNumbers: true,
-         lineWrapping: true,
+            lineWrapping: true,
 			mode: "text/typescript",
 			theme: "dracula",	//设置主题
 			 matchBrackets: true,
 		  });
+		  editor.setSize('auto',document.body.clientHeight - 240 +"px");
+		  function get_ai(){
+		    var keyword = $(`#keyword`).val();
+		    var loding = layer.msg('智能分析中..', {icon: 16,shade: 0.3,time: false});
+            $.ajax({
+                    url: `{$sfdp_ai}`,
+                    data: {keyword:keyword},
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.code==0){
+                            layer.close(loding);
+                            editor.setValue(res.data.replace("```sql", "").replace("```", ""))
+                            $('#btn').html(`<button  class="button" onclick="save()">&nbsp;&nbsp;数据分析执行&nbsp;&nbsp;</button>`);
+                        }else{
+                            layer.alert(res.data);
+                        }
+                    },
+                    error: function(err) {
+                    }
+                });
+		  }
 		  function build(){
 		      $('#btn').html(``);
 		      var data = [];
@@ -788,9 +854,9 @@ php;
 		                field_json[code].data[td_id].xx_type = 0
 		             }
              });
-             var json_data = JSON.parse(localStorage.getItem("json_data"));
+             var json_data = JSON.parse(localStorage.getItem("json_data_"+design_main_id));
                 json_data.list = field_json;
-		        localStorage.setItem("json_data", JSON.stringify(json_data));
+		        localStorage.setItem("json_data_"+design_main_id, JSON.stringify(json_data));
 		        parent.$("#up_save").trigger("click");
 		        layer.msg('构建成功，页面即将刷新',{icon:1,time: 3500},function(){
                     parent.location.reload(); // 父页面刷新
@@ -799,12 +865,12 @@ php;
 		  }
 		   function save(){
 		        $('#btn').html(`<button  class="button" onclick="build()" style="background-color: #e55417;">&nbsp;&nbsp;立即构建&nbsp;&nbsp;</button>`);
-		        var Reg = /`(?<Field>\S+)` (?<FieldType>[a-z\d()]+) .*?COMMENT '(?<FieldNote>.*?)'/;
+		        var Reg = /`(?<Field>\S+)` (?<FieldType>[a-z\d()]+) .*?comment '(?<FieldNote>.*?)'/;
 		        var data = editor.getValue().split(',');;
 		        $.each(data,function(index,value){
-		            var f = Reg.exec(value);
+		            var f = Reg.exec(value.toLowerCase());
 		            if(f != null){
-                        if(jQuery.inArray(f.groups.Field, [ 'id', 'uid','status','create_time','update_time','uptime']) == -1){
+                        if(jQuery.inArray(f.groups.Field, [ 'id', 'uid','status','is_delete','create_time','update_time','uptime']) == -1){
                             field.push(f.groups);
                         }
 		            }

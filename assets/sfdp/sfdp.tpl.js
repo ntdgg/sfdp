@@ -97,6 +97,12 @@ var load_form_check='\n\rfunction load_form_check(curform){\r' +
     '' +
     '}';
 
+/*表单提交前校验*/
+var load_list_after='\n\rfunction load_list_after(data){\r' +
+    '//Eg:data 为加载后的事件；\r' +
+    '' +
+    '}';
+
 /*编辑页面加载后事件*/
 var load_end_fun='\n\rfunction load_end_fun(act){\n\r' +
     '//Eg:去读某个字段的值：$(\'#dropdown_2021233\').val()；\r' +

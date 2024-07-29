@@ -86,7 +86,7 @@ class Control{
                 BuildFun::Bfun($sid['function'],$bill);
                 unit::errJSMsg('Success,脚本生成成功！',$urls['api'].'?act=script&sid='.$sid['sid']);
             }
-            return lib::mysql();
+            return lib::mysql($sid);
         }
 		if($act =='script'){
 			if($sid !='' && is_array($sid)){
@@ -96,6 +96,10 @@ class Control{
 			}
 			return lib::script(Script::script($sid),$sid);
 		}
+        if($act =='user_field'){
+           return Field::user_field($sid);
+        }
+
 		if($act =='save'){
 			return json(Design::saveDesc($sid,'save'));
 		}
@@ -116,7 +120,7 @@ class Control{
 		}
 		/*免部署生成*/
         if($act =='fix2'){
-        	$ret = BuildFix::Bfix($sid);
+        	$ret = BuildFix::Bfix($sid,$map);
         	if($ret['code']==-1){
 
             }
@@ -132,17 +136,22 @@ class Control{
                         return json(['code'=>1,'msg'=>unit::errMsg(3001)]);
                     }
                     $db_field_array[] = $v2['tpfd_db'];
-                    if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
-                        $ret = Data::getFun($v2['checkboxes_func']);;
-                        if(isset($ret['code'])){
-                            return json($ret);
+                    //如果传递了map则忽略函数检查/插件安装
+                    if($map<>1){
+                        if(isset($v2['xx_type']) && $v2['xx_type']==1 && $v2['td_type']!='time_range' && $v2['td_type']!='date'){
+                            $ret = Data::getFun($v2['checkboxes_func']);;
+                            if(isset($ret['code'])){
+                                return json($ret);
+                            }
                         }
                     }
                 }
             }
+
             if (count($db_field_array) != count(array_unique($db_field_array))) {
                 return json(['code'=>1,'msg'=>unit::errMsg(3002)]);
             }
+
 			$ret =  BuildTable::hasDbbak($json['name_db']);
 			if($ret['code']==1){
 				 Design::saveDesc(['s_db_bak'=>1,'s_look'=>1,'id'=>$sid],'update');
@@ -283,7 +292,7 @@ class Control{
         if($act =='customShow'){
             $json = View::ver($sid['sid']);
             if($sid['show_type']==1||$sid['show_type']==2){
-                if($sid['show_fun']!='sys_role'){
+                if($sid['show_fun']!='sys_role' && $sid['show_fun']!='sys_tab_status'){
                     $ret = Data::getFun($sid['show_fun']);;
                     if((isset($ret['errCode']) || (isset($ret['code']) && $ret['errCode']!=3004))){
                         return $ret;
@@ -533,7 +542,7 @@ class Control{
 			if(unit::gconfig('return_mode')==1){
 				return view(ROOT_PATH.'/edit.html',['showtype'=>'edit','config'=>$data['data']['config'],'data'=>$data['info']]);
 				}else{
-				return ['config'=>$data['data']['config'],'data'=>$data['info'],'bill_info'=>$data['bill_info']];
+				return ['config'=>$data['data']['config'],'keyfield'=>$data['keyfield'],'data'=>$data['info'],'bill_info'=>$data['bill_info']];
 			}
 		}
 		if($act =='del'){	
@@ -558,7 +567,7 @@ class Control{
 		}
         if($act =='info'){
             $data = Design::getAddData($sid);
-            return ['config'=>$data['config'],'nofield'=>$data['nofield'],'data'=>$data['info']['s_field']];
+            return ['config'=>$data['config'],'nofield'=>$data['nofield'],'keyfield'=>$data['keyfield'],'data'=>$data['info']['s_field']];
         }
         if($act=='Data'){
             return M::Save($data);

@@ -22,10 +22,25 @@ class BuildFix{
 	/**
 	 * 创建数据表
 	 */
-	public static function Bfix($sid)
+	public static function Bfix($sid,$delbak=0)
 	{
 		$info = Design::find($sid);
 		$json = Design::getDesignJson($sid);
+        //增加如果强制删除备份表
+        //存在备份表
+        if($delbak==1){
+            //判断是否有附表
+            if(isset($json['sublist']) && $json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
+                $delsubtable = BuildStable::delDbbak($json['name_db'],$json['sublist']);
+                if($delsubtable['code']==1){
+                    return $Stable;
+                }
+            }
+            $deltable = BuildTable::delDbbak($json['name_db']);
+            if($deltable['code']==0){
+                Design::saveDesc(['add_time'=>time(),'s_db_bak'=>0,'id'=>$sid],'update');
+            }
+        }
 		if(isset($json['sublist']) && $json['sublist']!='' && is_array($json['sublist']) && count($json['sublist'])>0){
             $old_field = View::ver($sid);//当前版本数据
             $old_sid = $old_field['ver']['id'];
@@ -111,12 +126,12 @@ class BuildFix{
 						$new_modue_name[array_search($fiels['name'],$old_modue_name)] =$v['tpfd_name'];
 					}
 				}
-                $checkboxes_func = '';
-                $xx_type ='';
-                if(isset($v['xx_type']) && $v['xx_type'] == 1){
-                    $xx_type=1;
-                    $checkboxes_func = $v['checkboxes_func'];
-               }
+               // $checkboxes_func = '';
+               // $xx_type ='';
+                //if(isset($v['xx_type']) && isset($v['tpfd_type']) && $v['xx_type'] == 1){
+                    $xx_type=$v['xx_type'] ?? '';
+                    $checkboxes_func = $v['checkboxes_func'] ?? '';
+               //}
 				$update[$fiels['id']] =['field'=>$v['tpfd_db'],'name_type'=>$v['tpfd_dblx'],'type_data'=>json_encode($v['tpfd_data'] ?? '',true),'length'=>$v['tpfd_dbcd'],'data'=>$xx_type,'name'=>$v['tpfd_name'],'function'=>$checkboxes_func];
 			}else{
 				//新增字段信息

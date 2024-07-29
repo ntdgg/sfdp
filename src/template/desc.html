@@ -1,6 +1,6 @@
 <html>
 <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
-<link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.0" />
+<link rel="stylesheet" href="{$patch}sfdp.7.0.css?v=7.0.9" />
 <body>
 <style>
     .btn-list-group {
@@ -127,7 +127,7 @@
         sfdp.int_data({$json|raw},1);
     });
     $("#up_save").click(function(){
-        var int_data = localStorage.getItem("json_data");
+        var int_data = localStorage.getItem("json_data_"+design_main_id);
         var id='{$fid}';
         $.ajax({
             url:'{$save}',
